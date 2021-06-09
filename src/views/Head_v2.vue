@@ -851,11 +851,12 @@
                           >
                             <template v-slot:selection="{ item, index }">
                               <v-chip
-                                color="rgba(19,84,122,.5)"
+                                color="primary"
                                 dark
                                 label
                                 close
                                 close-icon="mdi-close-outline"
+                                @click:close="removeSelectedDistrict(item)"
                                 v-if="index === 0"
                               >
                                 <span>{{ item }}</span>
@@ -971,11 +972,12 @@
                           >
                             <template v-slot:selection="{ item, index }">
                               <v-chip
-                                color="rgba(19,84,122,.5)"
+                                color="primary"
                                 dark
                                 label
                                 close
                                 close-icon="mdi-close-outline"
+                                @click:close="removeSelectedRegion(item)"
                                 v-if="index === 0"
                               >
                                 <span>{{ item }}</span>
@@ -1082,11 +1084,12 @@
                           >
                             <template v-slot:selection="{ item, index }">
                               <v-chip
-                                color="rgba(19,84,122,.5)"
+                                color="primary"
                                 dark
                                 label
                                 close
                                 close-icon="mdi-close-outline"
+                                @click:close="removeSelectedZone(item)"
                                 v-if="index === 0"
                               >
                                 <span>{{ item }}</span>
@@ -1193,11 +1196,12 @@
                           >
                             <template v-slot:selection="{ item, index }">
                               <v-chip
-                                color="rgba(19,84,122,.5)"
+                                color="primary"
                                 dark
                                 label
                                 close
                                 close-icon="mdi-close-outline"
+                                @click:close="removeSelectedVillage(item)"
                                 v-if="index === 0"
                               >
                                 <span>{{ item }}</span>
@@ -2005,7 +2009,6 @@ export default {
       );
     },
     calcAge(dateOfBirth) {
-      console.log(dateOfBirth);
       return (
         new Date().getUTCFullYear() -
         new Date(Date.parse(dateOfBirth.toString())).getUTCFullYear()
@@ -2033,8 +2036,8 @@ export default {
     districtRegion(val) {
       const region = this.regionOptions.filter((region) => region.name === val);
       const regionId = parseInt(region[0].id);
-      console.log(regionId);
-      console.log(this.zoneOptions);
+      console.log("regionId", regionId);
+      console.log("zoneOptions", this.zoneOptions);
       this.zoneOptions = this.zoneOptions.filter(
         (zone) => {
           if (zone.region !== null) {
@@ -2051,8 +2054,7 @@ export default {
         const district = this.districts.filter(
           (district) => district.name === val
         );
-      
-        console.log(district);
+
         if (district !== undefined) {
           if (district[0].coordinator !== null) {
             this.socialWorkerCoordinators.push(district[0].coordinator);
@@ -2066,7 +2068,6 @@ export default {
   },
   methods: {
     socialWorkerBirthdateSave(date) {
-      // console.log(this.$refs.menu);
       this.$refs.menu.save(date);
     },
     showCoordinatorRegistration() {
@@ -2352,15 +2353,10 @@ export default {
             password: String(pwd),
           },
         })
-        // .then((res) => console.log(res))
         .then((res) => res.data.data.register.user)
         .catch((err) => console.warn(err));
     },
     async createCoordinator(firstName, middleName, lastName, userId) {
-      console.log("firstName", firstName);
-        console.log("middleName", middleName);
-        console.log("lastName", lastName);
-        console.log("userId", userId);
       //  createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: Int)
       return await axios
         .post("/graphql/", {
@@ -2390,8 +2386,7 @@ export default {
           },
         })
         .then((res) => res.data.data.createCoordinator)
-        // .then((res) => console.log(res.data.data.createCoordinator.firstName))
-        .catch((err) => console.log(err));
+        .catch((err) => console.warn(err));
     },
     async createDonor(companyName, nameInitials, userId, coordinatorId) {
       return await axios
@@ -2629,10 +2624,6 @@ export default {
           password
         );
         const userId = parseInt(user.id);
-        // console.log("firstName", firstName);
-        // console.log("middleName", middleName);
-        // console.log("lastName", lastName);
-        // console.log("userId", userId);
         const coordinator = await this.createCoordinator(
           firstName,
           middleName,
@@ -2847,7 +2838,6 @@ export default {
         );
         this.$refs.socialWorkerForm.reset();
         console.log(`Social Worker ${socialWorker} created!`);
-        // console.log(this.socialWorkerVillages);
       }
     },
     socialWorkerCancel() {
@@ -2909,7 +2899,6 @@ export default {
           //   withCredentials: true,
           // }
         )
-        // .then((res) => console.log(res))
         .then((res) => res.data.data.allRegions)
         .then((res) => this.regionTable.push(...res))
         .catch((err) => console.warn(err));
@@ -3059,7 +3048,6 @@ export default {
     // custom search function based on selected columns
     // TODO: do MultipleFilter
     searchRegionTableFilter(value, search, item) {
-      console.log(value);
       if (search.length > 0) {
         if (this.regionTableFilterValue.length > 0) {
           for (const filterVal of this.regionTableFilterValue) {
@@ -3090,7 +3078,6 @@ export default {
       }
     },
     searchZoneTableFilter(value, search, item) {
-      console.log(item);
       if (search.length > 0) {
         if (this.zoneTableFilterValue.length > 0) {
           for (const filterVal of this.zoneTableFilterValue) {
@@ -3120,7 +3107,6 @@ export default {
       }
     },
     searchDistrictTableFilter(value, search, item) {
-      console.log("Value: " + value);
       if (search.length > 0) {
         if (this.districtTableFilterValue.length > 0) {
           for (const filterVal of this.districtTableFilterValue) {
@@ -3164,8 +3150,6 @@ export default {
       }
     },
     searchVillageTableFilter(value, search, item) {
-      console.log(item);
-      // console.log(this.filterValue);
       if (search.length > 0) {
         if (this.villageTableFilterValue.length > 0) {
           for (const filterVal of this.villageTableFilterValue) {
@@ -3395,8 +3379,24 @@ export default {
         })
         .then((res) => res.data.data.allSocialWorkers)
         .then((res) => item.children.push(...res))
-        .then((res) => console.log(res))
+        .then((res) => console.log("SocialWorker", res))
         .catch((err) => console.warn(err));
+    },
+    removeSelectedRegion(item) {
+      this.regionTableFilterValue.splice(this.regionTableFilterValue.indexOf(item), 1);
+      this.regionTableFilterValue = [...this.regionTableFilterValue];
+    },
+    removeSelectedZone(item) {
+      this.zoneTableFilterValue.splice(this.zoneTableFilterValue.indexOf(item), 1);
+      this.zoneTableFilterValue = [...this.zoneTableFilterValue];
+    },
+    removeSelectedDistrict(item) {
+      this.districtTableFilterValue.splice(this.districtTableFilterValue.indexOf(item), 1);
+      this.districtTableFilterValue = [...this.districtTableFilterValue];
+    },
+    removeSelectedVillage(item) {
+      this.villageTableFilterValue.splice(this.villageTableFilterValue.indexOf(item), 1);
+      this.villageTableFilterValue = [...this.villageTableFilterValue];
     },
     test() {},
   },

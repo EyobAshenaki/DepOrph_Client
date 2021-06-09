@@ -50,11 +50,12 @@
                   >
                     <template v-slot:selection="{ item, index }">
                       <v-chip
-                        color="rgba(19,84,122,.5)"
+                        color="primary"
                         dark
                         label
                         close
                         close-icon="mdi-close-outline"
+                        @click:close="removeSelected(item)"
                         v-if="index === 0"
                       >
                         <span>{{ item }}</span>
@@ -1166,8 +1167,6 @@ export default {
     },
     // custom search function based on selected columns
     searchFilter(value, search, item) {
-      // console.log(item);
-      // console.log(this.filterValue);
       if (search.length > 0) {
         if (this.filterValue.length > 0) {
           for (const filterVal of this.filterValue) {
@@ -1180,7 +1179,7 @@ export default {
                   .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
-              return item.age.indexOf(search) !== -1;
+              return this.calcAge(item).toString().indexOf(search) !== -1;
             } else if (filterVal === this.headers[3].text) {
               return (
                 item.gender.toLowerCase().indexOf(search.toLowerCase()) !== -1
@@ -1211,7 +1210,6 @@ export default {
     // table modifiers
     // TODO: add error handling if father is NULL and etc
     fullName(item) {
-      console.log(item);
       return (
         `${item.firstName.substr(0, 1).toUpperCase()}${item.firstName.substr(
           1
@@ -1323,7 +1321,6 @@ export default {
       }
       this.detailDialog = true;
       if (this.orphanItems.enrollmentStatus === "enrolled") {
-        console.log("hi");
         this.enrollmentStatusDisplay = "Enrolled";
       } else if (this.orphanItems.enrollmentStatus === "drop-Out") {
         this.enrollmentStatusDisplay = "Dropout";
@@ -1343,11 +1340,15 @@ export default {
         this.orphanHousingSituationSelect.indexOf(item),
         1
       );
-      console.log(this.orphanHousingSituationSelect);
-      console.log(attrs);
+      console.log("orphanHousingSituationSelect", this.orphanHousingSituationSelect);
+      console.log("attrs", attrs);
       this.orphanHousingSituationSelect = [
         ...this.orphanHousingSituationSelect,
       ];
+    },
+    removeSelected(item) {
+      this.filterValue.splice(this.filterValue.indexOf(item), 1);
+      this.filterValue = [...this.filterValue];
     },
     // **********************************
     // Portrait Photo

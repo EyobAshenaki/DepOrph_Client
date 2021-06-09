@@ -5,7 +5,6 @@
     <!-- TODO: # add a details column -->
     <!--       # impliment editable fullName * NEW FEATURE * -->
     <!--       # impliment a custom pagination -->
-    <!--       # add chips in the sponsoreship status column -->
     <v-col cols="9" style="margin-top: 7rem">
       <v-card>
         <v-row>
@@ -66,61 +65,6 @@
             </v-col>
           </v-col>
           <v-col cols="12">
-            <!-- REMOVED filter select and search / filter  -->
-            <!-- <v-row>
-        <v-col sm="2" style="padding-top: 0px; padding-bottom: 20px;">
-        </v-col>
-        <v-col sm="5">
-          <v-responsive
-            min-width="320"
-            max-width="320"
-            class="mx-xs-auto ml-sm-auto mt-sm-2"
-          >
-            <v-select
-              v-model="filterValue"
-              hint="select field/s to filter explicity"
-              :items="filterItems"
-              :menu-props="{ bottom: true, offsetY: true }"
-              solo
-              outlined
-              dense
-              persistent-hint
-              multiple
-              placeholder="Filter By"
-            >
-              <template v-slot:selection="{ item, index }">
-                <v-chip
-                  color="rgba(19,84,122,.5)"
-                  dark
-                  label
-                  close
-                  close-icon="mdi-close-outline"
-                  v-if="index === 0"
-                >
-                  <span>{{ item }}</span>
-                </v-chip>
-                <span v-if="index === 1" class="grey--text caption">
-                  (+{{ filterValue.length - 1 }} others)
-                </span>
-              </template>
-            </v-select>
-          </v-responsive>
-        </v-col>
-        <v-col sm="4">
-          <v-responsive max-width="300" class=" ml-sm-3 mt-sm-4">
-            <v-text-field
-              v-model="search"
-              placeholder="Search"
-              dense
-              flat
-              clearable
-              append-icon="mdi-filter-minus"
-            >
-              <template v-slot:prepend> </template>
-            </v-text-field>
-          </v-responsive>
-        </v-col>
-      </v-row> -->
             <v-expansion-panels popout v-model="orphanPanel">
               <!-- Active -->
               <v-expansion-panel>
@@ -148,17 +92,16 @@
                         :headers="headers"
                         :items="activeOrphans"
                         item-key="id"
-                        :search="search"
+                        :search="activeSearch"
                         append-icon="mdi-magnify"
-                        :custom-filter="searchFilter"
+                        :custom-filter="activeSearchFilter"
                         multi-sort
                         class="elevation-1"
                       >
                         <template v-slot:top>
                           <v-row style="margin: 0px">
                             <!-- Filter/Search Selection -->
-                            <!-- TODO: # add close icon and function to remove from selection -->
-                            <!--       # add tooltip maybe -->
+                            <!-- TODO: # add tooltip maybe -->
                             <v-col
                               sm="5"
                               offset="0"
@@ -172,9 +115,9 @@
                                 class="mx-xs-auto ml-sm-auto mt-sm-2"
                               >
                                 <v-select
-                                  v-model="filterValue"
+                                  v-model="activeFilterValue"
                                   hint="select field/s to filter explicity"
-                                  :items="filterItems"
+                                  :items="activeFilterItems"
                                   :menu-props="{ bottom: true, offsetY: true }"
                                   solo
                                   outlined
@@ -185,11 +128,12 @@
                                 >
                                   <template v-slot:selection="{ item, index }">
                                     <v-chip
-                                      color="rgba(19,84,122,.5)"
+                                      color="primary"
                                       dark
                                       label
                                       close
                                       close-icon="mdi-close-outline"
+                                      @click:close="removeSelectedActive(item)"
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -198,7 +142,8 @@
                                       v-if="index === 1"
                                       class="grey--text caption"
                                     >
-                                      (+{{ filterValue.length - 1 }} others)
+                                      (+{{ activeFilterValue.length - 1 }}
+                                      others)
                                     </span>
                                   </template>
                                 </v-select>
@@ -219,7 +164,7 @@
                                 class="ml-sm-3 mt-sm-4"
                               >
                                 <v-text-field
-                                  v-model="search"
+                                  v-model="activeSearch"
                                   placeholder="Search"
                                   dense
                                   flat
@@ -346,9 +291,9 @@
                         :headers="headers"
                         :items="processingOrphans"
                         item-key="id"
-                        :search="search"
+                        :search="processingSearch"
                         append-icon="mdi-magnify"
-                        :custom-filter="searchFilter"
+                        :custom-filter="processingSearchFilter"
                         :show-select="orphanShow"
                         multi-sort
                         class="elevation-1"
@@ -371,9 +316,9 @@
                                 class="mx-xs-auto ml-sm-auto mt-sm-2"
                               >
                                 <v-select
-                                  v-model="filterValue"
+                                  v-model="processingFilterValue"
                                   hint="select field/s to filter explicity"
-                                  :items="filterItems"
+                                  :items="processingFilterItems"
                                   :menu-props="{ bottom: true, offsetY: true }"
                                   solo
                                   outlined
@@ -384,11 +329,12 @@
                                 >
                                   <template v-slot:selection="{ item, index }">
                                     <v-chip
-                                      color="rgba(19,84,122,.5)"
+                                      color="primary"
                                       dark
                                       label
                                       close
                                       close-icon="mdi-close-outline"
+                                      @click:close="removeSelectedProcessing(item)"
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -397,7 +343,8 @@
                                       v-if="index === 1"
                                       class="grey--text caption"
                                     >
-                                      (+{{ filterValue.length - 1 }} others)
+                                      (+{{ processingFilterValue.length - 1 }}
+                                      others)
                                     </span>
                                   </template>
                                 </v-select>
@@ -418,7 +365,7 @@
                                 class="ml-sm-3 mt-sm-4"
                               >
                                 <v-text-field
-                                  v-model="search"
+                                  v-model="processingSearch"
                                   placeholder="Search"
                                   dense
                                   flat
@@ -1229,8 +1176,9 @@
                         <template v-slot:item.sponsorshipStatus="{ item }">
                           {{ calcSponsorshipStatus(item) }}
                         </template>
+                        <!-- TODO # fix this coz this is done not to change the header array of objects -->
                         <template v-slot:header.sponsoredDate="{ header }">
-                          {{ changeSponsoredDateHeader(header) }}
+                          {{ changeSponsoredDateHeaderOfProcessing(header) }}
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ displaySelectedOrphanDonor(item) }}
@@ -1239,7 +1187,7 @@
                           <!-- <v-icon @click="showDetails(item)">
                             mdi-account-details
                           </v-icon> -->
-                          <orphan-detail :details="item"/>
+                          <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -1288,9 +1236,9 @@
                         :headers="headers"
                         :items="pendingOrphans"
                         item-key="id"
-                        :search="search"
+                        :search="pendingSearch"
                         append-icon="mdi-magnify"
-                        :custom-filter="searchFilter"
+                        :custom-filter="pendingSearchFilter"
                         multi-sort
                         class="elevation-1"
                       >
@@ -1312,9 +1260,9 @@
                                 class="mx-xs-auto ml-sm-auto mt-sm-2"
                               >
                                 <v-select
-                                  v-model="filterValue"
+                                  v-model="pendingFilterValue"
                                   hint="select field/s to filter explicity"
-                                  :items="filterItems"
+                                  :items="pendingFilterItems"
                                   :menu-props="{ bottom: true, offsetY: true }"
                                   solo
                                   outlined
@@ -1325,11 +1273,12 @@
                                 >
                                   <template v-slot:selection="{ item, index }">
                                     <v-chip
-                                      color="rgba(19,84,122,.5)"
+                                      color="primary"
                                       dark
                                       label
                                       close
                                       close-icon="mdi-close-outline"
+                                      @click:close="removeSelectedPending(item)"
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -1338,7 +1287,8 @@
                                       v-if="index === 1"
                                       class="grey--text caption"
                                     >
-                                      (+{{ filterValue.length - 1 }} others)
+                                      (+{{ pendingFilterValue.length - 1 }}
+                                      others)
                                     </span>
                                   </template>
                                 </v-select>
@@ -1359,7 +1309,7 @@
                                 class="ml-sm-3 mt-sm-4"
                               >
                                 <v-text-field
-                                  v-model="search"
+                                  v-model="pendingSearch"
                                   placeholder="Search"
                                   dense
                                   flat
@@ -1435,8 +1385,12 @@
                         <template v-slot:item.sponsorshipStatus="{ item }">
                           {{ calcSponsorshipStatus(item) }}
                         </template>
+                        <!-- TODO # fix this coz this is done not to change the header array of objects -->
+                        <template v-slot:header.sponsoredDate="{ header }">
+                          {{ changeSponsoredDateHeaderOfPending(header) }}
+                        </template>
                         <template v-slot:item.sponsoredDate="{ item }">
-                          {{ calcSponsoredDate(item) }}
+                          {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -1485,9 +1439,9 @@
                         :headers="headers"
                         :items="graduatedOrphans"
                         item-key="id"
-                        :search="search"
+                        :search="graduatedSearch"
                         append-icon="mdi-magnify"
-                        :custom-filter="searchFilter"
+                        :custom-filter="graduatedSearchFilter"
                         multi-sort
                         class="elevation-1"
                       >
@@ -1509,9 +1463,9 @@
                                 class="mx-xs-auto ml-sm-auto mt-sm-2"
                               >
                                 <v-select
-                                  v-model="filterValue"
+                                  v-model="graduatedFilterValue"
                                   hint="select field/s to filter explicity"
-                                  :items="filterItems"
+                                  :items="graduatedFilterItems"
                                   :menu-props="{ bottom: true, offsetY: true }"
                                   solo
                                   outlined
@@ -1522,11 +1476,12 @@
                                 >
                                   <template v-slot:selection="{ item, index }">
                                     <v-chip
-                                      color="rgba(19,84,122,.5)"
+                                      color="primary"
                                       dark
                                       label
                                       close
                                       close-icon="mdi-close-outline"
+                                      @click:close="removeSelectedGraduated(item)"
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -1535,7 +1490,8 @@
                                       v-if="index === 1"
                                       class="grey--text caption"
                                     >
-                                      (+{{ filterValue.length - 1 }} others)
+                                      (+{{ graduatedFilterValue.length - 1 }}
+                                      others)
                                     </span>
                                   </template>
                                 </v-select>
@@ -1556,7 +1512,7 @@
                                 class="ml-sm-3 mt-sm-4"
                               >
                                 <v-text-field
-                                  v-model="search"
+                                  v-model="graduatedSearch"
                                   placeholder="Search"
                                   dense
                                   flat
@@ -1632,8 +1588,12 @@
                         <template v-slot:item.sponsorshipStatus="{ item }">
                           {{ calcSponsorshipStatus(item) }}
                         </template>
+                        <!-- TODO # fix this coz this is done not to change the header array of objects -->
+                        <template v-slot:header.sponsoredDate="{ header }">
+                          {{ changeSponsoredDateHeaderOfGraduated(header) }}
+                        </template>
                         <template v-slot:item.sponsoredDate="{ item }">
-                          {{ calcSponsoredDate(item) }}
+                          {{ calcGraduatedDate(item) }}
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -1661,38 +1621,6 @@
         </v-row>
       </v-card>
     </v-col>
-    <!-- Notification Panel -->
-    <!-- TODO: # figure out a way to do notification -->
-    <!--  
-      <v-card elevation="1" max-width="400" height="120vh">
-        <v-virtual-scroll
-          :bench="benched"
-          :items="items"
-          max-height="850"
-          item-height="64"
-        >
-          <template v-slot:default="{ item }">
-            <v-list-item :key="item">
-              <v-list-item-action>
-                <v-btn fab small depressed color="rgba(19,84,122,.5)">
-                  {{ item }}
-                </v-btn>
-              </v-list-item-action>
-
-              <v-list-item-content>
-                <v-list-item-title>
-                  User Database Record <strong>ID {{ item }}</strong>
-                </v-list-item-title>
-              </v-list-item-content>
-
-              <v-list-item-action>
-                <v-icon small> mdi-open-in-new </v-icon>
-              </v-list-item-action>
-            </v-list-item>
-          </template>
-        </v-virtual-scroll>
-      </v-card>
-    </v-col> -->
   </v-row>
 </template>
 
@@ -1720,12 +1648,15 @@ export default {
   },
   components: {
     NewOrphanRegistrationModel,
-    OrphanDetail
+    OrphanDetail,
   },
 
   data() {
     return {
-      search: "", // used for filter
+      activeSearch: "", // used for activeFilter
+      processingSearch: "", // used for processingFilter
+      pendingSearch: "", // used for pendingFilter
+      graduatedSearch: "", // used for graduatedFilter
       drawer: false, // constroles the sidebar
       // test fields *****************
       benched: 0,
@@ -1735,7 +1666,7 @@ export default {
       max25chars: (v) => v.length <= 25 || "Input too long!",
       // *****************************
       orphanDetails: {
-        id: 0, 
+        id: 0,
         // showOrphanDetail: false,
       },
       detailDialog: false,
@@ -1829,15 +1760,42 @@ export default {
       selectedOrphanDonor: "",
       selectedOrphanDonorOptions: [],
       // used in filter selection items
-      filterItems: [
+      activeFilterItems: [
         "Id",
         "Full Name",
         "Age",
         "Gender",
         "Sponsorship Status",
-        "Sponsorship Date",
+        "Sponsored Date",
       ],
-      filterValue: [],
+      processingFilterItems: [
+        "Id",
+        "Full Name",
+        "Age",
+        "Gender",
+        "Sponsorship Status",
+        "Selected Donor",
+      ],
+      pendingFilterItems: [
+        "Id",
+        "Full Name",
+        "Age",
+        "Gender",
+        "Sponsorship Status",
+        "Sponsoring Donor",
+      ],
+      graduatedFilterItems: [
+        "Id",
+        "Full Name",
+        "Age",
+        "Gender",
+        "Sponsorship Status",
+        "Graduated Date",
+      ],
+      activeFilterValue: [],
+      processingFilterValue: [],
+      pendingFilterValue: [],
+      graduatedFilterValue: [],
       // used for filter selection
       // table headers if that wasn't clear enough LOL
       headers: [
@@ -2048,39 +2006,63 @@ export default {
       }
     },
     // custom search function based on selected columns
-    searchFilter(value, search, item) {
-      // console.log(item);
-      // console.log(this.filterValue);
+    activeSearchFilter(value, search, item) {
+      return this.searchFilter(value, search, item, this.activeFilterValue);
+    },
+    processingSearchFilter(value, search, item) {
+      return this.searchFilter(value, search, item, this.processingFilterValue);
+    },
+    pendingSearchFilter(value, search, item) {
+      return this.searchFilter(value, search, item, this.pendingFilterValue);
+    },
+    graduatedSearchFilter(value, search, item) {
+      return this.searchFilter(value, search, item, this.activeFilterValue);
+    },
+    searchFilter(value, search, item, filterValue) {
       if (search.length > 0) {
-        if (this.filterValue.length > 0) {
-          for (const filterVal of this.filterValue) {
+        if (filterValue.length > 0) {
+          for (const filterVal of filterValue) {
             if (filterVal === this.headers[0].text) {
               return item.id.indexOf(search) !== -1;
             } else if (filterVal === this.headers[1].text) {
               return (
-                item.fullName.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                this.fullName(item)
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
-              return item.Age.indexOf(search) !== -1;
+              return (
+                this.calcAge(item)
+                  .toString()
+                  .indexOf(search) !== -1
+              );
             } else if (filterVal === this.headers[3].text) {
               return (
                 item.gender.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[4].text) {
               return (
-                item.sponsorshipStatus
+                this.calcSponsorshipStatus(item)
                   .toLowerCase()
                   .indexOf(search.toLowerCase()) !== -1
               );
-            } else {
-              return item.sponsoredDate.indexOf(search) !== -1;
+            } else if (filterVal === this.headers[5].text) {
+              return this.calcSponsoredDate(item).indexOf(search) !== -1;
+            } else if (filterVal === this.changeSponsoredDateHeaderOfProcessing()) {
+              return this.displaySelectedOrphanDonor(item).indexOf(search) !== -1;
+            } else if (filterVal === this.changeSponsoredDateHeaderOfPending()) {
+              return this.displaySponsoringOrphanDonor(item).indexOf(search) !== -1;
+            } else if (filterVal === this.changeSponsoredDateHeaderOfGraduated()) {
+              return this.calcGraduatedDate(item).indexOf(search) !== -1;
+            }else {
+              return -1
             }
           }
         } else {
           return (
-            value != null &&
-            typeof value === "string" &&
-            value
+            this.fullName(item) != null &&
+            typeof this.fullName(item) === "string" &&
+            this.fullName(item)
               .toString()
               .toLowerCase()
               .indexOf(search) !== -1
@@ -2112,6 +2094,21 @@ export default {
         .status;
     },
     calcSponsoredDate(item) {
+      const options = {
+        // weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return new Date(
+        Date.parse(
+          item.sponsorshipStatuses[
+            item.sponsorshipStatuses.length - 1
+          ].date.toString()
+        )
+      ).toLocaleDateString(undefined, options);
+    },
+    calcGraduatedDate(item) {
       const options = {
         // weekday: "long",
         year: "numeric",
@@ -2228,21 +2225,22 @@ export default {
         //     }
         //   }
         // }
+
       }
-      // this.showDonorSelectionDialog = !this.orphanShow ? true : false;
-      // this.selectedOrphans = this.orphanShow ? this.selectedOrphans : [];
-      // this.orphanShow = !this.orphanShow;
-      // this.orphanSelectBtnLable = this.orphanShow
-      //   ? "Send Orphans"
-      //   : "Select Orphans";
-      // this.orphanPanel = this.orphanShow ? 1 : null;
     },
-    changeSponsoredDateHeader() {
-      // changeSponsoredDateHeader(header) {
-      // console.log("header", header);
+    changeSponsoredDateHeaderOfProcessing() {
       return "Selected Donor";
     },
+    changeSponsoredDateHeaderOfPending() {
+      return "Sponsoring Donor";
+    },
+    changeSponsoredDateHeaderOfGraduated() {
+      return "Graduated Date";
+    },
     displaySelectedOrphanDonor(item) {
+      return item.donor ? item.donor.nameInitials : "";
+    },
+    displaySponsoringOrphanDonor(item) {
       return item.donor ? item.donor.nameInitials : "";
     },
     // old showDetails(item) {
@@ -2317,7 +2315,6 @@ export default {
       }
       this.detailDialog = true;
       if (this.orphanItems.enrollmentStatus === "enrolled") {
-        console.log("hi");
         this.enrollmentStatusDisplay = "Enrolled";
       } else if (this.orphanItems.enrollmentStatus === "drop-Out") {
         this.enrollmentStatusDisplay = "Dropout";
@@ -2343,8 +2340,8 @@ export default {
         this.orphanHousingSituationSelect.indexOf(item),
         1
       );
-      console.log(this.orphanHousingSituationSelect);
-      console.log(attrs);
+      console.log("orphanHousingSituationSelect", this.orphanHousingSituationSelect);
+      console.log("attrs", attrs);
       this.orphanHousingSituationSelect = [
         ...this.orphanHousingSituationSelect,
       ];
@@ -2366,6 +2363,28 @@ export default {
     toggleBirthCertificateDialog() {
       this.birthCertificateDialog = !this.birthCertificateDialog;
     },
+    removeSelectedActive(item) {
+      this.activeFilterValue.splice(this.activeFilterValue.indexOf(item), 1);
+      this.activeFilterValue = [...this.activeFilterValue];
+    },
+    removeSelectedProcessing(item) {
+      this.processingFilterValue.splice(
+        this.processingFilterValue.indexOf(item),
+        1
+      );
+      this.processingFilterValue = [...this.processingFilterValue];
+    },
+    removeSelectedPending(item) {
+      this.pendingFilterValue.splice(this.pendingFilterValue.indexOf(item), 1);
+      this.pendingFilterValue = [...this.pendingFilterValue];
+    },
+    removeSelectedGraduated(item) {
+      this.graduatedfilterValue.splice(
+        this.graduatedFilterValue.indexOf(item),
+        1
+      );
+      this.graduatedFilterValue = [...this.graduatedFilterValue];
+    },
 
     // **********************************
     sendTest() {
@@ -2378,7 +2397,7 @@ export default {
       // subtracts current date and that one
       // console.log(current.getUTCFullYear() - dateOfBirth.getUTCFullYear());
 
-      console.log(this.orphans);
+      console.log("orphans", this.orphans);
     },
   },
 };

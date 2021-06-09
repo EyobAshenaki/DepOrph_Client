@@ -5,7 +5,6 @@
       <!-- TODO: # add a details column -->
       <!--       # impliment editable fullName * NEW FEATURE * -->
       <!--       # impliment a custom pagination -->
-      <!--       # add chips in the sponsoreship status column -->
       <v-col cols="9" style="margin-top: 6rem">
         <v-card elevation="16" min-height="50vh" max-width="150vh">
           <v-sheet
@@ -48,11 +47,12 @@
                       >
                         <template v-slot:selection="{ item, index }">
                           <v-chip
-                            color="rgba(19,84,122,.5)"
+                            color="primary"
                             dark
                             label
                             close
                             close-icon="mdi-close-outline"
+                            @click:close="removeSelected(item)"
                             v-if="index === 0"
                           >
                             <span>{{ item }}</span>
@@ -375,6 +375,10 @@ export default {
       // this comes at the very last of the process so:
       // notify the user weither the operation was successful or keep/write to the log functionality
       console.log("Dialog closed");
+    },
+    removeSelected(item) {
+      this.filterValue.splice(this.filterValue.indexOf(item), 1);
+      this.filterValue = [...this.filterValue];
     },
   },
 };
