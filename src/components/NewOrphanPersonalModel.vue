@@ -1,0 +1,419 @@
+<template>
+  <div>
+    <v-card link max-width="15rem" @click="dialog = true">
+      <v-card-title class="headline justify-center">
+        Personal Info
+      </v-card-title>
+    </v-card>
+    <v-dialog v-model="dialog" max-width="60em">
+      <!-- the dialog main body; the card -->
+      <v-card>
+        <!-- the form part; the fields part-->
+        <v-card-text>
+          <v-form
+            ref="personalForm"
+            v-model="validPersonalForm"
+            lazy-validation
+          >
+            <v-container>
+              <v-row class="mt-2">
+                <!-- Orphan Name field -->
+                <v-col cols="12" sm="6" md="4">
+                  <!-- <v-responsive max-width="" class=""> -->
+                  <v-text-field
+                    v-model="orphan.firstName"
+                    :rules="[rules.required, rules.name]"
+                    label="Orphan Name"
+                  >
+                  </v-text-field>
+                  <!-- </v-responsive> -->
+                </v-col>
+                <!-- Father Name field -->
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="orphan.father.firstName"
+                    label="Father Name"
+                    :rules="[rules.required, rules.name]"
+                  >
+                  </v-text-field>
+                </v-col>
+                <!-- Grand Father Name field -->
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="orphan.father.lastName"
+                    label="Grand Father Name"
+                    :rules="[rules.required, rules.name]"
+                  >
+                  </v-text-field>
+                </v-col>
+                <!-- Gender -->
+                <v-col cols="12" sm="6" md="2">
+                  <v-select
+                    v-model="orphan.gender"
+                    :items="genderOptions"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    label="Gender"
+                    :rules="[rules.required]"
+                  ></v-select>
+                </v-col>
+                <!-- Date of Birth field -->
+                <v-col cols="12" sm="6" md="4">
+                  <v-menu
+                    ref="menu"
+                    v-model="orphanDateOfBirthMenu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="orphan.dateOfBirth"
+                        label="Date of Birth"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        :rules="[rules.required]"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      ref="picker"
+                      v-model="orphan.dateOfBirth"
+                      no-title
+                      scrollable
+                      :max="new Date().toISOString().substr(0, 10)"
+                      min="1950-01-01"
+                      @change="orphanDateOfBirthSave"
+                    >
+                      <!-- <v-spacer></v-spacer>
+                              <v-btn text color="primary" @click="menu = false">
+                                Cancel
+                              </v-btn>
+                              <v-btn
+                                text
+                                color="primary"
+                                @click="$refs.menu.save(dates)"
+                              >
+                                OK
+                              </v-btn> -->
+                    </v-date-picker>
+                  </v-menu>
+                </v-col>
+                <!-- Place of Birth -->
+                <v-col cols="12" sm="6" md="6">
+                  <!-- <v-responsive max-width="" class="" style="margin-top: -11px;">
+                    <v-combobox
+                      v-model="orphanPlaceOfBirthSelect"
+                      :items="orphanPlaceOfBirthOptions"
+                      label="Place of Birth"
+                      multiple
+                      chips
+                    >
+                      <template v-slot:selection="data">
+                        <v-chip
+                          color="rgba(19,84,122,.5)"
+                          dark
+                          label
+                          close
+                          close-icon="mdi-close-outline"
+                          v-if="data.index === 0"
+                        >
+                          <span>{{ data.item }}</span>
+                        </v-chip>
+                        <v-chip
+                          color="rgba(19,84,122,.5)"
+                          dark
+                          label
+                          close
+                          close-icon="mdi-close-outline"
+                          v-if="data.index === 1"
+                        >
+                          <span>{{ data.item }}</span>
+                        </v-chip>
+                        <span v-if="data.index === 2" class="grey--text caption">
+                          (+{{ orphanPlaceOfBirthSelect.length - 2 }}
+                          others)
+                        </span>
+                      </template>
+                    </v-combobox>
+                  </v-responsive> -->
+                  <v-text-field
+                    v-model="orphan.placeOfBirth"
+                    label="Place of Birth"
+                    :rules="[rules.required, rules.name]"
+                  ></v-text-field>
+                </v-col>
+                <!-- Spoken Language(s) -->
+                <v-col cols="12" sm="6" md="6">
+                  <!-- <v-responsive max-width="" class="" style="margin-top: -9px;">
+                    <v-combobox
+                      v-model="orphanSpokenLanguagesSelect"
+                      :items="orphanSpokenLanguagesOptions"
+                      label="Spoken Language(s)"
+                      multiple
+                      chips
+                    >
+                      <template v-slot:selection="data">
+                        <v-chip
+                          color="rgba(19,84,122,.5)"
+                          dark
+                          label
+                          close
+                          close-icon="mdi-close-outline"
+                          v-if="data.index === 0"
+                        >
+                          <span>{{ data.item }}</span>
+                        </v-chip>
+                        <v-chip
+                          color="rgba(19,84,122,.5)"
+                          dark
+                          label
+                          close
+                          close-icon="mdi-close-outline"
+                          v-if="data.index === 1"
+                        >
+                          <span>{{ data.item }}</span>
+                        </v-chip>
+                        <span v-if="data.index === 2" class="grey--text caption">
+                          (+{{ orphanSpokenLanguagesSelect.length - 2 }}
+                          others)
+                        </span>
+                      </template>
+                    </v-combobox>
+                  </v-responsive> -->
+                  <v-text-field
+                    v-model="orphan.spokenLanguages"
+                    label="Spoken Language(s)"
+                    :rules="[rules.required, rules.name]"
+                  ></v-text-field>
+                </v-col>
+                <!-- Religion -->
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    v-model="orphan.religion"
+                    :items="orphanReligionOptions"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    label="Religion"
+                    :rules="[rules.required]"
+                  ></v-select>
+                </v-col>
+                <!-- Psychological Status -->
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    v-model="orphan.psychologicalStatus"
+                    :items="orphanPsychologicalStatusOptions"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    label="Psychological Status"
+                    :rules="[rules.required]"
+                  ></v-select>
+                </v-col>
+                <!-- Health Description -->
+                <v-col cols="12" sm="6" md="12">
+                  <v-textarea
+                    v-model="orphan.healthDescription"
+                    label="Health Description"
+                    auto-grow
+                    rows="1"
+                    :rules="[rules.required]"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </v-card-text>
+        <v-divider class="mt-3"></v-divider>
+        <!-- the action part; the buttons part -->
+        <v-card-actions>
+          <v-btn color="red darken-1" text @click="orphanDialogCancel">
+            Cancel
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-slide-x-reverse-transition>
+            <v-tooltip v-if="formHasErrors" left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  class="my-0"
+                  v-bind="attrs"
+                  @click="orphanDialogReset"
+                  v-on="on"
+                >
+                  <v-icon>mdi-refresh</v-icon>
+                </v-btn>
+              </template>
+              <span>Refresh form</span>
+            </v-tooltip>
+          </v-slide-x-reverse-transition>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="orphanDialogNext"
+            :disabled="!validPersonalForm"
+          >
+            Next
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<style scoped>
+/* media queries */
+</style>
+
+<script>
+export default {
+  data() {
+    return {
+      dialog: false,
+      validPersonalForm: false,
+      formHasErrors: false,
+      orphan: {
+        firstName: null,
+        gender: null,
+        dateOfBirth: null,
+        placeOfBirth: null,
+        spokenLanguages: null,
+        religion: null,
+        psychologicalStatus: null,
+        healthDescription: null,
+        father: {
+          firstName: null,
+          lastName: null,
+        },
+      },
+      rules: {
+        required: (value) => !!value || "Required.",
+        name: (value) => {
+          const namePattern = /(^[A-z][A-Z-a-z/'.,/]+)[A-z]\s*$/g;
+          return namePattern.test(value) || "Invalid name";
+        },
+      },
+      orphanDateOfBirthMenu: false,
+      orphanReligionOptions: [
+        "Christianity",
+        "Islam",
+        "Judaism",
+        "Buddhism",
+        "Hinduism",
+        "Other",
+      ],
+      orphanPsychologicalStatusOptions: [
+        "Normal",
+        "Isolated",
+        "Stressed",
+        "Unsociable",
+        "Overly Sociable",
+      ],
+      genderOptions: ["Male", "Female"],
+      // orphanIndex: 14,
+      // orphanItem: {
+      //   id: "",
+      //   fullName: "Selam Girma Yohans",
+      //   Age: "",
+      //   gender: "",
+      //   sponsorshipStatus: "",
+      //   sponsoredDate: "",
+      // },
+      // defaultItem: {
+      //   id: "015",
+      //   fullName: "Selam Girma Yohans",
+      //   Age: "20",
+      //   gender: "Male",
+      //   sponsorshipStatus: "active",
+      //   sponsoredDate: "2021-01-02",
+      // },
+    };
+  },
+  mounted() {},
+  computed: {},
+  watch: {
+    orphanDateOfBirthMenu(val) {
+      // console.log(this.$refs.picker);
+      // console.log(
+      //   val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"))
+      // );
+      // Changes the active picker from the default "DATE" to "YEAR"
+      val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"));
+    },
+    dialog(val) {
+      val || this.orphanDialogClose();
+    },
+  },
+  methods: {
+    displayOrphan() {
+      console.log(this.orphan);
+    },
+    orphanDateOfBirthSave(date) {
+      this.$refs.menu.save(date);
+    },
+
+    orphanDialogClose() {
+      this.dialog = false;
+
+      // this.$nextTick(() => {
+      //   this.orphanItem = Object.assign({}, this.defaultItem);
+      //   this.orphanIndex = -1;
+      // });
+    },
+
+    orphanDialogReset() {
+      this.formHasErrors = false;
+      this.$refs.personalForm.reset();
+
+      // $$ This gets executed after the DOM have been renderd in the next event loop what ever that means
+      // this.$nextTick(() => {
+      //   this.orphanItem = Object.assign({}, this.defaultItem);
+      //   this.orphanIndex = -1;
+      // });
+    },
+
+    orphanDialogNext() {
+      // if (this.orphanIndex > -1) {
+      //   Object.assign(this.orphans[this.orphanIndex], this.orphanItem);
+      // } else {
+      //   this.orphans.push(this.orphanItem);
+      // }
+      this.formHasErrors = false;
+
+      if (this.$refs.personalForm.validate()) {
+        // #TODO => pass this.orphan to parent and switch to the nxt model
+        /**
+         * {
+         *   flag: bool, // to indicate success
+         * }
+         */
+        // console.log(this.orphan);
+
+        this.orphan.gender = this.orphan.gender.slice(0, 1).toUpperCase();
+        this.orphan.dateOfBirth = new Date(
+          this.orphan.dateOfBirth
+        ).toISOString();
+        if (this.orphan.psychologicalStatus) {
+          const words = this.orphan.psychologicalStatus.split(" ");
+          this.orphan.psychologicalStatus = "";
+          if (words.length > 1) {
+            words.forEach((elmt) => {
+              this.orphan.psychologicalStatus += elmt.toLowerCase();
+            });
+          } else {
+            this.orphan.psychologicalStatus = words[0].toLowerCase();
+          }
+        }
+
+        this.$emit("personalDone", this.orphan);
+        this.orphanDialogClose();
+      } else if (!this.$refs.personalForm.validate()) {
+        this.formHasErrors = true;
+      }
+    },
+
+    orphanDialogCancel() {
+      this.orphanDialogReset();
+      this.orphanDialogClose();
+    },
+  },
+};
+</script>
