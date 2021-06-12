@@ -146,13 +146,24 @@ export default {
         .post(
           "/graphql",
           {
-            query: `mutation login($email: String!, 
-                    $password: String!) {
+            query: `mutation login($email: String!, $password: String!) {
                       login(email: $email, password: $password) {
                         user {
                           id
                           email
                           role
+                          coordinators {
+                            id
+                          }
+                          heads {
+                            id
+                          }
+                          donors {
+                            id
+                          }
+                          socialWorkers {
+                            id
+                          }
                         }
                       }
                     }`,
@@ -168,13 +179,13 @@ export default {
         .then((res) => res.data.data.login.user)
         .then(user => {
           if (user.role === "Head") {
-            this.$router.push({name: "Head_v2", params: { id: user.id}})
+            this.$router.push({name: "Head_v2", params: { id: user.heads[0].id}})
           } else if (user.role === "Donor") {
-            this.$router.push({name: "Donor", params: { id: user.id}})
+            this.$router.push({name: "Donor", params: { id: user.donors[0].id}})
           } else if (user.role === "Coordinator") {
-            this.$router.push({name: "Coordinator", params: { id: user.id}})
+            this.$router.push({name: "Coordinator", params: { id: user.coordinators[0].id}})
           } else if (user.role === "SocialWorker") {
-            this.$router.push({name: "SocialWorker", params: { id: user.id}})
+            this.$router.push({name: "SocialWorker", params: { id: user.socialWorkers[0].id}})
           }
         }) 
         .catch((err) => console.warn(err));

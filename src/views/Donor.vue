@@ -1,6 +1,6 @@
 <template>
   <div align="center" style="margin-top: 6rem">
-    <AppNavBar />
+    <AppNavBar :user="donorUser" />
     <v-card elevation="16" width="70%" max-height="75vh">
       <v-sheet
         id="scrolling-techniques-3"
@@ -201,7 +201,9 @@
                             <v-col cols="6">
                               <v-img
                                 :src="`https://picsum.photos/500/300?image=20`"
-                                :lazy-src="`https://picsum.photos/10/6?image=20`"
+                                :lazy-src="
+                                  `https://picsum.photos/10/6?image=20`
+                                "
                                 aspect-ratio="1"
                                 class="grey lighten-2"
                               >
@@ -313,10 +315,7 @@
                             </v-col>
                             <!-- Place of Birth -->
                             <v-col cols="12" sm="6" md="6" class="pb-0">
-                              <v-responsive
-                                max-width=""
-                                class=""
-                              >
+                              <v-responsive max-width="" class="">
                                 <v-text-field
                                   v-model="orphanItems.placeOfBirth"
                                   label="Place of Birth"
@@ -338,10 +337,7 @@
                             </v-col>
                             <!-- Spoken Language(s) -->
                             <v-col cols="12" sm="6" md="6" class="py-0">
-                              <v-responsive
-                                max-width=""
-                                class=""
-                              >
+                              <v-responsive max-width="" class="">
                                 <v-text-field
                                   v-model="orphanItems.spokenLanguages"
                                   label="Spoken Language(s)"
@@ -389,29 +385,29 @@
                             <template
                               v-if="
                                 enrollmentStatusDisplay === 'Enrolled' ||
-                                enrollmentStatusDisplay === 'Dropout'
+                                  enrollmentStatusDisplay === 'Dropout'
                               "
                             >
                               <!-- Education Level -->
                               <v-col cols="12" sm="6" md="4">
                                 <v-responsive max-width="270" class="">
                                   <v-text-field
-                                  v-model="orphanItems.educationLevel"
-                                  label="Enrollment Level"
-                                  readonly
-                                >
-                                </v-text-field>
+                                    v-model="orphanItems.educationLevel"
+                                    label="Enrollment Level"
+                                    readonly
+                                  >
+                                  </v-text-field>
                                 </v-responsive>
                               </v-col>
                               <!-- Grade/Year -->
                               <v-col cols="12" sm="6" md="4">
                                 <v-responsive max-width="" class="">
                                   <v-text-field
-                                  v-model="orphanItems.educationYearState"
-                                  label="Grade/Year"
-                                  readonly
-                                >
-                                </v-text-field>
+                                    v-model="orphanItems.educationYearState"
+                                    label="Grade/Year"
+                                    readonly
+                                  >
+                                  </v-text-field>
                                 </v-responsive>
                               </v-col>
                             </template>
@@ -423,11 +419,11 @@
                               <v-col cols="12" sm="6" md="3">
                                 <v-responsive max-width="" class="">
                                   <v-text-field
-                                  v-model="orphanItems.schoolType"
-                                  label="School Type"
-                                  readonly
-                                >
-                                </v-text-field>
+                                    v-model="orphanItems.schoolType"
+                                    label="School Type"
+                                    readonly
+                                  >
+                                  </v-text-field>
                                 </v-responsive>
                               </v-col>
                               <!-- School/University Name -->
@@ -726,11 +722,11 @@
                                 <v-col cols="12" sm="6" md="4" class="mt-n6">
                                   <v-responsive max-width="" class="">
                                     <v-text-field
-                                    v-model="orphanItems.motherMaritalStatus"
-                                    label="Marital Status"
-                                    readonly
-                                  >
-                                  </v-text-field>
+                                      v-model="orphanItems.motherMaritalStatus"
+                                      label="Marital Status"
+                                      readonly
+                                    >
+                                    </v-text-field>
                                   </v-responsive>
                                 </v-col>
                               </template>
@@ -746,11 +742,11 @@
                               <!-- Housing Situation field -->
                               <v-col cols="12" sm="6" md="5" class="mb-n3">
                                 <v-text-field
-                                    v-model="orphanItems.housingSituation"
-                                    label="Housing Situation"
-                                    readonly
-                                  >
-                                  </v-text-field>
+                                  v-model="orphanItems.housingSituation"
+                                  label="Housing Situation"
+                                  readonly
+                                >
+                                </v-text-field>
                               </v-col>
                               <!-- Birth Certificate Dialog -->
                               <v-col cols="3">
@@ -839,12 +835,11 @@
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
 
 <script>
 import axios from "axios";
-import AppNavBar from "@/components/AppNavBar"
+import AppNavBar from "@/components/AppNavBar";
 
 export default {
   components: {
@@ -1021,6 +1016,13 @@ export default {
           sortable: false,
         },
       ],
+      donor: {},
+      donorUser: {
+        companyName: "",
+        nameInitials: "",
+        email: "",
+        role: "",
+      },
       // table rows/items
       orphans: [],
     };
@@ -1073,21 +1075,25 @@ export default {
       }
     },
     // ***************************************
-    
+
     // ***************************************
   },
   methods: {
+    getUser() {
+      return this.donor.user;
+    },
     initialize() {
-      const id = 2;
       axios
         .post("/graphql/", {
           query: `query donor($id: ID!) {
                     donor(id: $id) {
                       id
                       nameInitials
+                      companyName
                       user {
                         id
                         email
+                        role
                       }
                       orphans {
                         id
@@ -1161,11 +1167,23 @@ export default {
                     }
                   }`,
           variables: {
-            id: id,
+            id: this.$route.params.id,
           },
         })
         .then((res) => res.data.data.donor)
-        .then((res) => (this.orphans = [...res.orphans]))
+        .then((donor) => {
+          this.orphans = [...donor.orphans];
+          this.donor = Object.assign({}, donor);
+          this.donorUser = Object.assign(this.donorUser, donor.user);
+          // this.donorUser = new Object(donor.user);
+          for (const property in this.donorUser) {
+            if (Object.hasOwnProperty.call(this.donor, property)) {
+              this.donorUser[property] = donor[property];
+            }
+          }
+          console.log("donor", this.donor);
+          console.log("donorUser", this.donorUser);
+        })
         .catch((err) => console.warn(err));
       // console.log(this.orphans);
     },
@@ -1183,7 +1201,11 @@ export default {
                   .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
-              return this.calcAge(item).toString().indexOf(search) !== -1;
+              return (
+                this.calcAge(item)
+                  .toString()
+                  .indexOf(search) !== -1
+              );
             } else if (filterVal === this.headers[3].text) {
               return (
                 item.gender.toLowerCase().indexOf(search.toLowerCase()) !== -1
@@ -1206,7 +1228,10 @@ export default {
           return (
             this.fullName(item) != null &&
             typeof this.fullName(item) === "string" &&
-            this.fullName(item).toString().toLowerCase().indexOf(search) !== -1
+            this.fullName(item)
+              .toString()
+              .toLowerCase()
+              .indexOf(search) !== -1
           );
         }
       }
@@ -1344,7 +1369,10 @@ export default {
         this.orphanHousingSituationSelect.indexOf(item),
         1
       );
-      console.log("orphanHousingSituationSelect", this.orphanHousingSituationSelect);
+      console.log(
+        "orphanHousingSituationSelect",
+        this.orphanHousingSituationSelect
+      );
       console.log("attrs", attrs);
       this.orphanHousingSituationSelect = [
         ...this.orphanHousingSituationSelect,

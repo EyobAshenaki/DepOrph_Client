@@ -1,6 +1,6 @@
 <template style="positon: relative;">
   <div>
-    <AppNavBar />
+    <AppNavBar :user="coordinatorUser" />
     <v-row v-if="!showOrphans" justify="center" no-gutters>
       <!-- Table Card -->
       <!-- TODO: # add a details column -->
@@ -206,6 +206,14 @@ export default {
           value: "orphans",
         },
       ],
+      coordinator: {},
+      coordinatorUser: {
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        email: "",
+        role: "",
+      },
       // table rows/items
       villages: [],
       showOrphans: false,
@@ -228,40 +236,61 @@ export default {
   watch: {},
   methods: {
     initialize() {
+      console.log("routerCoordinatorId: ", this.$route.params.id);
       axios
         .post("/graphql/", {
-          query: `query {
-                    allVillages (orderBy: {id: asc}) {
-                        id
-                        name
-                        registrationDate
-                        coordinator {
-                        firstName
-                        middleName
-                        lastName
-                        }
-                        district {
-                        name
-                        socialWorkers{
-                            firstName
-                            middleName
-                            lastName
-                        }
-                        }
-                        donor {
-                        nameInitials
-                        }
-                        orphans {
-                        id
-                        }
+          query: `query coordinator($id: ID!) {
+                  coordinator(id: $id) {
+                    firstName
+                    middleName
+                    lastName
+                    user {
+                      id
+                      email
+                      role
                     }
+                    villages {
+                      id
+                      name
+                      registrationDate
+                      district {
+                        name
+                        socialWorkers {
+                          firstName
+                          middleName
+                          lastName
+                        }
+                      }
+                      donor {
+                        nameInitials
+                      }
+                      orphans {
+                        id
+                      }
+                    }
+                  }
                 }`,
+          variables: {
+            id: this.$route.params.id,
+          },
         })
-        .then((res) => res.data.data.allVillages)
-        // .then((res) => console.log(res.data))
-        .then((res) => this.villages.push(...res))
+        .then((res) => res.data.data.coordinator)
+        .then((coordinator) => {
+          this.coordinator = Object.assign({}, coordinator);
+          this.coordinatorUser = Object.assign(
+            this.coordinatorUser,
+            coordinator.user
+          );
+          this.villages.push(...this.coordinator.villages);
+          for (const property in this.coordinatorUser) {
+            if (Object.hasOwnProperty.call(this.coordinator, property)) {
+              this.coordinatorUser[property] = coordinator[property];
+            }
+          }
+          console.log("coordinator", this.coordinator);
+          console.log("coordiantorUser", this.coordinatorUser);
+        })
         .catch((err) => console.warn(err));
-      console.log(this.villages);
     },
     getVillageTableId(item) {
       return item.id;

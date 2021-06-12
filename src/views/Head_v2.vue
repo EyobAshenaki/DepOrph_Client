@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 6.5rem">
-    <AppNavBar />
+    <AppNavBar :user="headUser" />
     <!-- the value property make it not behave difrently than the showSidebar property -->
     <v-navigation-drawer
       v-model="showSidebar"
@@ -1429,14 +1429,14 @@
                     <v-avatar color="indigo" size="50">
                       <span class="white--text headline">{{
                         selectedCoordinator.firstName.substr(0, 1) +
-                        selectedCoordinator.middleName.substr(0, 1)
+                          selectedCoordinator.middleName.substr(0, 1)
                       }}</span>
                     </v-avatar>
                     <h3 class="headline mb-2">
                       {{
                         selectedCoordinator.firstName +
-                        selectedCoordinator.middleName +
-                        selectedCoordinator.lastName
+                          selectedCoordinator.middleName +
+                          selectedCoordinator.lastName
                       }}
                     </h3>
                     <div class="blue--text subheading font-weight-bold">
@@ -1533,16 +1533,16 @@
                     <v-avatar color="indigo" size="50">
                       <span class="white--text headline">{{
                         selectedSocialWorker.firstName.substr(0, 1) +
-                        selectedSocialWorker.middleName.substr(0, 1)
+                          selectedSocialWorker.middleName.substr(0, 1)
                       }}</span>
                     </v-avatar>
                     <h3 class="headline mb-2">
                       {{
                         selectedSocialWorker.firstName +
-                        " " +
-                        selectedSocialWorker.middleName +
-                        " " +
-                        selectedSocialWorker.lastName
+                          " " +
+                          selectedSocialWorker.middleName +
+                          " " +
+                          selectedSocialWorker.lastName
                       }}
                     </h3>
                     <div
@@ -1924,6 +1924,14 @@ export default {
         value: "numberOfOrphans",
       },
     ],
+    head: {},
+    headUser: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      email: "",
+      role: "",
+    },
     // table rows/items
     regionTable: [],
     districtTable: [],
@@ -1938,6 +1946,7 @@ export default {
     socialWorkersTree: [],
   }),
   created() {
+    this.initializeHead();
     // table
     // this.initializeDistrictTable();
     // this.initializeRegionTable();
@@ -2025,19 +2034,17 @@ export default {
       // Changes the active picker from the default "DATE" to "YEAR"
       val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"));
     },
-    // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently 
+    // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently
     districtRegion(val) {
       const region = this.regionOptions.filter((region) => region.name === val);
       const regionId = parseInt(region[0].id);
       console.log("regionId", regionId);
       console.log("zoneOptions", this.zoneOptions);
-      this.zoneOptions = this.zoneOptions.filter(
-        (zone) => {
-          if (zone.region !== null) {
-            return parseInt(zone.region.id) === regionId
-          }  
+      this.zoneOptions = this.zoneOptions.filter((zone) => {
+        if (zone.region !== null) {
+          return parseInt(zone.region.id) === regionId;
         }
-      );
+      });
     },
     socialWorkerDistrict(val) {
       this.socialWorkerCoordinators.length = 0;
@@ -2060,6 +2067,40 @@ export default {
     },
   },
   methods: {
+    initializeHead() {
+      axios
+        .post("/graphql/", {
+          query: `query head($id: ID!) {
+                  head(id: $id) {
+                    id
+                    firstName
+                    middleName
+                    lastName
+                    user {
+                      id
+                      email
+                      role
+                    }
+                  }
+                }`,
+          variables: {
+            id: this.$route.params.id,
+          },
+        })
+        .then((res) => res.data.data.head)
+        .then((head) => {
+          this.head = Object.assign({}, head);
+          this.headUser = Object.assign(this.headUser, head.user);
+          for (const property in this.headUser) {
+            if (Object.hasOwnProperty.call(this.head, property)) {
+              this.headUser[property] = head[property];
+            }
+          }
+          console.log("head", this.head);
+          console.log("headUser", this.headUser);
+        })
+        .catch((err) => console.warn(err));
+    },
     socialWorkerBirthdateSave(date) {
       this.$refs.menu.save(date);
     },
@@ -2874,8 +2915,10 @@ export default {
     initializeRegionTable() {
       if (this.regionTable.length > 0) this.regionTable.length = 0;
       return axios
-        .post("/graphql/", {
-          query: `query {
+        .post(
+          "/graphql/",
+          {
+            query: `query {
                   allRegions {
                     id
                     name
@@ -2887,7 +2930,7 @@ export default {
                     }
                   }
                 }`,
-        },
+          }
           // {
           //   withCredentials: true,
           // }
@@ -3064,8 +3107,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
-              -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search.toLowerCase()) !== -1
           );
         }
       }
@@ -3094,7 +3139,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search) !== -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search) !== -1
           );
         }
       }
@@ -3136,8 +3184,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
-              -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search.toLowerCase()) !== -1
           );
         }
       }
@@ -3150,24 +3200,33 @@ export default {
               return item.id.indexOf(search) !== -1;
             } else if (filterVal === this.villageHeaders[1].text) {
               return (
-                item.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[2].text) {
               return (
-                item.district.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.district.name
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[3].text) {
               return (
-                item.registrationDate.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.registrationDate
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
               // TODO # fix it to be visible as stacked avatars
             } else if (filterVal === this.villageHeaders[4].text) {
-              return item.donor.nameInitials.toLowerCase().indexOf(search.toLowerCase()) !== -1
+              return (
+                item.donor.nameInitials
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
+              );
             } else if (filterVal === this.villageHeaders[5].text) {
               let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
-              return coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+              return (
+                coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
+                -1
+              );
             } else if (filterVal === this.villageHeaders[6].text) {
               return parseInt(item.orphans.length) === parseInt(search);
             }
@@ -3176,7 +3235,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search) !== -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search) !== -1
           );
         }
       }
@@ -3376,19 +3438,31 @@ export default {
         .catch((err) => console.warn(err));
     },
     removeSelectedRegion(item) {
-      this.regionTableFilterValue.splice(this.regionTableFilterValue.indexOf(item), 1);
+      this.regionTableFilterValue.splice(
+        this.regionTableFilterValue.indexOf(item),
+        1
+      );
       this.regionTableFilterValue = [...this.regionTableFilterValue];
     },
     removeSelectedZone(item) {
-      this.zoneTableFilterValue.splice(this.zoneTableFilterValue.indexOf(item), 1);
+      this.zoneTableFilterValue.splice(
+        this.zoneTableFilterValue.indexOf(item),
+        1
+      );
       this.zoneTableFilterValue = [...this.zoneTableFilterValue];
     },
     removeSelectedDistrict(item) {
-      this.districtTableFilterValue.splice(this.districtTableFilterValue.indexOf(item), 1);
+      this.districtTableFilterValue.splice(
+        this.districtTableFilterValue.indexOf(item),
+        1
+      );
       this.districtTableFilterValue = [...this.districtTableFilterValue];
     },
     removeSelectedVillage(item) {
-      this.villageTableFilterValue.splice(this.villageTableFilterValue.indexOf(item), 1);
+      this.villageTableFilterValue.splice(
+        this.villageTableFilterValue.indexOf(item),
+        1
+      );
       this.villageTableFilterValue = [...this.villageTableFilterValue];
     },
     test() {},

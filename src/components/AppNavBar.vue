@@ -14,44 +14,57 @@
 
       <v-spacer></v-spacer>
 
-      <template>
+      <template v-if="user.role === 'Coordinator'">
         <v-btn text class="mr-0 py-8">New Orphan</v-btn>
         <v-btn text class="py-8">Support Plans</v-btn>
         <v-btn text class="mr-0 py-8">Change Status</v-btn>
       </template>
 
-      <!-- <template>
+      <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on">New</v-btn>
+            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+              >Processing</v-btn
+            >
           </template>
           <span>New Orphans</span>
         </v-tooltip>
-        
+
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on">Waiting</v-btn>
+            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+              >Pending</v-btn
+            >
           </template>
           <span>Waiting Orphans</span>
         </v-tooltip>
-        
+
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on">Sponsored</v-btn>
+            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+              >Sponsored</v-btn
+            >
           </template>
           <span>Sponsored Orphans</span>
         </v-tooltip>
-        
+
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on">Graduated</v-btn>
+            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+              >Graduated</v-btn
+            >
           </template>
           <span>Graduated Orphans</span>
         </v-tooltip>
-        
-      </template> -->
+      </template>
 
-      <!-- <template>
+      <template v-else-if="user.role === 'Head'">
+        <v-btn text class="mr-0 py-8">View</v-btn>
+        <v-btn text class="mr-0 py-8">Register</v-btn>
+        <v-btn text class="mr-0 py-8">User</v-btn>
+      </template>
+
+      <!-- <template v-else-if="user.role === 'SocialWorker'">
         <v-btn text class="mr-0 py-8">View</v-btn>
         <v-btn text class="mr-0 py-8">Register</v-btn>
         <v-btn text class="mr-0 py-8">User</v-btn>
@@ -97,14 +110,20 @@
             <v-row>
               <v-col sm="3">
                 <v-avatar color="green">
-                  <span class="white--text text-h5">EA</span>
+                  <span class="white--text text-h5">
+                    {{ displayNameInitials() }}
+                  </span>
                 </v-avatar>
               </v-col>
               <v-col sm="9">
                 <v-col class="pa-0">
-                  <span class="black--text">Eyob Aschenaki</span>
+                  <span class="black--text">
+                    {{ displayName() }}
+                  </span>
                 </v-col>
-                <span class="gray--text">ethioeyoba@gmail.com</span>
+                <span class="gray--text">
+                  {{ user.email }}
+                </span>
               </v-col>
             </v-row>
           </v-card-text>
@@ -143,6 +162,12 @@
 
 <script>
 export default {
+  props: {
+    user: {
+      type: Object,
+    },
+  },
+
   data() {
     return {
       accountMenu: false,
@@ -151,6 +176,21 @@ export default {
     };
   },
   methods: {
+    displayName() {
+      if (Object.hasOwnProperty.call(this.user, "companyName")) {
+        return this.user.companyName;
+      } else
+        return `${this.user.firstName} ${this.user.middleName}`;
+    },
+    displayNameInitials() {
+      if (Object.hasOwnProperty.call(this.user, "nameInitials")) {
+        return this.user.nameInitials;
+      } else
+        return (
+          this.user.firstName.slice(0, 1).toUpperCase() +
+          this.user.middleName.slice(0, 1).toUpperCase()
+        );
+    },
     closeAccountMenu() {
       this.accountMenu = false;
     },
