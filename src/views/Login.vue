@@ -165,16 +165,16 @@ export default {
           //   withCredentials: true,
           // }
         )
-        .then((res) => res.data.data.login.user.role)
-        .then(role => {
-          if (role === "Head") {
-            this.$router.push({name: "Head_v2"})
-          } else if (role === "Donor") {
-            this.$router.push({name: "Donor"})
-          } else if (role === "Coordinator") {
-            this.$router.push({name: "Coordinator"})
-          } else if (role === "SocialWorker") {
-            this.$router.push({name: "SocialWorker"})
+        .then((res) => res.data.data.login.user)
+        .then(user => {
+          if (user.role === "Head") {
+            this.$router.push({name: "Head_v2", params: { id: user.id}})
+          } else if (user.role === "Donor") {
+            this.$router.push({name: "Donor", params: { id: user.id}})
+          } else if (user.role === "Coordinator") {
+            this.$router.push({name: "Coordinator", params: { id: user.id}})
+          } else if (user.role === "SocialWorker") {
+            this.$router.push({name: "SocialWorker", params: { id: user.id}})
           }
         }) 
         .catch((err) => console.warn(err));

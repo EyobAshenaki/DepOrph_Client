@@ -1,5 +1,6 @@
 <template>
   <div align="center" style="margin-top: 6rem">
+    <AppNavBar />
     <v-card elevation="16" width="70%" max-height="75vh">
       <v-sheet
         id="scrolling-techniques-3"
@@ -843,9 +844,12 @@
 
 <script>
 import axios from "axios";
+import AppNavBar from "@/components/AppNavBar"
 
 export default {
-  components: {},
+  components: {
+    AppNavBar,
+  },
 
   data() {
     return {

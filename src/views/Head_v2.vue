@@ -1,5 +1,6 @@
 <template>
   <div style="margin-top: 6.5rem">
+    <AppNavBar />
     <!-- the value property make it not behave difrently than the showSidebar property -->
     <v-navigation-drawer
       v-model="showSidebar"
@@ -1685,14 +1686,14 @@
 
 <script>
 import axios from "axios";
+import AppNavBar from "@/components/AppNavBar";
 
 export default {
-  // props: ['truthValue'],
-  props: {
-    truthValue: Boolean,
+  components: {
+    AppNavBar,
   },
   data: () => ({
-    showSidebar: true,
+    showSidebar: false,
     sideMenu: false,
     sheet: false,
     group: null,
@@ -2023,14 +2024,6 @@ export default {
       // );
       // Changes the active picker from the default "DATE" to "YEAR"
       val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"));
-    },
-    // truthValue(newValue, oldValue) {
-    //   console.log(`old: ${oldValue}`)
-    //   console.log(`new: ${newValue}`)
-    //   this.showSidebar = this.truthValue;
-    // },
-    truthValue() {
-      this.showSidebar = this.truthValue;
     },
     // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently 
     districtRegion(val) {

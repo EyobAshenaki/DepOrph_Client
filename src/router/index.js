@@ -10,12 +10,12 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/head_v2",
+    path: "/head_v2/:id",
     name: "Head_v2",
     component: Head_v2,
   },
   {
-    path: "/donor",
+    path: "/donor/:id",
     name: "Donor",
     component: Donor,
   },
@@ -26,12 +26,12 @@ const routes = [
     component: Login,
   },
   {
-    path: "/coordinator",
+    path: "/coordinator/:id",
     name: "Coordinator",
     component: Coordinator,
   },
   {
-    path: "/social_worker",
+    path: "/social_worker/:id",
     name: "SocialWorker",
     component: SocialWorker
   },

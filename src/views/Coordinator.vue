@@ -1,5 +1,6 @@
 <template style="positon: relative;">
   <div>
+    <AppNavBar />
     <v-row v-if="!showOrphans" justify="center" no-gutters>
       <!-- Table Card -->
       <!-- TODO: # add a details column -->
@@ -145,10 +146,12 @@
 <script>
 import axios from "axios";
 import OrphanList from "@/views/OrphanList.vue";
+import AppNavBar from "@/components/AppNavBar";
 
 export default {
   components: {
     OrphanList,
+    AppNavBar,
   },
 
   data() {
