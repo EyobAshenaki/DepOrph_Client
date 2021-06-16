@@ -142,7 +142,7 @@ import SocialWorkerOrphanList from "@/views/SocialWorkerOrphanList.vue";
 
 export default {
   components: {
-    SocialWorkerOrphanList,
+    SocialWorkerOrphanList
   },
 
   data() {
@@ -155,28 +155,23 @@ export default {
       snack: false,
       snackColor: "",
       snackText: "",
-      max25chars: (v) => v.length <= 25 || "Input too long!",
+      max25chars: v => v.length <= 25 || "Input too long!",
       // *****************************
       // used in filter selection items
-      filterItems: [
-        "Id",
-        "Village Name",
-        "District",
-        "Donor",
-      ],
+      filterItems: ["ID", "District", "Village", "Donor"],
       filterValue: [],
       // used for filter selection
       // table headers if that wasn't clear enough LOL
       headers: [
-        { text: "Id", value: "id" },
-        {
-          text: "Village Name",
-          align: "Start",
-          value: "villageName",
-        },
+        { text: "ID", value: "id" },
         {
           text: "District",
-          value: "district",
+          value: "district"
+        },
+        {
+          text: "Village",
+          align: "Start",
+          value: "villageName"
         },
         // {
         //   text: "Registred on",
@@ -184,18 +179,18 @@ export default {
         // },
         {
           text: "Donor",
-          value: "donor",
+          value: "donor"
         },
         {
           text: "Orphans",
-          value: "orphans",
-        },
+          value: "orphans"
+        }
       ],
       // table rows/items
       orphans: [],
       villages: [],
       showOrphans: false,
-      selectedOrphanIds: [],
+      selectedOrphanIds: []
     };
   },
   created() {
@@ -208,15 +203,17 @@ export default {
     },
     length() {
       return 7000;
-    },
+    }
     // used in new orphan dialog
   },
   watch: {},
   methods: {
     initialize() {
-      axios
-        .post("/graphql/", {
-          query: `query socialWorker($id: ID!) {
+      const { id } = this.$route.params;
+
+      (async () => {
+        try {
+          const query = `query socialWorker($id: ID!) {
                     socialWorker(id: $id) {
                       id
                       orphans {
@@ -236,21 +233,20 @@ export default {
                         }
                       }
                     }
-                  }`,
-          variables: {
-            id: 1,
-          }
-        })
-        .then((res) => res.data.data.socialWorker)
-        .then((socialWorker) => {
+                  }`;
+          const requestOptions = { query, variables: { id } };
+          const res = await axios.post("/graphql", requestOptions);
+          const { socialWorker } = res.data.data;
+
+          console.log(socialWorker);
           this.orphans = socialWorker.orphans;
-          // console.log(this.orphans);
           for (const orphan of socialWorker.orphans) {
-            this.villages.push(orphan.village)
+            this.villages.push(orphan.village);
           }
-        })
-        .catch((err) => console.warn(err));
-      // console.log(this.orphans);
+        } catch (error) {
+          console.log(error.message);
+        }
+      })();
     },
     getVillageTableId(item) {
       return item.village.id;
@@ -268,7 +264,7 @@ export default {
     },
     goToOrphansTable(item) {
       this.showOrphans = true;
-      this.selectedOrphanIds = item.id
+      this.selectedOrphanIds = item.id;
       console.log(item);
       console.log(this.selectedOrphanIds);
     },
@@ -282,7 +278,9 @@ export default {
               return item.village.id.indexOf(search) !== -1;
             } else if (filterVal === this.headers[1].text) {
               return (
-                item.village.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.village.name
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
               return (
@@ -338,7 +336,7 @@ export default {
       // this comes at the very last of the process so:
       // notify the user weither the operation was successful or keep/write to the log functionality
       console.log("Dialog closed");
-    },
-  },
+    }
+  }
 };
 </script>
