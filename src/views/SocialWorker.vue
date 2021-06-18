@@ -42,11 +42,10 @@
             <v-col class="mt-3">
               <v-text-field v-model="search" placeholder="Search ..." />
             </v-col>
-            <v-col cols="1" class="mt-4 pt-5">
+            <v-col cols="1" class="mt-4 mr-3 pt-5">
               <v-btn
                 fab
                 small
-                class="mr-5"
                 elevation="1"
                 right
                 color="blue lighten-1"
@@ -63,21 +62,135 @@
                 :items-per-page="itemsPerPage"
                 :search="search"
                 :custom-filter="searchFilter"
-                dark
-                fixed-header
               >
                 <template v-slot:[`item.actions`]="{ item }">
-                  <v-icon small class="mr-2" @click="editItem(item)">
+                  <v-icon small class="mr-2" @click="openInsertImageDialog">
                     mdi-image-plus
                   </v-icon>
-                  <v-icon small @click="deleteItem(item)">
+                  <v-icon
+                    small
+                    @click="insertEducationalUpdateDialog = { item, on, attrs }"
+                  >
                     mdi-file-plus
                   </v-icon>
-                </template>
-              </v-data-table></v-col
-            >
-          </v-row></v-card
-        >
+                  <v-dialog
+                    v-model="insertImageDialog"
+                    persistent
+                    :retain-focus="false"
+                    max-width="450"
+                    overlay-color="#eee"
+                    overlay-opacity=".3"
+                  >
+                    <v-card>
+                      <v-card-title>Upload Photos</v-card-title>
+                      <v-divider></v-divider>
+                      <v-card-text>
+                        <v-form
+                          ref="imagesForm"
+                          v-model="validImagesForm"
+                          lazy-validation
+                        >
+                          <v-container>
+                            <v-row
+                              ><v-col cols="12"
+                                ><v-file-input
+                                  v-model="portraitImage"
+                                  label="Portrait Photo"
+                                  prepend-icon="mdi-camera-plus"
+                                  accept="image/*"
+                                  :rules="[rules.required]"
+                                >
+                                  <template v-slot:append>
+                                    <v-tooltip top>
+                                      <template
+                                        v-slot:activator="{ on, attrs }"
+                                      >
+                                        <v-icon
+                                          class="ml-auto"
+                                          v-bind="attrs"
+                                          v-on="on"
+                                          @click="togglePortraitImageDialog"
+                                        >
+                                          mdi-file-eye
+                                        </v-icon>
+                                      </template>
+                                      <span>Preview</span>
+                                    </v-tooltip>
+                                    <v-dialog
+                                      v-model="portraitImageDialog"
+                                      max-height="600"
+                                      max-width="400"
+                                      overlay-color="#eee"
+                                      overlay-opacity=".3"
+                                    >
+                                      <v-img
+                                        :src="portraitImagePreview"
+                                        contain
+                                      ></v-img>
+                                    </v-dialog>
+                                  </template> </v-file-input></v-col
+                            ></v-row>
+                            <v-row
+                              ><v-col cols="12"
+                                ><v-file-input
+                                  v-model="longImage"
+                                  label="Long Photo"
+                                  accept="image/*"
+                                  prepend-icon="mdi-camera-plus"
+                                  :rules="[rules.required]"
+                                  ><template v-slot:append>
+                                    <v-tooltip top>
+                                      <template
+                                        v-slot:activator="{ on, attrs }"
+                                      >
+                                        <v-icon
+                                          class="ml-auto"
+                                          v-bind="attrs"
+                                          v-on="on"
+                                          @click="toggleLongImageDialog"
+                                        >
+                                          mdi-file-eye
+                                        </v-icon>
+                                      </template>
+                                      <span>Preview</span>
+                                    </v-tooltip>
+                                    <v-dialog
+                                      v-model="longImageDialog"
+                                      max-height="600"
+                                      max-width="400"
+                                      overlay-color="#eee"
+                                      overlay-opacity=".3"
+                                    >
+                                      <v-img
+                                        :src="longImagePreview"
+                                        contain
+                                      ></v-img>
+                                    </v-dialog>
+                                  </template> </v-file-input></v-col
+                            ></v-row>
+                          </v-container>
+                        </v-form>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="#777" @click="closeImageInsertDialog"
+                          >Close</v-btn
+                        >
+                        <v-btn
+                          text
+                          color="primary"
+                          @click="saveImageInsertDialog(item)"
+                          :disabled="!validImagesForm"
+                          >Save</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                  <v-dialog v-model="insertEducationalUpdateDialog"> </v-dialog>
+                </template> </v-data-table
+            ></v-col> </v-row
+        ></v-card>
       </v-col>
     </v-row>
     <!-- <v-row v-if="!showOrphans" justify="center" no-gutters>
@@ -214,8 +327,6 @@
   </div>
 </template>
 
-<style scoped></style>
-
 <script>
 import axios from "axios";
 import { capitalize, calculateAge } from "@/utils/utils.js";
@@ -289,9 +400,20 @@ export default {
       itemsPerPage: 20,
       // table rows/items
       orphans: [],
-      villages: [],
+      rules: {
+        required: (value) => !!value || "Required."
+      },
       showOrphans: false,
-      selectedOrphanIds: []
+      selectedOrphanIds: [],
+      insertImageDialog: false,
+      portraitImage: null,
+      portraitImagePreview: null,
+      portraitImageDialog: null,
+      longImage: null,
+      longImagePreview: null,
+      longImageDialog: null,
+      validImagesForm: false,
+      insertEducationalUpdateDialog: false
     };
   },
   created() {
@@ -307,7 +429,6 @@ export default {
     }
     // used in new orphan dialog
   },
-  watch: {},
   methods: {
     initialize() {
       this.snackText = `Login Successful! Welcome ${String(
@@ -368,13 +489,9 @@ export default {
                 donor: item.donor.nameInitials
               };
             });
-            formattedOrphans.sort((a,b) => a.id - b.id);
+            formattedOrphans.sort((a, b) => a.id - b.id);
 
             this.orphans = formattedOrphans;
-
-            for (const orphan of socialWorker.orphans) {
-              this.villages.push(orphan.village);
-            }
           }
         } catch (error) {
           console.log(error.message);
@@ -390,6 +507,100 @@ export default {
         }
       })();
     },
+    openInsertImageDialog() {
+      this.insertImageDialog = true;
+    },
+    togglePortraitImageDialog() {
+      if (this.$refs.imagesForm.inputs[0].validate()) {
+        this.portraitImagePreview = URL.createObjectURL(this.portraitImage);
+        this.portraitImageDialog = true;
+      }
+    },
+    toggleLongImageDialog() {
+      if (this.$refs.imagesForm.inputs[1].validate()) {
+        this.longImagePreview = URL.createObjectURL(this.longImage);
+        this.longImageDialog = true;
+      }
+    },
+    closeImageInsertDialog() {
+      this.insertImageDialog = false;
+    },
+    saveImageInsertDialog(item) {
+      this.snackText = "Uploading Images...";
+      this.snackColor = "sky-blue";
+      this.snack = true;
+      console.log(this.snackText);
+      if (this.$refs.imagesForm.validate()) {
+        // (1) SEND IMAGES TO SERVER, 
+        // (2) GET IMAGES URLS, 
+        // (3) CREATE A DB RECORD, 
+        // (4) LOG CREATE RESULT
+
+        // ! prep images before send
+        const portraitImageFormData = new FormData();
+        portraitImageFormData.append(
+          "orphanPhotosPhotoPortrait",
+          this.portraitImage,
+          this.portraitImage.name
+        );
+        const longImageFormData = new FormData();
+        longImageFormData.append(
+          "orphanPhotosPhotoLong",
+          this.longImage.this.longImage.name
+        );
+        // ! send and get urls
+        (async () => {
+          try {
+            const portraitRes = axios.post(
+              `/orphanPhotosPhotoPortrait`,
+              portraitImageFormData
+            );
+            const longRes = axios.post(
+              `/orphanPhotosPhotoLong`,
+              longImageFormData
+            );
+            // ! create DB record with the urls
+            try {
+              (async () => {
+                const query = `
+                  mutation createPhotos(
+                    $photoPortraitUrl: String!
+                    $photoLongUrl: String
+                    $orphanId: ID
+                    ) {
+                      createOrphanPhotos(
+                        photoPortraitUrl: $photoPortraitUrl
+                        photoLongUrl: $photoLongUrl
+                        orphanId: $orphanId
+                        ) { id }
+                    }
+                `;
+                const queryOptions = {
+                  query,
+                  variables: {
+                    photoPortraitUrl: portraitRes.data,
+                    photoLongUrl: longRes.data,
+                    orphanId: item.id
+                  }
+                };
+                const createPhotosRes = await axios.post(
+                  `/graphql/`,
+                  queryOptions
+                );
+                // ! log create result
+                console.log(createPhotosRes.data);
+              })();
+            } catch (err) {
+              console.error(err);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        })();
+        this.insertImageDialog = false;
+      }
+    },
+
     getVillageTableId(item) {
       return item.village.id;
     },
@@ -493,3 +704,10 @@ export default {
   }
 };
 </script>
+
+<style>
+.v-dialog {
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+    0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important;
+}
+</style>
