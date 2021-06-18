@@ -163,6 +163,7 @@ export default {
                           }
                           socialWorkers {
                             id
+                            firstName
                           }
                         }
                       }
@@ -185,7 +186,7 @@ export default {
           } else if (user.role === "Coordinator") {
             this.$router.push({name: "Coordinator", params: { id: user.coordinators[0].id}})
           } else if (user.role === "SocialWorker") {
-            this.$router.push({name: "SocialWorker", params: { id: user.socialWorkers[0].id}})
+            this.$router.push({name: "SocialWorker", params: { id: user.socialWorkers[0].id, firstName: user.socialWorkers[0].firstName }})
           }
         }) 
         .catch((err) => console.warn(err));

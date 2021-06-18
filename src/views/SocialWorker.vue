@@ -1,13 +1,93 @@
 <template style="positon: relative;">
-  <div>
-    <v-row v-if="!showOrphans" justify="center" no-gutters>
-      <!-- Table Card -->
-      <!-- TODO: # add a details column -->
-      <!--       # impliment editable fullName * NEW FEATURE * -->
-      <!--       # impliment a custom pagination -->
-      <!--       # add chips in the sponsoreship status column -->
-      <v-col cols="9" style="margin-top: 6rem">
-        <v-card elevation="16" min-height="50vh" max-width="150vh">
+  <div style="min-width:1024px; min-height:768px">
+    <v-row justify="center" no-gutters>
+      <v-col cols="9" style="margin-top: 8rem">
+        <v-card elevation="2">
+          <v-row>
+            <!-- TODO implement expanding button into the select-list  -->
+            <v-col cols="1" class="mt-4 pt-5">
+              <v-btn fab small class="ml-5" elevation="1" right color="#eee">
+                <v-icon> mdi-filter </v-icon>
+              </v-btn>
+            </v-col>
+            <v-col class="mt-6">
+              <v-select
+                v-model="filterValue"
+                hint="select field/s to filter explicity"
+                :items="filterItems"
+                :menu-props="{ bottom: true, offsetY: true }"
+                dense
+                elevation="1"
+                persistent-hint
+                multiple
+                placeholder="Filter By"
+              >
+                <template v-slot:selection="{ item, index }">
+                  <v-chip
+                    color="primary"
+                    label
+                    close
+                    close-icon="mdi-close"
+                    v-if="index === 0"
+                  >
+                    <span>{{ item }}</span>
+                  </v-chip>
+                  <span v-if="index === 1" class="grey--text caption">
+                    (+{{ filterValue.length - 1 }} others)
+                  </span>
+                </template>
+              </v-select>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col class="mt-3">
+              <v-text-field v-model="search" placeholder="Search ..." />
+            </v-col>
+            <v-col cols="1" class="mt-4 pt-5">
+              <v-btn
+                fab
+                small
+                class="mr-5"
+                elevation="1"
+                right
+                color="blue lighten-1"
+              >
+                <v-icon> mdi-account-search </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12"
+              ><v-data-table
+                :headers="headers"
+                :items="orphans"
+                :items-per-page="itemsPerPage"
+                :search="search"
+                :custom-filter="searchFilter"
+                dark
+                fixed-header
+              >
+                <template v-slot:[`item.actions`]="{ item }">
+                  <v-icon small class="mr-2" @click="editItem(item)">
+                    mdi-image-plus
+                  </v-icon>
+                  <v-icon small @click="deleteItem(item)">
+                    mdi-file-plus
+                  </v-icon>
+                </template>
+              </v-data-table></v-col
+            >
+          </v-row></v-card
+        >
+      </v-col>
+    </v-row>
+    <!-- <v-row v-if="!showOrphans" justify="center" no-gutters>
+      !-- Table Card --
+      !-- TODO: # add a details column --
+      !--       # impliment editable fullName * NEW FEATURE * --
+      !--       # impliment a custom pagination --
+      !--       # add chips in the sponsoreship status column --
+      <v-col cols="9" style="margin-top: 8rem">
+        <v-card elevation="2" class="mt-6" >
           <v-sheet
             id="scrolling-techniques-3"
             class="overflow-y-auto"
@@ -25,9 +105,9 @@
             >
               <template v-slot:top>
                 <v-row style="margin: 0px">
-                  <!-- Filter/Search Selection -->
-                  <!-- TODO: # add close icon and function to remove from selection -->
-                  <!--       # add tooltip maybe -->
+                  !-- Filter/Search Selection --
+                  !-- TODO: # add close icon and function to remove from selection --
+                  !--       # add tooltip maybe --
                   <v-col cols="12" sm="7" class="ml-md-auto mx-sm-auto">
                     <v-responsive
                       min-width="300"
@@ -64,8 +144,8 @@
                       </v-select>
                     </v-responsive>
                   </v-col>
-                  <!-- Search Input -->
-                  <!-- TODO: # add search icon and close icon -->
+                  !-- Search Input --
+                  !-- TODO: # add search icon and close icon --
                   <v-col
                     cols="12"
                     sm="6"
@@ -109,10 +189,10 @@
                 >
               </template>
             </v-data-table>
-            <!-- becomes visble when full name is edited -->
-            <!-- TODO: # Impliment a loding functionality -->
-            <!--       # maybe server side validation also -->
-            <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+            !-- becomes visble when full name is edited --
+            !-- TODO: # Impliment a loding functionality --
+            !--       # maybe server side validation also --
+            <v-snackbar top right v-model="snack" :timeout="5000" :color="snackColor">
               {{ snackText }}
 
               <template v-slot:action="{ attrs }">
@@ -130,7 +210,7 @@
         :orphanIds="selectedOrphanIds"
         @onBack="showOrphans = $event"
       />
-    </v-fab-transition>
+    </v-fab-transition> -->
   </div>
 </template>
 
@@ -138,12 +218,10 @@
 
 <script>
 import axios from "axios";
-import SocialWorkerOrphanList from "@/views/SocialWorkerOrphanList.vue";
+import { capitalize, calculateAge } from "@/utils/utils.js";
 
 export default {
-  components: {
-    SocialWorkerOrphanList
-  },
+  components: {},
 
   data() {
     return {
@@ -155,15 +233,37 @@ export default {
       snack: false,
       snackColor: "",
       snackText: "",
-      max25chars: v => v.length <= 25 || "Input too long!",
+      max25chars: (v) => v.length <= 25 || "Input too long!",
       // *****************************
       // used in filter selection items
-      filterItems: ["ID", "District", "Village", "Donor"],
+      filterItems: [
+        "ID",
+        "Full Name",
+        "Age",
+        "Gender",
+        "District",
+        "Village",
+        "Donor"
+      ],
       filterValue: [],
       // used for filter selection
       // table headers if that wasn't clear enough LOL
       headers: [
         { text: "ID", value: "id" },
+        {
+          text: "Full Name",
+          align: "start",
+          value: "fullName"
+        },
+        {
+          text: "Age",
+          value: "age"
+        },
+        {
+          text: "Gender",
+          value: "gender"
+        },
+        // { text: "Sponsored Date", value: "sponsoredDate" },
         {
           text: "District",
           value: "district"
@@ -171,7 +271,7 @@ export default {
         {
           text: "Village",
           align: "Start",
-          value: "villageName"
+          value: "village"
         },
         // {
         //   text: "Registred on",
@@ -182,10 +282,11 @@ export default {
           value: "donor"
         },
         {
-          text: "Orphans",
-          value: "orphans"
+          text: "Actions",
+          value: "actions"
         }
       ],
+      itemsPerPage: 20,
       // table rows/items
       orphans: [],
       villages: [],
@@ -209,7 +310,14 @@ export default {
   watch: {},
   methods: {
     initialize() {
-      const { id } = this.$route.params;
+      this.snackText = `Login Successful! Welcome ${String(
+        this.$route.params.firstName
+      )
+        .charAt(0)
+        .toUpperCase()}${String(this.$route.params.firstName).substring(1)} `;
+      this.snackColor = `green`;
+      this.snack = true;
+      let { id } = this.$route.params;
 
       (async () => {
         try {
@@ -219,6 +327,12 @@ export default {
                       orphans {
                         id
                         firstName
+                        father {
+                          firstName
+                          lastName
+                        }
+                        dateOfBirth
+                        gender
                         village {
                           id
                           name
@@ -226,25 +340,53 @@ export default {
                             id
                             name
                           }
+                        }
                           donor {
                             id
                             nameInitials
                           }
-                        }
                       }
                     }
                   }`;
           const requestOptions = { query, variables: { id } };
           const res = await axios.post("/graphql", requestOptions);
-          const { socialWorker } = res.data.data;
+          if (res.data.errors) {
+            throw new Error(res.data.errors[0].message.message);
+          } else {
+            const { socialWorker } = res.data.data;
 
-          console.log(socialWorker);
-          this.orphans = socialWorker.orphans;
-          for (const orphan of socialWorker.orphans) {
-            this.villages.push(orphan.village);
+            let formattedOrphans = socialWorker.orphans.map((item) => {
+              return {
+                id: item.id,
+                fullName: `${capitalize(item.firstName)} ${capitalize(
+                  item.father.firstName
+                )} ${capitalize(item.father.lastName)}`,
+                age: calculateAge(item.dateOfBirth),
+                gender: item.gender,
+                district: item.village.district.name,
+                village: item.village.name,
+                donor: item.donor.nameInitials
+              };
+            });
+            formattedOrphans.sort((a,b) => a.id - b.id);
+
+            this.orphans = formattedOrphans;
+
+            for (const orphan of socialWorker.orphans) {
+              this.villages.push(orphan.village);
+            }
           }
         } catch (error) {
           console.log(error.message);
+          if (
+            error.message ===
+            "Cannot return null for non-nullable field Query.socialWorker."
+          ) {
+            error.message = `Social worker  with id: ${id} doesn't exist.`;
+          }
+          this.snackText = error.message;
+          this.snackColor = `red`;
+          this.snack = true;
         }
       })();
     },
@@ -270,46 +412,57 @@ export default {
     },
     // custom search function based on selected columns
     searchFilter(value, search, item) {
-      // console.log(this.filterValue);
       if (search.length > 0) {
         if (this.filterValue.length > 0) {
           for (const filterVal of this.filterValue) {
             if (filterVal === this.headers[0].text) {
-              return item.village.id.indexOf(search) !== -1;
+              // filter by id only
+              return item.id.indexOf(search) !== -1;
             } else if (filterVal === this.headers[1].text) {
+              // filter by full name only
               return (
-                item.village.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.fullName.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
+              // filter by age only, N.B.: '0' gives all marked by less than a year
               return (
-                item.village.district.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.age === parseInt(search) ||
+                (search == 0 && item.age === `Less than a year`)
               );
             } else if (filterVal === this.headers[3].text) {
+              // filter by gender only
               return (
-                item.village.donor.nameInitials
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.gender.toLowerCase().indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[4].text) {
+              // filter by district name only
+              return (
+                item.district.toLowerCase().indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[5].text) {
+              // filter by village name only
+              return (
+                item.village.toLowerCase().indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[6].text) {
+              // filter by donor name initals only
+              return (
+                item.donor.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             }
           }
         } else {
+          // default search by full name
           return (
-            item.village.name != null &&
-            typeof item.village.name === "string" &&
-            item.village.name
+            item.fullName != null &&
+            typeof item.fullName === "string" &&
+            item.fullName
               .toString()
               .toLowerCase()
               .indexOf(search) !== -1
           );
         }
       }
-    },
-    sendTest() {
-      console.log(this.villages);
     },
 
     // used for the specific edit on orphan name and sponsoreship status
