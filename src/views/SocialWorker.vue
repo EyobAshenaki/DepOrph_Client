@@ -43,13 +43,7 @@
               <v-text-field v-model="search" placeholder="Search ..." />
             </v-col>
             <v-col cols="1" class="mt-4 mr-3 pt-5">
-              <v-btn
-                fab
-                small
-                elevation="1"
-                right
-                color="blue lighten-1"
-              >
+              <v-btn fab small elevation="1" right color="blue lighten-1">
                 <v-icon> mdi-account-search </v-icon>
               </v-btn>
             </v-col>
@@ -67,10 +61,8 @@
                   <v-icon small class="mr-2" @click="openInsertImageDialog">
                     mdi-image-plus
                   </v-icon>
-                  <v-icon
-                    small
-                    @click="insertEducationalUpdateDialog = { item, on, attrs }"
-                  >
+
+                  <v-icon small @click="openInsertERDialog(item)">
                     mdi-file-plus
                   </v-icon>
                   <v-dialog
@@ -109,7 +101,9 @@
                                           class="ml-auto"
                                           v-bind="attrs"
                                           v-on="on"
-                                          @click="togglePortraitImageDialog"
+                                          @click="
+                                            openPortraitImagePreviewDialog
+                                          "
                                         >
                                           mdi-file-eye
                                         </v-icon>
@@ -147,7 +141,7 @@
                                           class="ml-auto"
                                           v-bind="attrs"
                                           v-on="on"
-                                          @click="toggleLongImageDialog"
+                                          @click="openLongImagePreviewDialog"
                                         >
                                           mdi-file-eye
                                         </v-icon>
@@ -187,10 +181,153 @@
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-model="insertEducationalUpdateDialog"> </v-dialog>
-                </template> </v-data-table
-            ></v-col> </v-row
-        ></v-card>
+                  <v-dialog
+                    v-model="insertERDialog"
+                    persistent
+                    :retain-focus="false"
+                    max-width="1377"
+                    overlay-color="#eee"
+                    overlay-opacity=".3"
+                  >
+                    <v-card>
+                      <v-card-title
+                        ><span> Educational Records</span> <v-spacer></v-spacer
+                        ><v-btn color="primary">New Record</v-btn></v-card-title
+                      >
+                      <v-divider></v-divider>
+                      <v-card-text>
+                        <v-row>
+                          <!-- Controls -->
+                          <v-col cols="1"></v-col>
+                        </v-row>
+                        <v-row>
+                          <!-- Table -->
+                          <v-col cols="12">
+                            <v-data-table
+                              :items="ERTableRecords"
+                              :headers="ERTableHeaders"
+                              :items-per-page="itemsPerPage"
+                              show-expand
+                              single-expand
+                              :expanded.sync="ERTableExpandedRecords"
+                              item-key="id"
+                            >
+                              <template
+                                v-slot:[`expanded-item`]="{ headers, item }"
+                                right
+                              >
+                                <td :colspan="headers.length" class="px-0">
+                                  <v-card class="elevation-1" tile>
+                                    <v-card-title>Record Details</v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-text cols="12">
+                                      <v-row>
+                                        <v-col
+                                          ><p>
+                                            School Name: {{ item.schoolName }}
+                                          </p></v-col
+                                        >
+                                        <v-col
+                                          ><p>
+                                            Status:
+                                            {{
+                                              item.status
+                                                .substring(0, 1)
+                                                .toUpperCase()
+                                            }}{{
+                                              item.status
+                                                .substring(1)
+                                                .toLowerCase()
+                                            }}
+                                          </p></v-col
+                                        >
+                                        <v-col
+                                          ><p>
+                                            School Type:
+                                            {{
+                                              item.typeOfSchool
+                                                .substring(0, 1)
+                                                .toUpperCase()
+                                            }}{{
+                                              item.typeOfSchool
+                                                .substring(1)
+                                                .toLowerCase()
+                                            }}
+                                          </p></v-col
+                                        >
+                                      </v-row>
+                                      <v-row>
+                                        <v-col
+                                          ><p>
+                                            Education Level: {{ item.level }}
+                                          </p></v-col
+                                        ><v-col
+                                          ><p>
+                                            Year Division:
+                                            {{
+                                              item.yearDivision
+                                                .substring(0, 1)
+                                                .toUpperCase() == `S` ? `${item.yearDivision.substring(0, 1).toUpperCase()}${item.yearDivision.substring(1).toLowerCase()}` : `Quarter`
+                                            }}
+                                          </p></v-col
+                                        ><v-col
+                                          ><p>
+                                            Current
+                                            {{
+                                              item.yearDivision
+                                                .substring(0, 1)
+                                                .toUpperCase() == "S"
+                                                ? `Semester`
+                                                : `Quarter`
+                                            }}:
+                                            {{
+                                              item.yearDivision
+                                                .substring(0, 1)
+                                                .toUpperCase() == "S"
+                                                ? `${item.semester
+                                                    .substring(0, 1)
+                                                    .toUpperCase()}${item.semester
+                                                    .substring(1)
+                                                    .toLowerCase()}`
+                                                : `${item.quarter
+                                                    .substring(0, 1)
+                                                    .toUpperCase()}${item.quarter
+                                                    .substring(1)
+                                                    .toLowerCase()}`
+                                            }}
+                                          </p></v-col
+                                        >
+                                      </v-row>
+                                      <v-row>
+                                        <v-col cols="12">
+                                          <v-img :src="item.reportCardUrl"></v-img>
+                                        </v-col>
+                                      </v-row>
+                                    </v-card-text></v-card
+                                  >
+                                </td>
+                              </template>
+                            </v-data-table></v-col
+                          >
+                        </v-row>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          elevation="2"
+                          class="mr-3 my-3 error"
+                          @click="closeInsertERDialog"
+                          >close</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card></v-dialog
+                  >
+                </template>
+              </v-data-table></v-col
+            >
+          </v-row></v-card
+        >
       </v-col>
     </v-row>
     <!-- <v-row v-if="!showOrphans" justify="center" no-gutters>
@@ -329,6 +466,7 @@
 
 <script>
 import axios from "axios";
+import moment from "moment";
 import { capitalize, calculateAge } from "@/utils/utils.js";
 
 export default {
@@ -352,6 +490,9 @@ export default {
         "Full Name",
         "Age",
         "Gender",
+        "Guardian Full Name",
+        "Guardian Phone Number",
+        "Account Number",
         "District",
         "Village",
         "Donor"
@@ -373,6 +514,18 @@ export default {
         {
           text: "Gender",
           value: "gender"
+        },
+        {
+          text: "Guardian Full Name",
+          value: "guardianFullName"
+        },
+        {
+          text: "Guardian Mobile Number",
+          value: "guardianMobileNumber"
+        },
+        {
+          text: "Account Number",
+          value: "accountNumber"
         },
         // { text: "Sponsored Date", value: "sponsoredDate" },
         {
@@ -403,8 +556,7 @@ export default {
       rules: {
         required: (value) => !!value || "Required."
       },
-      showOrphans: false,
-      selectedOrphanIds: [],
+      // Image Upload Form Dialog
       insertImageDialog: false,
       portraitImage: null,
       portraitImagePreview: null,
@@ -413,22 +565,78 @@ export default {
       longImagePreview: null,
       longImageDialog: null,
       validImagesForm: false,
-      insertEducationalUpdateDialog: false
+      // Educational Record Upload From Dialog
+      insertERDialog: false,
+      ERTableRecords: [],
+      ERTableHeaders: [
+        {
+          text: "Date",
+          value: "created_at"
+        },
+        // {
+        //   text: "Status",
+        //   value: "status"
+        // },
+        // {
+        //   text: "School Name",
+        //   value: "schoolName"
+        // },
+        // {
+        //   text: "Type",
+        //   value: "typeOfSchool"
+        // },
+        {
+          text: "Grade / Year",
+          value: "year"
+        },
+        // {
+        //   text: "Education Level",
+        //   value: "eddLvl "
+        // },
+        // {
+        //   text: "Division",
+        //   value: "yearDivision"
+        // },
+        // {
+        //   text: "Quarter",
+        //   value: "quarter"
+        // },
+        // {
+        //   text: "Semester",
+        //   value: "semester"
+        // },
+        {
+          text: "Total",
+          value: "totalMark"
+        },
+        {
+          text: "# Subjects",
+          value: "numberOfSubjects"
+        },
+        {
+          text: "Average",
+          value: "average"
+        },
+        {
+          text: "Rank",
+          value: "rank"
+        },
+        {
+          text: "SGPA",
+          value: "semesterGPA"
+        },
+        {
+          text: "CGPA",
+          value: "cumulativeGPA"
+        }
+      ],
+      ERTableExpandedRecords: []
     };
   },
   created() {
     this.initialize();
   },
-  computed: {
-    // temporary filter for the notification panel
-    items() {
-      return Array.from({ length: this.length }, (k, v) => v + 1); // I don't know what this is doing exactly
-    },
-    length() {
-      return 7000;
-    }
-    // used in new orphan dialog
-  },
+  computed: {},
   methods: {
     initialize() {
       this.snackText = `Login Successful! Welcome ${String(
@@ -454,6 +662,13 @@ export default {
                         }
                         dateOfBirth
                         gender
+                        guardian {
+                          firstName
+                          middleName
+                          lastName
+                          mobileNumber
+                        }
+                        accountNumber
                         village {
                           id
                           name
@@ -462,10 +677,10 @@ export default {
                             name
                           }
                         }
-                          donor {
-                            id
-                            nameInitials
-                          }
+                        donor {
+                          id
+                          nameInitials
+                        }
                       }
                     }
                   }`;
@@ -484,11 +699,19 @@ export default {
                 )} ${capitalize(item.father.lastName)}`,
                 age: calculateAge(item.dateOfBirth),
                 gender: item.gender,
+                guardianFullName: `${capitalize(
+                  item.guardian.firstName
+                )} ${capitalize(item.guardian.middleName)} ${capitalize(
+                  item.guardian.lastName
+                )}`,
+                guardianMobileNumber: item.guardian.mobileNumber,
+                accountNumber: item.accountNumber,
                 district: item.village.district.name,
                 village: item.village.name,
                 donor: item.donor.nameInitials
               };
             });
+
             formattedOrphans.sort((a, b) => a.id - b.id);
 
             this.orphans = formattedOrphans;
@@ -510,13 +733,13 @@ export default {
     openInsertImageDialog() {
       this.insertImageDialog = true;
     },
-    togglePortraitImageDialog() {
+    openPortraitImagePreviewDialog() {
       if (this.$refs.imagesForm.inputs[0].validate()) {
         this.portraitImagePreview = URL.createObjectURL(this.portraitImage);
         this.portraitImageDialog = true;
       }
     },
-    toggleLongImageDialog() {
+    openLongImagePreviewDialog() {
       if (this.$refs.imagesForm.inputs[1].validate()) {
         this.longImagePreview = URL.createObjectURL(this.longImage);
         this.longImageDialog = true;
@@ -531,9 +754,9 @@ export default {
       this.snack = true;
       console.log(this.snackText);
       if (this.$refs.imagesForm.validate()) {
-        // (1) SEND IMAGES TO SERVER, 
-        // (2) GET IMAGES URLS, 
-        // (3) CREATE A DB RECORD, 
+        // (1) SEND IMAGES TO SERVER,
+        // (2) GET IMAGES URLS,
+        // (3) CREATE A DB RECORD,
         // (4) LOG CREATE RESULT
 
         // ! prep images before send
@@ -600,29 +823,80 @@ export default {
         this.insertImageDialog = false;
       }
     },
+    openInsertERDialog(item) {
+      console.log(`orphan.id: `, item.id);
+      (async () => {
+        try {
+          const query = `
+              query educationalRecordsByOrphanId($orphanId: ID!){
+                  orphan(id:$orphanId){
+                    education{
+                      educationalRecords{
+                        id
+                        created_at
+                        enrollmentStatus
+                        schoolName
+                        typeOfSchool
+                        year
+                        level
+                        reason
+                        yearDivision
+                        quarter
+                        semester
+                        totalMark
+                        numberOfSubjects
+                        average
+                        rank
+                        reportCardUrl
+                        semesterGPA
+                        cumulativeGPA
+                      }
+                    }
+                  }
+                }
+              `;
+          const requestOptions = { query, variables: { orphanId: item.id } };
+          const ERRes = await axios.post(`/graphql/`, requestOptions);
+          console.log(ERRes.data.data.orphan.education.educationalRecords);
+          let tempRecords = ERRes.data.data.orphan.education.educationalRecords.map(
+            (item) => {
+              let returnItem = { ...item };
+              returnItem.status = item.enrollmentStatus;
+              returnItem.level =
+                item.level == "religiousEducation"
+                  ? "Religious Education"
+                  : item.level == "preSchool"
+                  ? "Kindergarten (pre-school & KG)"
+                  : item.level == "gradeSchool"
+                  ? "Grade School"
+                  : item.level == "underGraduate"
+                  ? "Undergraduate (University / College)"
+                  : item.level == "postGraduate"
+                  ? "Postgraduate (University / College)"
+                  : NaN;
+                  returnItem.created_at = moment(item.created_at).format("DD / MM / YY")
+              delete returnItem.enrollmentStatus;
+              return returnItem;
+            }
+          );
+          console.log(tempRecords);
 
-    getVillageTableId(item) {
-      return item.village.id;
+          this.ERTableRecords = tempRecords;
+        } catch (error) {
+          console.error(error);
+        }
+      })();
+      this.insertERDialog = true;
     },
-    getVillageTableVillageName(item) {
-      return item.village.name;
+    closeInsertERDialog() {
+      this.insertERDialog = false;
     },
-    getVillageTableDistrict(item) {
-      if (item.village.district === null) return "";
-      return item.village.district.name;
-    },
-    getVillageTableDonor(item) {
-      if (item.village.donor === null) return "";
-      return item.village.donor.nameInitials;
-    },
-    goToOrphansTable(item) {
-      this.showOrphans = true;
-      this.selectedOrphanIds = item.id;
+    saveInsertERDialog(item) {
       console.log(item);
-      console.log(this.selectedOrphanIds);
     },
+
     // custom search function based on selected columns
-    searchFilter(value, search, item) {
+    searchFilter(_value, search, item) {
       if (search.length > 0) {
         if (this.filterValue.length > 0) {
           for (const filterVal of this.filterValue) {
@@ -635,10 +909,11 @@ export default {
                 item.fullName.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[2].text) {
-              // filter by age only, N.B.: '0' gives all marked by less than a year
+              // filter by age only, N.B.: '0' , '<1' & '< 1' gives all marked by < 1
               return (
                 item.age === parseInt(search) ||
-                (search == 0 && item.age === `Less than a year`)
+                ((search == 0 || search == `< 1` || search == `<1`) &&
+                  item.age === `< 1`)
               );
             } else if (filterVal === this.headers[3].text) {
               // filter by gender only
@@ -646,16 +921,37 @@ export default {
                 item.gender.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.headers[4].text) {
+              // filter by guardian full name only
+              return (
+                item.guardianFullName
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[5].text) {
+              // filter by guardian mobile number only
+              return (
+                item.guardianMobileNumber
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[6].text) {
+              // filter by account number only
+              return (
+                item.accountNumber
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
+              );
+            } else if (filterVal === this.headers[7].text) {
               // filter by district name only
               return (
                 item.district.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
-            } else if (filterVal === this.headers[5].text) {
+            } else if (filterVal === this.headers[8].text) {
               // filter by village name only
               return (
                 item.village.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
-            } else if (filterVal === this.headers[6].text) {
+            } else if (filterVal === this.headers[9].text) {
               // filter by donor name initals only
               return (
                 item.donor.toLowerCase().indexOf(search.toLowerCase()) !== -1
@@ -674,39 +970,14 @@ export default {
           );
         }
       }
-    },
-
-    // used for the specific edit on orphan name and sponsoreship status
-    save() {
-      // send the edited data to the server after validation via the rule/s prop
-      // maybe impliment a loding functionality
-      this.snack = true;
-      this.snackColor = "success";
-      this.snackText = "Data saved";
-    },
-    cancel() {
-      // nothing happens keep the current changes
-      this.snack = true;
-      this.snackColor = "error";
-      this.snackText = "Canceled";
-    },
-    open() {
-      // maybe fireup validation functions
-      this.snack = true;
-      this.snackColor = "info";
-      this.snackText = "Dialog opened";
-    },
-    close() {
-      // this comes at the very last of the process so:
-      // notify the user weither the operation was successful or keep/write to the log functionality
-      console.log("Dialog closed");
     }
   }
 };
 </script>
 
 <style>
-.v-dialog {
+.v-dialog,
+.v-menu__content {
   box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important;
 }

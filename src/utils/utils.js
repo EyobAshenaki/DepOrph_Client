@@ -9,7 +9,7 @@ function capitalize(string) {
 function calculateAge(dateOfBirth) {
   const ageInYears = moment().diff(dateOfBirth, `years`);
   if (ageInYears > 0) return ageInYears;
-  return `Less than a year`;
+  return `< 1`;
 }
 
 export { capitalize, calculateAge };
