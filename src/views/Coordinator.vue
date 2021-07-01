@@ -1,143 +1,202 @@
 <template style="positon: relative;">
   <div>
-    <AppNavBar :user="coordinatorUser" />
-    <v-row v-if="!showOrphans" justify="center" no-gutters>
-      <!-- Table Card -->
-      <!-- TODO: # add a details column -->
-      <!--       # impliment editable fullName * NEW FEATURE * -->
-      <!--       # impliment a custom pagination -->
-      <v-col cols="9" style="margin-top: 6rem">
-        <v-card elevation="16" min-height="50vh" max-width="150vh">
-          <v-sheet
-            id="scrolling-techniques-3"
-            class="overflow-y-auto"
-            max-height="83vh"
-          >
-            <v-data-table
-              :headers="headers"
-              :items="villages"
-              item-key="id"
-              :search="search"
-              append-icon="mdi-magnify"
-              :custom-filter="searchFilter"
-              multi-sort
-              class="elevation-1"
+    <AppNavBar
+      :user="coordinatorUser"
+      :dialog="showVillagesSelectionDialog"
+      @toggleNewOrphanDialog="toggleNewOrphanDialog($event)"
+      @toggleSupportPlanComponent="toggleSupportPlanTable($event)"
+    />
+    <!-- village select Dialog -->
+    <v-dialog v-model="showVillagesSelectionDialog" width="30%" persistent>
+      <v-card>
+        <v-card-title class="justify-center">
+          Choose Village
+        </v-card-title>
+        <v-form ref="villageSelect" v-model="validVillageChoice">
+          <v-responsive min-width="200" max-width="200" class="pl-0 mx-auto">
+            <v-select
+              v-model="selectedOrphanVillage"
+              :items="selectedOrphanVillageOptions"
+              item-text="name"
+              item-value="id"
+              :menu-props="{ bottom: true, offsetY: true }"
+              solo
+              outlined
+              dense
+              :rules="[rules.required]"
             >
-              <template v-slot:top>
-                <v-row style="margin: 0px">
-                  <!-- Filter/Search Selection -->
-                  <!-- TODO: # add close icon and function to remove from selection -->
-                  <!--       # add tooltip maybe -->
-                  <v-col cols="12" sm="7" class="ml-md-auto mx-sm-auto">
-                    <v-responsive
-                      min-width="300"
-                      max-width="300"
-                      class="mx-xs-auto ml-sm-auto mt-sm-2"
-                    >
-                      <v-select
-                        v-model="filterValue"
-                        hint="select field/s to filter explicity"
-                        :items="filterItems"
-                        :menu-props="{ bottom: true, offsetY: true }"
-                        solo
-                        outlined
-                        dense
-                        persistent-hint
-                        multiple
-                        placeholder="Filter By"
-                      >
-                        <template v-slot:selection="{ item, index }">
-                          <v-chip
-                            color="primary"
-                            dark
-                            label
-                            close
-                            close-icon="mdi-close-outline"
-                            @click:close="removeSelected(item)"
-                            v-if="index === 0"
-                          >
-                            <span>{{ item }}</span>
-                          </v-chip>
-                          <span v-if="index === 1" class="grey--text caption">
-                            (+{{ filterValue.length - 1 }} others)
-                          </span>
-                        </template>
-                      </v-select>
-                    </v-responsive>
-                  </v-col>
-                  <!-- Search Input -->
-                  <!-- TODO: # add search icon and close icon -->
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="5"
-                    offset-md="0"
-                    class="mx-sm-auto"
-                  >
-                    <v-responsive max-width="300" class="ml-sm-3 mt-sm-4">
-                      <v-text-field
-                        v-model="search"
-                        placeholder="Search"
-                        dense
-                        flat
-                        clearable
-                        append-icon="mdi-filter-minus"
-                      >
-                        <template v-slot:prepend> </template>
-                      </v-text-field>
-                    </v-responsive>
-                  </v-col>
-                </v-row>
-              </template>
-              <template v-slot:item.id="{ item }">
-                {{ getVillageTableId(item) }}
-              </template>
-              <template v-slot:item.villageName="{ item }">
-                {{ getVillageTableVillageName(item) }}
-              </template>
-              <template v-slot:item.district="{ item }">
-                {{ getVillageTableDistrict(item) }}
-              </template>
-              <template v-slot:item.registrationDate="{ item }">
-                {{ getVillageTableRegistrationDate(item) }}
-              </template>
-              <template v-slot:item.donor="{ item }">
-                {{ getVillageTableDonor(item) }}
-              </template>
-              <template v-slot:item.socialWorker="{ item }">
-                {{ getVillageTableSocialWorker(item) }}
-              </template>
-              <template v-slot:item.orphans="{ item }">
-                <v-btn
-                  small
-                  color="primary darken-2"
-                  @click="goToOrphansTable(item)"
-                  >Show Orphan</v-btn
-                >
-              </template>
-            </v-data-table>
-            <!-- becomes visble when full name is edited -->
-            <!-- TODO: # Impliment a loding functionality -->
-            <!--       # maybe server side validation also -->
-            <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-              {{ snackText }}
+            </v-select>
+          </v-responsive>
+        </v-form>
+        <v-card-actions class="justify-end">
+          <v-btn text class="red--text" @click="cancelVillagesChoice"
+            >Cancel</v-btn
+          >
+          <v-btn
+            text
+            class="primary--text"
+            @click="chooseVillages"
+            :disabled="!validVillageChoice"
+            >Confirm</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-              <template v-slot:action="{ attrs }">
-                <v-btn v-bind="attrs" text @click="snack = false">
-                  Close
-                </v-btn>
-              </template>
-            </v-snackbar>
-          </v-sheet>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-fab-transition v-else>
-      <OrphanList
-        :orphanIds="selectedOrphanIds"
-        @onBack="showOrphans = $event"
+    <v-fab-transition>
+      <NewOrphanRegistrationModel
+        :newOrphanDialog="newOrphanDialog"
+        :orphanVillageId="parseInt(selectedOrphanVillage)"
+        @dialogClosed="newOrphanDialog = $event"
       />
     </v-fab-transition>
+
+    <template v-if="showSupportPlanTable">
+      <v-fab-transition>
+        <support-plan-table />
+      </v-fab-transition>
+    </template>
+
+    <template v-else>
+      <v-row v-if="!showOrphans" justify="center" no-gutters>
+        <!-- Table Card -->
+        <!-- TODO: # add a details column -->
+        <!--       # impliment editable fullName * NEW FEATURE * -->
+        <!--       # impliment a custom pagination -->
+        <v-col cols="9" style="margin-top: 6rem">
+          <v-card elevation="3" min-height="50vh" max-width="150vh">
+            <v-sheet
+              id="scrolling-techniques-3"
+              class="overflow-y-auto"
+              max-height="83vh"
+            >
+              <v-data-table
+                :headers="headers"
+                :items="villages"
+                item-key="id"
+                :search="search"
+                append-icon="mdi-magnify"
+                :custom-filter="searchFilter"
+                multi-sort
+                class="elevation-1"
+              >
+                <template v-slot:top>
+                  <v-row style="margin: 0px">
+                    <!-- Filter/Search Selection -->
+                    <!-- TODO: # add close icon and function to remove from selection -->
+                    <!--       # add tooltip maybe -->
+                    <v-col cols="12" sm="7" class="ml-md-auto mx-sm-auto">
+                      <v-responsive
+                        min-width="300"
+                        max-width="300"
+                        class="mx-xs-auto ml-sm-auto mt-sm-2"
+                      >
+                        <v-select
+                          v-model="filterValue"
+                          hint="select field/s to filter explicity"
+                          :items="filterItems"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          solo
+                          flat
+                          outlined
+                          dense
+                          persistent-hint
+                          multiple
+                          placeholder="Filter By"
+                        >
+                          <template v-slot:selection="{ item, index }">
+                            <v-chip
+                              color="primary"
+                              dark
+                              label
+                              close
+                              close-icon="mdi-close-outline"
+                              @click:close="removeSelected(item)"
+                              v-if="index === 0"
+                            >
+                              <span>{{ item }}</span>
+                            </v-chip>
+                            <span v-if="index === 1" class="grey--text caption">
+                              (+{{ filterValue.length - 1 }} others)
+                            </span>
+                          </template>
+                        </v-select>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Search Input -->
+                    <!-- TODO: # add search icon and close icon -->
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="5"
+                      offset-md="0"
+                      class="mx-sm-auto"
+                    >
+                      <v-responsive max-width="300" class="ml-sm-3 mt-sm-4">
+                        <v-text-field
+                          v-model="search"
+                          placeholder="Search"
+                          dense
+                          flat
+                          clearable
+                          append-icon="mdi-filter-minus"
+                        >
+                          <template v-slot:prepend> </template>
+                        </v-text-field>
+                      </v-responsive>
+                    </v-col>
+                  </v-row>
+                </template>
+                <template v-slot:item.id="{ item }">
+                  {{ getVillageTableId(item) }}
+                </template>
+                <template v-slot:item.villageName="{ item }">
+                  {{ getVillageTableVillageName(item) }}
+                </template>
+                <template v-slot:item.district="{ item }">
+                  {{ getVillageTableDistrict(item) }}
+                </template>
+                <template v-slot:item.registrationDate="{ item }">
+                  {{ getVillageTableRegistrationDate(item) }}
+                </template>
+                <template v-slot:item.donor="{ item }">
+                  {{ getVillageTableDonor(item) }}
+                </template>
+                <template v-slot:item.socialWorker="{ item }">
+                  {{ getVillageTableSocialWorker(item) }}
+                </template>
+                <template v-slot:item.orphans="{ item }">
+                  <v-btn
+                    small
+                    color="primary darken-2"
+                    @click="goToOrphansTable(item)"
+                    >Show Orphan</v-btn
+                  >
+                </template>
+              </v-data-table>
+              <!-- becomes visble when full name is edited -->
+              <!-- TODO: # Impliment a loding functionality -->
+              <!--       # maybe server side validation also -->
+              <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+                {{ snackText }}
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn v-bind="attrs" text @click="snack = false">
+                    Close
+                  </v-btn>
+                </template>
+              </v-snackbar>
+            </v-sheet>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-fab-transition v-else>
+        <OrphanList
+          :orphanIds="selectedOrphanIds"
+          @onBack="showOrphans = $event"
+        />
+      </v-fab-transition>
+    </template>
   </div>
 </template>
 
@@ -147,11 +206,15 @@
 import axios from "axios";
 import OrphanList from "@/views/OrphanList.vue";
 import AppNavBar from "@/components/AppNavBar";
+import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
+import SupportPlanTable from '../components/SupportPlanTable.vue';
 
 export default {
   components: {
     OrphanList,
     AppNavBar,
+    NewOrphanRegistrationModel,
+    SupportPlanTable,
   },
 
   data() {
@@ -214,6 +277,15 @@ export default {
         email: "",
         role: "",
       },
+      rules: {
+        required: (value) => !!value || "Required.",
+      },
+      newOrphanDialog: false,
+      showVillagesSelectionDialog: false,
+      selectedOrphanVillage: "",
+      selectedOrphanVillageOptions: [],
+      validVillageChoice: false,
+      showSupportPlanTable: false,
       // table rows/items
       villages: [],
       showOrphans: false,
@@ -233,7 +305,13 @@ export default {
     },
     // used in new orphan dialog
   },
-  watch: {},
+  watch: {
+    showVillagesSelectionDialog(val) {
+      if (val === true) {
+        this.selectedOrphanVillageOptions = [...this.coordinator.villages];
+      }
+    },
+  },
   methods: {
     initialize() {
       console.log("routerCoordinatorId: ", this.$route.params.id);
@@ -291,6 +369,13 @@ export default {
           console.log("coordiantorUser", this.coordinatorUser);
         })
         .catch((err) => console.warn(err));
+    },
+    toggleNewOrphanDialog(val) {
+      this.showVillagesSelectionDialog = val;
+    },
+    toggleSupportPlanTable(val) {
+      console.log(val);
+      this.showSupportPlanTable = val;
     },
     getVillageTableId(item) {
       return item.id;
@@ -379,6 +464,29 @@ export default {
         }
       }
     },
+    chooseVillages() {
+      if (this.$refs.villageSelect.validate()) {
+        this.villageChoiceClose();
+        this.villageChoiceReset();
+        this.selectedOrphanVillageOptions = [];
+        this.newOrphanDialog = true;
+      } else {
+        // handle error and show some kind of notification
+      }
+    },
+    cancelVillagesChoice() {
+      this.selectedOrphanVillage = "";
+      this.villageChoiceClose();
+      this.villageChoiceReset();
+    },
+    villageChoiceClose() {
+      this.showVillagesSelectionDialog = false;
+    },
+    villageChoiceReset() {
+      this.$refs.villageSelect.reset();
+    },
+
+    // -------------------------------------
     sendTest() {
       console.log(this.villages);
     },

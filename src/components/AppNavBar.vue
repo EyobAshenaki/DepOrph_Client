@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <v-app-bar absolute elevate-on-scroll style="background: #eee;"> -->
     <v-app-bar absolute dark elevate-on-scroll>
       <template v-slot:img="{ props }">
         <v-img
@@ -15,8 +16,10 @@
       <v-spacer></v-spacer>
 
       <template v-if="user.role === 'Coordinator'">
-        <v-btn text class="mr-0 py-8">New Orphan</v-btn>
-        <v-btn text class="py-8">Support Plans</v-btn>
+        <v-btn text class="mr-0 py-8" @click.stop="toggleNewOrphanDialog"
+          >New Orphan</v-btn
+        >
+        <v-btn text class="py-8" @click.stop="toggleSupportPlanComponent">Support Plans</v-btn>
         <v-btn text class="mr-0 py-8">Change Status</v-btn>
       </template>
 
@@ -81,6 +84,7 @@
           color="orange"
         ></v-text-field>
       </v-responsive>
+      <!-- user profile menu -->
       <v-menu
         v-model="accountMenu"
         :close-on-content-click="false"
@@ -166,6 +170,9 @@ export default {
     user: {
       type: Object,
     },
+    dialog: {
+      type: Boolean,
+    }
   },
 
   data() {
@@ -173,14 +180,27 @@ export default {
       accountMenu: false,
       search: "",
       drawer: false,
+      newOrphanDialog: true,
+      supportPlanTable: true,
     };
   },
   methods: {
+    toggleNewOrphanDialog() {
+      // because when the dialog closes this function don't get the memo
+      // if(this.newOrphanDialog === false) this.newOrphanDialog = true;
+      if(this.newOrphanDialog === false) this.newOrphanDialog = !this.dialog;
+      this.$emit("toggleNewOrphanDialog", this.newOrphanDialog);
+      this.newOrphanDialog = !this.newOrphanDialog;
+    },
+    toggleSupportPlanComponent() {
+      // if(this.supportPlanTable === false) this.supportPlanTable = true;
+      this.$emit("toggleSupportPlanComponent", this.supportPlanTable);
+      this.supportPlanTable = !this.supportPlanTable;
+    },
     displayName() {
       if (Object.hasOwnProperty.call(this.user, "companyName")) {
         return this.user.companyName;
-      } else
-        return `${this.user.firstName} ${this.user.middleName}`;
+      } else return `${this.user.firstName} ${this.user.middleName}`;
     },
     displayNameInitials() {
       if (Object.hasOwnProperty.call(this.user, "nameInitials")) {

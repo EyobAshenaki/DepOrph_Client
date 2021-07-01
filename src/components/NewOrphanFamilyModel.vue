@@ -33,8 +33,8 @@
                       >
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
-                            v-model="orphan.father.dateOfBirth"
-                            label="Date of Birth"
+                            v-model="fatherDateOfBirth"
+                            label="Date of Birth*"
                             prepend-icon="mdi-calendar"
                             readonly
                             v-bind="attrs"
@@ -42,9 +42,10 @@
                             :rules="[rules.required]"
                           ></v-text-field>
                         </template>
+                        <!-- v-model="orphan.father.dateOfBirth" -->
                         <v-date-picker
                           ref="fatherDateOfBirthPicker"
-                          v-model="orphan.father.dateOfBirth"
+                          v-model="fatherDateOfBirth"
                           no-title
                           scrollable
                           :max="new Date().toISOString().substr(0, 10)"
@@ -67,9 +68,10 @@
                         min-width="auto"
                       >
                         <template v-slot:activator="{ on, attrs }">
+                          <!-- v-model="orphan.father.dateOfDeath" -->
                           <v-text-field
-                            v-model="orphan.father.dateOfDeath"
-                            label="Date of Death"
+                            v-model="fatherDateOfDeath"
+                            label="Date of Death*"
                             prepend-icon="mdi-calendar"
                             readonly
                             v-bind="attrs"
@@ -79,7 +81,7 @@
                         </template>
                         <v-date-picker
                           ref="fatherDateOfDeathPicker"
-                          v-model="orphan.father.dateOfDeath"
+                          v-model="fatherDateOfDeath"
                           no-title
                           scrollable
                           :max="new Date().toISOString().substr(0, 10)"
@@ -94,9 +96,10 @@
                   <!-- Father Cause of Death field-->
                   <v-col cols="12" sm="6" md="6">
                     <v-responsive max-width="" class="">
+                      <!-- v-model="orphan.father.causeOfDeath" -->
                       <v-text-field
-                        v-model="orphan.father.causeOfDeath"
-                        label="Cause of Death"
+                        v-model="fatherCauseOfDeath"
+                        label="Cause of Death*"
                         :rules="[rules.required]"
                       >
                       </v-text-field>
@@ -113,7 +116,7 @@
                     <v-responsive max-width="" class="">
                       <v-text-field
                         v-model="orphan.mother.firstName"
-                        label="First Name"
+                        label="First Name*"
                         :rules="[rules.required, rules.name]"
                       >
                       </v-text-field>
@@ -125,7 +128,7 @@
                       <v-text-field
                         v-model="orphan.mother.middleName"
                         :rules="[rules.required, rules.name]"
-                        label="Middle Name"
+                        label="Middle Name*"
                       >
                       </v-text-field>
                     </v-responsive>
@@ -136,7 +139,7 @@
                       <v-text-field
                         v-model="orphan.mother.lastName"
                         :rules="[rules.required, rules.name]"
-                        label="Last Name"
+                        label="Last Name*"
                       >
                       </v-text-field>
                     </v-responsive>
@@ -155,7 +158,7 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="orphan.mother.dateOfBirth"
-                            label="Date of Birth"
+                            label="Date of Birth*"
                             prepend-icon="mdi-calendar"
                             readonly
                             v-bind="attrs"
@@ -187,7 +190,7 @@
                           offsetY: true,
                         }"
                         :rules="[rules.required]"
-                        label="Vital Status"
+                        label="Vital Status*"
                       ></v-select>
                     </v-responsive>
                   </v-col>
@@ -202,7 +205,6 @@
                             bottom: true,
                             offsetY: true,
                           }"
-                          :rules="[rules.required]"
                           label="Marital Status"
                         ></v-select>
                       </v-responsive>
@@ -230,7 +232,6 @@
                               readonly
                               v-bind="attrs"
                               v-on="on"
-                              :rules="[rules.required]"
                             ></v-text-field>
                           </template>
                           <v-date-picker
@@ -264,7 +265,7 @@
                         offsetY: true,
                       }"
                       :rules="[rules.required]"
-                      label="Housing Situation"
+                      label="Housing Situation*"
                     ></v-select>
                     <!-- <v-responsive max-width="" class="">
                       <v-combobox
@@ -307,7 +308,6 @@
                         v-model="orphan.House_property.otherProperty"
                         label="Other Properties"
                         auto-grow
-                        :rules="[rules.required]"
                         rows="1"
                       ></v-textarea>
                     </v-responsive>
@@ -353,7 +353,7 @@
 import axios from "axios";
 
 export default {
-  props: ["updatedOrphan"],
+  props: ["updatedOrphan", "orphanVillageId"],
   data() {
     return {
       // dialog
@@ -389,6 +389,9 @@ export default {
       },
       fatherDateOfBirthMenu: false,
       fatherDateOfDeathMenu: false,
+      fatherDateOfBirth: null,
+      fatherDateOfDeath: null,
+      fatherCauseOfDeath: null,
       motherDateOfBirthMenu: false,
       motherDateOfDeathMenu: false,
       motherVitalStatusOptions: ["Alive", "Passed Away"],
@@ -509,7 +512,7 @@ export default {
             deathCertificateUrl: deathCertificateUrl,
           },
         })
-        .then((res) => res.data?.data?.createFather)
+        .then((res) => res.data.data.createFather)
         .catch((err) => console.warn(err));
     },
 
@@ -730,7 +733,8 @@ export default {
       educationId,
       guardianId,
       motherId,
-      house_propertyId
+      house_propertyId,
+      villageId
     ) {
       return await axios
         .post("/graphql", {
@@ -752,6 +756,7 @@ export default {
                     $educationId: ID
                     $guardianId: ID
                     $house_propertyId: ID
+                    $villageId: ID
                   ) {
                     createOrphan(
                       firstName: $firstName
@@ -771,6 +776,7 @@ export default {
                       educationId: $educationId
                       guardianId: $guardianId
                       house_propertyId: $house_propertyId
+                      villageId: $villageId
                     ) {
                       id
                       firstName
@@ -821,6 +827,9 @@ export default {
                         housingSituation
                         otherProperty
                       }
+                      village{
+                        id
+                      }
                     }
                   }`,
           variables: {
@@ -841,9 +850,37 @@ export default {
             guardianId: guardianId,
             motherId: motherId,
             house_propertyId: house_propertyId,
+            villageId: villageId,
           },
         })
         .then((res) => res.data.data.createOrphan)
+        .catch((err) => console.warn(err));
+    },
+
+    async createSponsorshipStatus(orphanId) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createSponsorshipStatus(
+                  $status: sponsorshipStatus
+                  $date: DateTime!
+                  $orphanId: ID
+                ) {
+                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
+                    id
+                    status
+                    date
+                    orphan {
+                      id
+                    }
+                  }
+                }`,
+          variables: {
+            status: "processing",
+            date: new Date().toISOString(),
+            orphanId: orphanId,
+          },
+        })
+        .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
     },
 
@@ -872,10 +909,16 @@ export default {
       if (this.$refs.familyForm.validate()) {
         this.orphan = Object.assign(this.orphan ?? {}, this.updatedOrphan);
 
+        this.orphan.dateOfBirth = this.isoDateFormatter(this.orphan.dateOfBirth);
+
         this.orphan.father = Object.assign(
           this.orphan.father ?? {},
           this.updatedOrphan?.father
         );
+
+        this.orphan.father.causeOfDeath = this.fatherCauseOfDeath;
+        this.orphan.father.dateOfBirth = this.fatherDateOfBirth;
+        this.orphan.father.dateOfDeath = this.fatherDateOfDeath;
 
         // this.orphan.mother = Object.assign(
         //   this.orphan.mother ?? {},
@@ -897,12 +940,19 @@ export default {
           this.updatedOrphan?.guardian
         );
 
+        this.orphan.father.dateOfDeath = this.isoDateFormatter(
+          this.orphan.father.dateOfDeath
+        );
+        this.orphan.father.dateOfBirth = this.isoDateFormatter(
+          this.orphan.father.dateOfBirth
+        );
+
         const father = this.getOrphanFather(
           this.orphan.father.firstName,
           this.orphan.father.lastName,
-          new Date(this.orphan.father.dateOfDeath).toISOString(),
+          this.orphan.father.dateOfDeath,
           this.orphan.father.causeOfDeath,
-          new Date(this.orphan.father.dateOfBirth).toISOString(),
+          this.orphan.father.dateOfBirth,
           "deathCertificateUrlPlaceholder"
         );
 
@@ -915,19 +965,24 @@ export default {
           this.orphan.education.reason
         );
 
+        this.orphan.mother.dateOfBirth = this.isoDateFormatter(
+          this.orphan.mother.dateOfBirth
+        );
         this.orphan.mother.vitalStatus = this.orphan.mother.vitalStatus
           .split(" ")[0]
           .toString()
           .toLowerCase();
-        this.orphan.mother.maritalStatus = this.orphan.mother.maritalStatus.toLowerCase();
-        this.orphan.mother.dateOfBirth = new Date(
-          this.orphan.mother.dateOfBirth
-        ).toISOString();
-        this.orphan.mother.dateOfDeath = new Date(
+        console.log(this.orphan.mother.vitalStatus);
+        if(this.orphan.mother.vitalStatus === "alive"){
+          this.orphan.mother.dateOfDeath = null;
+        } else this.orphan.mother.maritalStatus = null;
+        
+        this.orphan.mother.maritalStatus = this.orphan.mother.maritalStatus?.toLowerCase();
+        this.orphan.mother.dateOfDeath = this.isoDateFormatter(
           this.orphan.mother.dateOfDeath
-        ).toISOString();
-        (this.orphan.mother.mobileNumber = "0974671463"),
-          (this.orphan.mother.monthlyExpense = parseFloat(987.76));
+        );
+        this.orphan.mother.mobileNumber = "0974671463";
+        this.orphan.mother.monthlyExpense = parseFloat(987.76);
 
         const mother = this.getOrphanMother(
           this.orphan.mother.firstName,
@@ -941,6 +996,8 @@ export default {
           this.orphan.mother.mobileNumber,
           this.orphan.mother.monthlyExpense
         );
+
+        this.orphan.guardian.dateOfBirth = this.isoDateFormatter(this.orphan.guardian.dateOfBirth);
 
         const guardian = this.getOrphanGuardian(
           this.orphan.guardian.firstName,
@@ -989,7 +1046,7 @@ export default {
                               this.orphan.spokenLanguages,
                               this.orphan.hobbies,
                               this.orphan.religion,
-                              this.orphan.healthDescription,
+                              this.orphan.healthDescription || "N/A",
                               this.orphan.psychologicalStatus,
                               this.orphan.idCardUrl || "idCardUrl2",
                               this.orphan.passportUrl || "passportUrl2 ",
@@ -999,26 +1056,56 @@ export default {
                               educationRes.id,
                               guardianRes.id,
                               motherRes.id,
-                              housePropertyRes.id
-                            ).then(registeredOrphan => {
-                              console.log("registeredOrphan", registeredOrphan);
-                            })
+                              housePropertyRes.id,
+                              this.orphanVillageId
+                            )
+                              .then((registeredOrphan) => {
+                                console.log(
+                                  "registeredOrphan",
+                                  registeredOrphan
+                                );
+                                this.createSponsorshipStatus(
+                                  registeredOrphan.id
+                                )
+                                  .then((sponsorshipStatus) => {
+                                    console.log(
+                                      "sponsorshipStatus",
+                                      sponsorshipStatus
+                                    );
+                                  })
+                                  .catch((err) => console.warn(err));
+                              })
+                              .catch((err) => console.warn(err));
                           })
-                          .catch((err) => console.log(err));
+                          .catch((err) => console.warn(err));
                       })
-                      .catch((err) => console.log(err));
+                      .catch((err) => console.warn(err));
                   })
-                  .catch((err) => console.log(err));
+                  .catch((err) => console.warn(err));
               })
-              .catch((err) => console.log(err));
+              .catch((err) => console.warn(err));
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.warn(err));
 
         this.$emit("familyDone", this.orphan);
+        // this.orphan.dateOfBirth = this.dashDateFormatter(this.orphan.dateOfBirth);
+        // this.orphan.guardian.dateOfBirth = this.dashDateFormatter(this.orphan.guardian.dateOfBirth);
+        this.orphan.father.dateOfBirth = this.dashDateFormatter(this.orphan.father.dateOfBirth);
+        this.orphan.father.dateOfDeath = this.dashDateFormatter(this.orphan.father.dateOfDeath);
+        this.orphan.mother.dateOfBirth = this.dashDateFormatter(this.orphan.mother.dateOfBirth);
+        this.orphan.mother.dateOfDeath = this.dashDateFormatter(this.orphan.mother.dateOfDeath);
         this.familyDialogClose();
       } else if (!this.$refs.familyForm.validate()) {
         this.formHasErrors = true;
       }
+    },
+
+    isoDateFormatter(dateString) {
+      return new Date(dateString).toISOString();
+    },
+    dashDateFormatter(dateString) {
+      let dateFormat = new Date(dateString);
+      return `${dateFormat.getFullYear()}-${dateFormat.getMonth()}-${dateFormat.getDate()}`;
     },
 
     familyDialogCancel() {

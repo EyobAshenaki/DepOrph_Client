@@ -29,28 +29,31 @@
                   <v-card-title class="justify-center">
                     Choose Donor
                   </v-card-title>
-                  <v-responsive
-                    min-width="200"
-                    max-width="200"
-                    class="pl-0 mx-auto"
-                  >
-                    <v-select
-                      v-model="selectedOrphanDonor"
-                      :items="selectedOrphanDonorOptions"
-                      item-text="nameInitials"
-                      item-value="nameInitials"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      solo
-                      outlined
-                      dense
+                  <v-form ref="donorSelect" v-model="validDonorChoice">
+                    <v-responsive
+                      min-width="200"
+                      max-width="200"
+                      class="pl-0 mx-auto"
                     >
-                    </v-select>
-                  </v-responsive>
+                      <v-select
+                        v-model="selectedOrphanDonor"
+                        :items="selectedOrphanDonorOptions"
+                        item-text="nameInitials"
+                        item-value="nameInitials"
+                        :menu-props="{ bottom: true, offsetY: true }"
+                        solo
+                        outlined
+                        dense
+                        :rules="[rules.required]"
+                      >
+                      </v-select>
+                    </v-responsive>
+                  </v-form>
                   <v-card-actions class="justify-end">
                     <v-btn text class="red--text" @click="cancelOrphanChoice"
                       >Cancel</v-btn
                     >
-                    <v-btn text class="primary--text" @click="chooseOrphans"
+                    <v-btn text class="primary--text" @click="chooseOrphans" :disabled="!validDonorChoice"
                       >Confirm</v-btn
                     >
                   </v-card-actions>
@@ -58,11 +61,11 @@
               </v-dialog>
             </v-col>
             <!-- New Orphan Registration -->
-            <v-col class="justify-end" cols="4">
+            <!-- <v-col class="justify-end" cols="4">
               <v-fab-transition>
                 <NewOrphanRegistrationModel />
               </v-fab-transition>
-            </v-col>
+            </v-col> -->
           </v-col>
           <v-col cols="12">
             <v-expansion-panels popout v-model="orphanPanel">
@@ -334,7 +337,9 @@
                                       label
                                       close
                                       close-icon="mdi-close-outline"
-                                      @click:close="removeSelectedProcessing(item)"
+                                      @click:close="
+                                        removeSelectedProcessing(item)
+                                      "
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -1481,7 +1486,9 @@
                                       label
                                       close
                                       close-icon="mdi-close-outline"
-                                      @click:close="removeSelectedGraduated(item)"
+                                      @click:close="
+                                        removeSelectedGraduated(item)
+                                      "
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -1634,7 +1641,7 @@
 
 <script>
 import axios from "axios";
-import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
+// import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
 import OrphanDetail from "@/components/OrphanDetail.vue";
 
 export default {
@@ -1647,7 +1654,7 @@ export default {
     },
   },
   components: {
-    NewOrphanRegistrationModel,
+    // NewOrphanRegistrationModel,
     OrphanDetail,
   },
 
@@ -1752,6 +1759,9 @@ export default {
       fatherDeathCertificateDialog: false,
       birthCertificateDialog: false,
       // ********************************
+      rules: {
+        required: (value) => !!value || "Required.",
+      },
       orphanShow: false,
       orphanSelectBtnLable: "Select Orphans",
       orphanPanel: [],
@@ -1759,6 +1769,7 @@ export default {
       showDonorSelectionDialog: false,
       selectedOrphanDonor: "",
       selectedOrphanDonorOptions: [],
+      validDonorChoice: false,
       // used in filter selection items
       activeFilterItems: [
         "Id",
@@ -2048,14 +2059,24 @@ export default {
               );
             } else if (filterVal === this.headers[5].text) {
               return this.calcSponsoredDate(item).indexOf(search) !== -1;
-            } else if (filterVal === this.changeSponsoredDateHeaderOfProcessing()) {
-              return this.displaySelectedOrphanDonor(item).indexOf(search) !== -1;
-            } else if (filterVal === this.changeSponsoredDateHeaderOfPending()) {
-              return this.displaySponsoringOrphanDonor(item).indexOf(search) !== -1;
-            } else if (filterVal === this.changeSponsoredDateHeaderOfGraduated()) {
+            } else if (
+              filterVal === this.changeSponsoredDateHeaderOfProcessing()
+            ) {
+              return (
+                this.displaySelectedOrphanDonor(item).indexOf(search) !== -1
+              );
+            } else if (
+              filterVal === this.changeSponsoredDateHeaderOfPending()
+            ) {
+              return (
+                this.displaySponsoringOrphanDonor(item).indexOf(search) !== -1
+              );
+            } else if (
+              filterVal === this.changeSponsoredDateHeaderOfGraduated()
+            ) {
               return this.calcGraduatedDate(item).indexOf(search) !== -1;
-            }else {
-              return -1
+            } else {
+              return -1;
             }
           }
         } else {
@@ -2129,27 +2150,45 @@ export default {
     cancelOrphanChoice() {
       this.orphanShow = false;
       this.orphanPanel = null;
-      this.showDonorSelectionDialog = false;
+      this.donorChoiceClose();
+      this.donorChoiceReset();
     },
     chooseOrphans() {
-      this.orphanShow = true;
-      this.orphanSelectBtnLable = "Send Orphans";
-      this.orphanPanel = 1;
+      if (this.$refs.donorSelect.validate()) {
+        this.orphanShow = true;
+        this.orphanSelectBtnLable = "Send Orphans";
+        this.orphanPanel = 1;
+        this.donorChoiceClose();
+        // this.donorChoiceReset();
+        console.log("selectedOrphanDonor", this.selectedOrphanDonor);
+      } else {
+        // handle err and show some kind of notification
+      }
+    },
+    donorChoiceClose() {
       this.showDonorSelectionDialog = false;
-      console.log("selectedOrphanDonor", this.selectedOrphanDonor);
+    },
+    donorChoiceReset() {
+      this.$refs.donorSelect.reset();
     },
     async selectOrphans() {
       if (!this.orphanShow || !this.orphanPanel) {
         this.selectedOrphanDonorOptions = await axios
           .post("/graphql/", {
-            query: `query {
-                    allDonors {
-                      id
-                      nameInitials
-                    }
-                  }`,
+            query: `query coordinator($id: ID!) {
+                      coordinator(id: $id) {
+                        donors {
+                          id
+                          nameInitials
+                        }
+                      }
+                    }`,
+            variables: {
+              id: this.$route.params.id
+            }
           })
-          .then((res) => res.data.data.allDonors)
+          .then((res) => res.data.data.coordinator)
+          .then((coordinator) => coordinator.donors)
           .catch((err) => console.warn(err));
         console.log(
           "selectedOrphanDonorOptions",
@@ -2225,7 +2264,6 @@ export default {
         //     }
         //   }
         // }
-
       }
     },
     changeSponsoredDateHeaderOfProcessing() {
@@ -2340,7 +2378,10 @@ export default {
         this.orphanHousingSituationSelect.indexOf(item),
         1
       );
-      console.log("orphanHousingSituationSelect", this.orphanHousingSituationSelect);
+      console.log(
+        "orphanHousingSituationSelect",
+        this.orphanHousingSituationSelect
+      );
       console.log("attrs", attrs);
       this.orphanHousingSituationSelect = [
         ...this.orphanHousingSituationSelect,

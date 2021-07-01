@@ -25,7 +25,7 @@
                     <v-text-field
                       v-model="orphan.guardian.firstName"
                       :rules="[rules.required, rules.name]"
-                      label="First Name"
+                      label="First Name*"
                     >
                     </v-text-field>
                   </v-responsive>
@@ -36,7 +36,7 @@
                     <v-text-field
                       v-model="orphan.guardian.middleName"
                       :rules="[rules.required, rules.name]"
-                      label="Middle Name"
+                      label="Middle Name*"
                     >
                     </v-text-field>
                   </v-responsive>
@@ -47,7 +47,7 @@
                     <v-text-field
                       v-model="orphan.guardian.lastName"
                       :rules="[rules.required, rules.name]"
-                      label="Last Name"
+                      label="Last Name*"
                     >
                     </v-text-field>
                   </v-responsive>
@@ -66,7 +66,7 @@
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
                           v-model="orphan.guardian.dateOfBirth"
-                          label="Date of Birth"
+                          label="Date of Birth*"
                           prepend-icon="mdi-calendar"
                           readonly
                           v-bind="attrs"
@@ -94,7 +94,7 @@
                       v-model="orphan.guardian.gender"
                       :items="guardianGenderOptions"
                       :menu-props="{ bottom: true, offsetY: true }"
-                      label="Gender"
+                      label="Gender*"
                       :rules="[rules.required]"
                     ></v-select>
                   </v-responsive>
@@ -107,7 +107,7 @@
                       v-model="orphan.guardian.relationToOrphan"
                       :items="guardianRelationToOrphanOptions"
                       :menu-props="{ bottom: true, offsetY: true }"
-                      label="Relation to Orphan"
+                      label="Relation to Orphan*"
                       :rules="[rules.required]"
                     ></v-select>
                   </v-responsive>
@@ -118,7 +118,7 @@
                   <v-responsive max-width="" class="">
                     <v-text-field
                       v-model="orphan.guardian.jobTitle"
-                      :rules="[rules.required, rules.name]"
+                      :rules="[rules.name]"
                       label="Job Title"
                     >
                     </v-text-field>
@@ -132,7 +132,7 @@
                       v-model="orphan.guardian.nationality"
                       :items="guardianNationalityOptions"
                       :menu-props="{ bottom: true, offsetY: true }"
-                      label="Nationality"
+                      label="Nationality*"
                       :rules="[rules.required]"
                     ></v-select>
                   </v-responsive>
@@ -143,9 +143,9 @@
                   <v-responsive max-width="" class="">
                     <v-text-field
                       v-model="orphan.guardian.mobileNumber"
-                      placeholder="09XXXXXXXX"
+                      placeholder="09XXXXXXXX*"
                       :rules="[rules.required, rules.mobileNumber]"
-                      label="Mobile Phone"
+                      label="Mobile Phone*"
                     >
                     </v-text-field>
                   </v-responsive>
@@ -157,7 +157,7 @@
                     <v-text-field
                       v-model="orphan.guardian.telephoneNumber"
                       placeholder="01XXXXXXXX"
-                      :rules="[rules.required, rules.telephoneNumber]"
+                      :rules="[rules.telephoneNumber]"
                       label="Telephone"
                     >
                     </v-text-field>
@@ -170,7 +170,7 @@
                     <v-text-field
                       v-model="orphan.guardian.email"
                       type="email"
-                      label="E-mail"
+                      label="E-mail*"
                       :rules="[rules.required, rules.email]"
                       placeholder="CDN@gmail.com"
                     >
@@ -245,15 +245,15 @@ export default {
         required: (value) => !!value || "Required.",
         name: (value) => {
           const namePattern = /(^[A-z][A-Z-a-z/'.,/]+)[A-z]\s*$/g;
-          return namePattern.test(value) || "Invalid name";
+          return namePattern.test(value) || !value || "Invalid name";
         },
         email: (value) => {
           const emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           return emailPattern.test(value) || "Invalid e-mail";
         },
         telephoneNumber: (value) => {
-          const telephonePattern = /^01[0-9]{8}$/g;
-          return telephonePattern.test(value) || "Invalid Number";
+          const telephonePattern = /(^01[0-9]{8}$)/g;
+          return telephonePattern.test(value) || !value || "Invalid Number";
         },
         mobileNumber: (value) => {
           const mobilePattern = /^09[0-9]{8}$/g;
@@ -338,7 +338,6 @@ export default {
       if (this.$refs.guardianForm.validate()) {
         // console.log(this.orphan);
 
-        this.orphan.guardian.dateOfBirth = new Date(this.orphan.guardian.dateOfBirth).toISOString();
         this.orphan.guardian.gender = this.orphan.guardian.gender.slice(0, 1);
         this.orphan.guardian.relationToOrphan = this.orphan.guardian.relationToOrphan.slice(0, 1).toLowerCase() + this.orphan.guardian.relationToOrphan.slice(1);
 

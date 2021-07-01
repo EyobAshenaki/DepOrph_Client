@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="50rem">
     <!-- the activator of the dialog; the button. -->
-    <template v-slot:activator="{ on, attrs }">
+    <!-- <template v-slot:activator="{ on, attrs }">
       <v-btn
         color="primary"
         right
@@ -10,9 +10,9 @@
         style="align-item: right;"
       >
         Add New Orphan
-        <!-- <v-icon dark> mdi-account-plus </v-icon> -->
+        <v-icon dark> mdi-account-plus </v-icon>
       </v-btn>
-    </template>
+    </template> -->
     <!-- the dialog main body; the card -->
     <v-card
       class="pa-10"
@@ -38,6 +38,7 @@
         <v-col cols="12" md="6" lg="4" align="center">
           <NewOrphanEducationModel
             ref="educationModel"
+            :updatedOrphan="orphan"
             @educationDone="printEducation($event)"
           />
         </v-col>
@@ -51,6 +52,7 @@
           <NewOrphanFamilyModel
             ref="familyModel"
             :updatedOrphan="orphan"
+            :orphanVillageId="orphanVillageId"
             @familyDone="printFamily($event)"
           />
         </v-col>
@@ -81,6 +83,15 @@ import NewOrphanFamilyModel from "@/components/NewOrphanFamilyModel.vue";
 import NewOrphanDocumentModel from "@/components/NewOrphanDocumentModel.vue";
 
 export default {
+  props: {
+    newOrphanDialog: {
+      type: Boolean,
+    },
+    orphanVillageId: {
+      type: Number,
+    }
+  },
+
   components: {
     NewOrphanPersonalModel,
     NewOrphanEducationModel,
@@ -100,7 +111,11 @@ export default {
   },
   computed: {},
   watch: {
+    newOrphanDialog(val) {
+      this.dialog = val;
+    },
     dialog(val) {
+      if (val === false) this.$emit("dialogClosed", false)
       val || this.orphanDialogClose();
     },
   },
@@ -118,24 +133,42 @@ export default {
     },
     printEducation(updatedOrphan) {
       this.orphan = this.orphan ?? {};
-      this.orphan.education = Object.assign(this.orphan.education ?? {}, updatedOrphan.education);
-      Object.defineProperty(this.orphan, 'hobbies', {
-        value: updatedOrphan.hobbies || null,
-        writable: true
-      });
-      
+      this.orphan.education = Object.assign(
+        this.orphan.education ?? {},
+        updatedOrphan.education
+      );
+
+      this.orphan['hobbies'] = updatedOrphan.hobbies
+
+      // Object.defineProperty(this.orphan, "hobbies", {
+      //   value: updatedOrphan.hobbies || null,
+      //   writable: true,
+      // });
+
       console.log("educationOrphan", this.orphan);
     },
     printGuardian(updatedOrphan) {
       this.orphan = this.orphan ?? {};
-      this.orphan.guardian = Object.assign(this.orphan.guardian ?? {}, updatedOrphan.guardian);
+      this.orphan.guardian = Object.assign(
+        this.orphan.guardian ?? {},
+        updatedOrphan.guardian
+      );
       console.log("guardianOrphan", this.orphan);
     },
     printFamily(updatedOrphan) {
       this.orphan = this.orphan ?? {};
-      this.orphan.father = Object.assign(this.orphan.father ?? {}, updatedOrphan.father);
-      this.orphan.mother = Object.assign(this.orphan.mother ?? {}, updatedOrphan.mother);
-      this.orphan.House_property = Object.assign(this.orphan.House_property ?? {}, updatedOrphan.House_property);
+      this.orphan.father = Object.assign(
+        this.orphan.father ?? {},
+        updatedOrphan.father
+      );
+      this.orphan.mother = Object.assign(
+        this.orphan.mother ?? {},
+        updatedOrphan.mother
+      );
+      this.orphan.House_property = Object.assign(
+        this.orphan.House_property ?? {},
+        updatedOrphan.House_property
+      );
 
       console.log("familyOrphan", this.orphan);
     },

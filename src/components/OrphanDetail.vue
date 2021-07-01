@@ -2064,7 +2064,7 @@ export default {
   methods: {
     initialize() {
       this.orphan = this.details;
-      console.log("details", this.details);
+      // console.log("details", this.details);
     },
     populateFields() {
       this.orphanEditableFields.orphanFirstName = this.orphan.firstName;
@@ -2228,10 +2228,10 @@ export default {
         }
       );
 
-      console.log(
-        "orphanLevelOptions",
-        this.orphanSelectOptions.orphanEducationLevelOptions
-      );
+      // console.log(
+      //   "orphanLevelOptions",
+      //   this.orphanSelectOptions.orphanEducationLevelOptions
+      // );
     },
     // formats education level
     educationLevelFormatter() {
