@@ -2076,33 +2076,33 @@ export default {
       this.orphanEditableFields.orphanSpokenLanguages = this.orphan.spokenLanguages;
       this.orphanEditableFields.orphanPsychologicalStatus = this.orphan.psychologicalStatus;
       this.orphanEditableFields.orphanHealthDescription = this.orphan.healthDescription;
-      this.orphanEditableFields.orphanEducationEnrollmentStatus = this.orphan.education.enrollmentStatus;
-      this.orphanEditableFields.orphanEducationType = this.orphan.education.typeOfSchool;
-      this.orphanEditableFields.orphanEducationLevel = this.orphan.education.level;
-      this.orphanEditableFields.orphanEducationYear = this.orphan.education.year;
-      this.orphanEditableFields.orphanEducationSchoolName = this.orphan.education.schoolName;
-      this.orphanEditableFields.orphanEducationReason = this.orphan.education.reason;
+      this.orphanEditableFields.orphanEducationEnrollmentStatus = this.orphan.education?.enrollmentStatus;
+      this.orphanEditableFields.orphanEducationType = this.orphan.education?.typeOfSchool;
+      this.orphanEditableFields.orphanEducationLevel = this.orphan.education?.level;
+      this.orphanEditableFields.orphanEducationYear = this.orphan.education?.year;
+      this.orphanEditableFields.orphanEducationSchoolName = this.orphan.education?.schoolName;
+      this.orphanEditableFields.orphanEducationReason = this.orphan.education?.reason;
       this.orphanEditableFields.orphanHobbies = this.orphan.hobbies;
       this.orphanEditableFields.orphanFatherCauseOfDeath = this.orphan.father.causeOfDeath;
-      this.orphanEditableFields.orphanMotherFirstName = this.orphan.mother.firstName;
-      this.orphanEditableFields.orphanMotherMiddleName = this.orphan.mother.middleName;
-      this.orphanEditableFields.orphanMotherLastName = this.orphan.mother.lastName;
-      this.orphanEditableFields.orphanMotherVitalStatus = this.orphan.mother.vitalStatus;
-      this.orphanEditableFields.orphanMotherMaritalStatus = this.orphan.mother.maritalStatus;
-      this.orphanEditableFields.orphanMotherMobileNumber = this.orphan.mother.mobileNumber;
-      this.orphanEditableFields.orphanMotherCauseOfDeath = this.orphan.mother.causeOfDeath;
-      this.orphanEditableFields.orphanHouse_propertyHousingSituation = this.orphan.house_property.housingSituation;
-      this.orphanEditableFields.orphanHouse_propertyOtherProperty = this.orphan.house_property.otherProperty;
-      this.orphanEditableFields.orphanGuardianFirstName = this.orphan.guardian.firstName;
-      this.orphanEditableFields.orphanGuardianMiddleName = this.orphan.guardian.middleName;
-      this.orphanEditableFields.orphanGuardianLastName = this.orphan.guardian.lastName;
-      this.orphanEditableFields.orphanGuardianGender = this.orphan.guardian.gender;
-      this.orphanEditableFields.orphanGuardianEmail = this.orphan.guardian.email;
-      this.orphanEditableFields.orphanGuardianMobileNumber = this.orphan.guardian.mobileNumber;
-      this.orphanEditableFields.orphanGuardianRelationToOrphan = this.orphan.guardian.relationToOrphan;
-      this.orphanEditableFields.orphanGuardianNationality = this.orphan.guardian.nationality;
-      this.orphanEditableFields.orphanGuardianTelephoneNumber = this.orphan.guardian.telephoneNumber;
-      this.orphanEditableFields.orphanGuardianJobTitle = this.orphan.guardian.jobTitle;
+      this.orphanEditableFields.orphanMotherFirstName = this.orphan.mother?.firstName;
+      this.orphanEditableFields.orphanMotherMiddleName = this.orphan.mother?.middleName;
+      this.orphanEditableFields.orphanMotherLastName = this.orphan.mother?.lastName;
+      this.orphanEditableFields.orphanMotherVitalStatus = this.orphan.mother?.vitalStatus;
+      this.orphanEditableFields.orphanMotherMaritalStatus = this.orphan.mother?.maritalStatus;
+      this.orphanEditableFields.orphanMotherMobileNumber = this.orphan.mother?.mobileNumber;
+      this.orphanEditableFields.orphanMotherCauseOfDeath = this.orphan.mother?.causeOfDeath;
+      this.orphanEditableFields.orphanHouse_propertyHousingSituation = this.orphan.house_property?.housingSituation;
+      this.orphanEditableFields.orphanHouse_propertyOtherProperty = this.orphan.house_property?.otherProperty;
+      this.orphanEditableFields.orphanGuardianFirstName = this.orphan.guardian?.firstName;
+      this.orphanEditableFields.orphanGuardianMiddleName = this.orphan.guardian?.middleName;
+      this.orphanEditableFields.orphanGuardianLastName = this.orphan.guardian?.lastName;
+      this.orphanEditableFields.orphanGuardianGender = this.orphan.guardian?.gender;
+      this.orphanEditableFields.orphanGuardianEmail = this.orphan.guardian?.email;
+      this.orphanEditableFields.orphanGuardianMobileNumber = this.orphan.guardian?.mobileNumber;
+      this.orphanEditableFields.orphanGuardianRelationToOrphan = this.orphan.guardian?.relationToOrphan;
+      this.orphanEditableFields.orphanGuardianNationality = this.orphan.guardian?.nationality;
+      this.orphanEditableFields.orphanGuardianTelephoneNumber = this.orphan.guardian?.telephoneNumber;
+      this.orphanEditableFields.orphanGuardianJobTitle = this.orphan.guardian?.jobTitle;
     },
     toggleLongPhotoDialog() {
       this.longPhotoDialog = !this.longPhotoDialog;
@@ -2235,25 +2235,25 @@ export default {
     },
     // formats education level
     educationLevelFormatter() {
-      if (this.orphan.education.level === "religiousEducation") {
+      if (this.orphan.education?.level === "religiousEducation") {
         this.orphanEditableFields.orphanEducationLevel = "Religious Education";
         this.orphanSelectedOption.orphanEducationLevel = "Religious Education";
-      } else if (this.orphan.education.level === "preSchool") {
+      } else if (this.orphan.education?.level === "preSchool") {
         this.orphanEditableFields.orphanEducationLevel = "Preschool";
         this.orphanSelectedOption.orphanEducationLevel = "Preschool";
-      } else if (this.orphan.education.level === "gradeSchool") {
-        if (this.orphan.education.year > 0 && this.orphan.education.year < 7) {
+      } else if (this.orphan.education?.level === "gradeSchool") {
+        if (this.orphan.education?.year > 0 && this.orphan.education?.year < 7) {
           this.orphanEditableFields.orphanEducationLevel = "Primary/Elementary";
           this.orphanSelectedOption.orphanEducationLevel = "Primary/Elementary";
         } else if (
-          this.orphan.education.year > 6 &&
-          this.orphan.education.year < 9
+          this.orphan.education?.year > 6 &&
+          this.orphan.education?.year < 9
         ) {
           this.orphanEditableFields.orphanEducationLevel = "Junior";
           this.orphanSelectedOption.orphanEducationLevel = "Junior";
         } else if (
-          this.orphan.education.year > 8 &&
-          this.orphan.education.year < 13
+          this.orphan.education?.year > 8 &&
+          this.orphan.education?.year < 13
         ) {
           this.orphanEditableFields.orphanEducationLevel = "Highschool";
           this.orphanSelectedOption.orphanEducationLevel = "Highschool";
@@ -2261,15 +2261,15 @@ export default {
           this.orphanEditableFields.orphanEducationLevel = "N_A";
           this.orphanSelectedOption.orphanEducationLevel = "N_A";
         }
-      } else if (this.orphan.education.level === "underGraduate") {
+      } else if (this.orphan.education?.level === "underGraduate") {
         this.orphanEditableFields.orphanEducationLevel = "Under Graduate";
         this.orphanSelectedOption.orphanEducationLevel = "Under Graduate";
-      } else if (this.orphan.education.level === "postGraduate") {
+      } else if (this.orphan.education?.level === "postGraduate") {
         this.orphanEditableFields.orphanEducationLevel = "Post Graduate";
         this.orphanSelectedOption.orphanEducationLevel = "Post Graduate";
       } else {
-        this.orphanEditableFields.orphanEducationLevel = this.orphan.education.level;
-        this.orphanSelectedOption.orphanEducationLevel = this.orphan.education.level;
+        this.orphanEditableFields.orphanEducationLevel = this.orphan.education?.level;
+        this.orphanSelectedOption.orphanEducationLevel = this.orphan.education?.level;
       }
     },
     editOrphan(baseObject, editorObject) {

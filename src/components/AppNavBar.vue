@@ -26,7 +26,7 @@
       <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn text class="mr-0 py-8" :class="{active: isProcessing}" v-bind="attrs" v-on="on" @click.stop="processingActive"
               >Processing</v-btn
             >
           </template>
@@ -35,7 +35,7 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn text class="mr-0 py-8" :class="{active: isPending}" v-bind="attrs" v-on="on" @click.stop="pendingActive"
               >Pending</v-btn
             >
           </template>
@@ -44,7 +44,7 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn text class="mr-0 py-8" :class="{active: isSponsored}" v-bind="attrs" v-on="on" @click.stop="sponsoredActive"
               >Sponsored</v-btn
             >
           </template>
@@ -53,7 +53,7 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn text class="mr-0 py-8" :class="{active: isGraduated}" v-bind="attrs" v-on="on" @click.stop="graduatedActive"
               >Graduated</v-btn
             >
           </template>
@@ -164,6 +164,12 @@
   </div>
 </template>
 
+<style scoped>
+.active {
+  background-color:rgba(100,115,201, 0.5);
+}
+</style>
+
 <script>
 export default {
   props: {
@@ -182,6 +188,11 @@ export default {
       drawer: false,
       newOrphanDialog: true,
       supportPlanTable: true,
+      state: "",
+      isProcessing: false,
+      isPending: false,
+      isSponsored: false,
+      isGraduated: false,
     };
   },
   methods: {
@@ -216,6 +227,39 @@ export default {
     },
     logOut() {
       console.log("Logging out...");
+    },
+    // -------------Donor----------------
+    processingActive() {
+      this.state = "processing";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = true;
+      this.isPending = false;
+      this.isSponsored = false;
+      this.isGraduated = false;
+    },
+    pendingActive() {
+      this.state = "pending";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = true;
+      this.isSponsored = false;
+      this.isGraduated = false;
+    },
+    sponsoredActive() {
+      this.state = "sponsored";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = false;
+      this.isSponsored = true;
+      this.isGraduated = false;
+    },
+    graduatedActive() {
+      this.state = "graduated";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = false;
+      this.isSponsored = false;
+      this.isGraduated = true;
     },
   },
 };

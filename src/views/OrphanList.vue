@@ -53,19 +53,17 @@
                     <v-btn text class="red--text" @click="cancelOrphanChoice"
                       >Cancel</v-btn
                     >
-                    <v-btn text class="primary--text" @click="chooseOrphans" :disabled="!validDonorChoice"
+                    <v-btn
+                      text
+                      class="primary--text"
+                      @click="chooseOrphans"
+                      :disabled="!validDonorChoice"
                       >Confirm</v-btn
                     >
                   </v-card-actions>
                 </v-card>
               </v-dialog>
             </v-col>
-            <!-- New Orphan Registration -->
-            <!-- <v-col class="justify-end" cols="4">
-              <v-fab-transition>
-                <NewOrphanRegistrationModel />
-              </v-fab-transition>
-            </v-col> -->
           </v-col>
           <v-col cols="12">
             <v-expansion-panels popout v-model="orphanPanel">
@@ -246,6 +244,12 @@
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ calcSponsoredDate(item) }}
                         </template>
+                        <template v-slot:item.details="{ item }">
+                          <!-- <v-icon @click="showDetails(item)">
+                            mdi-account-details
+                          </v-icon> -->
+                          <orphan-detail :details="item" />
+                        </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
                       <!-- TODO: # Impliment a loding functionality -->
@@ -382,795 +386,6 @@
                               </v-responsive>
                             </v-col>
                           </v-row>
-                          <!-- Old Show Details dialog -->
-                          <v-dialog
-                            v-model="detailDialog"
-                            transition="dialog-bottom-transition"
-                            fullscreen
-                            persistent
-                            max-width="600"
-                          >
-                            <template v-slot:default="dialog">
-                              <v-card max-width="">
-                                <v-toolbar dense flat color="primary" dark>
-                                  <span class="mx-auto">
-                                    {{ "Name's Detail" }}
-                                  </span>
-                                </v-toolbar>
-                                <v-card-text class="pb-0">
-                                  <v-container>
-                                    <v-row>
-                                      <v-col cols="6">
-                                        <v-img
-                                          :src="
-                                            `https://picsum.photos/500/300?image=20`
-                                          "
-                                          :lazy-src="
-                                            `https://picsum.photos/10/6?image=20`
-                                          "
-                                          aspect-ratio="1"
-                                          class="grey lighten-2"
-                                        >
-                                          <template v-slot:placeholder>
-                                            <v-row
-                                              class="fill-height ma-0"
-                                              align="center"
-                                              justify="center"
-                                            >
-                                              <v-progress-circular
-                                                indeterminate
-                                                color="grey lighten-5"
-                                              ></v-progress-circular>
-                                            </v-row>
-                                          </template>
-                                        </v-img>
-                                      </v-col>
-                                      <v-col cols="6">
-                                        <v-row>
-                                          <!-- Orphan Name field -->
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="12"
-                                            class="py-0"
-                                          >
-                                            <v-responsive max-width="" class="">
-                                              <v-text-field
-                                                v-model="orphanItems.orphanName"
-                                                label="Orphan Name"
-                                                readonly
-                                              >
-                                              </v-text-field>
-                                            </v-responsive>
-                                          </v-col>
-                                          <!-- Father Name field -->
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="12"
-                                            class="py-0"
-                                          >
-                                            <v-responsive max-width="" class="">
-                                              <v-text-field
-                                                v-model="orphanItems.fatherName"
-                                                label="Father Name"
-                                                readonly
-                                              >
-                                              </v-text-field>
-                                            </v-responsive>
-                                          </v-col>
-                                          <!-- Grand Father Name field -->
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="12"
-                                            class="py-0"
-                                          >
-                                            <v-responsive max-width="" class="">
-                                              <v-text-field
-                                                v-model="
-                                                  orphanItems.grandFatherName
-                                                "
-                                                label="Grand Father Name"
-                                                readonly
-                                              >
-                                              </v-text-field>
-                                            </v-responsive>
-                                          </v-col>
-                                          <!-- Date of Birth field -->
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="12"
-                                            class="py-0 mt-n1"
-                                          >
-                                            <v-responsive max-width="" class="">
-                                              <v-menu
-                                                ref="menu"
-                                                v-model="orphanDateOfBirthMenu"
-                                                :close-on-content-click="false"
-                                                transition="scale-transition"
-                                                offset-y
-                                                min-width="auto"
-                                                disabled
-                                              >
-                                                <template
-                                                  v-slot:activator="{
-                                                    on,
-                                                    attrs,
-                                                  }"
-                                                >
-                                                  <v-text-field
-                                                    v-model="orphanDateOfBirth"
-                                                    label="Date of Birth"
-                                                    prepend-icon="mdi-calendar"
-                                                    readonly
-                                                    v-bind="attrs"
-                                                    v-on="on"
-                                                  ></v-text-field>
-                                                </template>
-                                                <v-date-picker
-                                                  ref="picker"
-                                                  v-model="orphanDateOfBirth"
-                                                  no-title
-                                                  scrollable
-                                                  :max="
-                                                    new Date()
-                                                      .toISOString()
-                                                      .substr(0, 10)
-                                                  "
-                                                  min="1950-01-01"
-                                                  @change="
-                                                    orphanDateOfBirthSave
-                                                  "
-                                                >
-                                                </v-date-picker>
-                                              </v-menu>
-                                            </v-responsive>
-                                          </v-col>
-                                        </v-row>
-                                      </v-col>
-                                      <!-- Gender -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="3"
-                                        class="pb-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="orphanItems.gender"
-                                            label="Gender"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- Place of Birth -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="6"
-                                        class="pb-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="orphanItems.placeOfBirth"
-                                            label="Place of Birth"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- Religion -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="3"
-                                        class="pb-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="orphanItems.religion"
-                                            label="Religion"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- Spoken Language(s) -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="6"
-                                        class="py-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="
-                                              orphanItems.spokenLanguages
-                                            "
-                                            label="Spoken Language(s)"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- Psychological Status -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="6"
-                                        class="py-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="
-                                              orphanItems.psychologicalStatus
-                                            "
-                                            label="Psychological Status"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- Health Discription -->
-                                      <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="12"
-                                        class="py-0"
-                                      >
-                                        <v-responsive max-width="" class="">
-                                          <v-textarea
-                                            v-model="orphanHealthDescription"
-                                            label="Health Discription"
-                                            auto-grow
-                                            rows="1"
-                                            readonly
-                                          ></v-textarea>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- ************************************************** -->
-                                      <!-- Enrollment Status -->
-                                      <v-col cols="12" sm="12" md="4">
-                                        <v-responsive max-width="200" class="">
-                                          <v-text-field
-                                            v-model="
-                                              orphanItems.enrollmentStatus
-                                            "
-                                            label="Enrollment Status"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <!-- If Enrolled or Drop-out -->
-                                      <template
-                                        v-if="
-                                          enrollmentStatusDisplay ===
-                                            'Enrolled' ||
-                                            enrollmentStatusDisplay ===
-                                              'Dropout'
-                                        "
-                                      >
-                                        <!-- Education Level -->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive
-                                            max-width="270"
-                                            class=""
-                                          >
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.educationLevel
-                                              "
-                                              label="Enrollment Level"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Grade/Year -->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.educationYearState
-                                              "
-                                              label="Grade/Year"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                      </template>
-                                      <!-- If Enrolled -->
-                                      <template
-                                        v-if="
-                                          enrollmentStatusDisplay === 'Enrolled'
-                                        "
-                                      >
-                                        <!-- School Type -->
-                                        <v-col cols="12" sm="6" md="3">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="orphanItems.schoolType"
-                                              label="School Type"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- School/University Name -->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="orphanItems.schoolName"
-                                              label="School/University Name"
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                      </template>
-                                      <!-- If Drop-out -->
-                                      <template
-                                        v-if="
-                                          enrollmentStatusDisplay === 'Dropout'
-                                        "
-                                      >
-                                        <!-- Reason for Drop-out -->
-                                        <v-col cols="12" sm="12" md="5">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItem.reasonForDropout
-                                              "
-                                              label="Reason for dropping out"
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                      </template>
-                                      <!-- If Un-Enrolled -->
-                                      <template
-                                        v-if="
-                                          enrollmentStatusDisplay ===
-                                            'Unenrolled'
-                                        "
-                                      >
-                                        <!-- Reason for Un-Enrolled -->
-                                        <v-col cols="12" sm="12" md="8">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.reasonForUnenrolled
-                                              "
-                                              label="Reason for not enrolling"
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                      </template>
-                                      <!-- Hobbies -->
-                                      <v-col cols="12" sm="12" md="4">
-                                        <v-responsive max-width="" class="">
-                                          <v-text-field
-                                            v-model="orphanItems.hobbies"
-                                            label="Hobbies"
-                                          >
-                                          </v-text-field>
-                                        </v-responsive>
-                                      </v-col>
-                                      <v-col cols="3">
-                                        <v-btn
-                                          class="mb-n10 ml-n4"
-                                          @click="
-                                            toggleEducationCertificateDialog
-                                          "
-                                          >Educational Record</v-btn
-                                        >
-                                        <v-dialog
-                                          v-model="educationCertificateDialog"
-                                        >
-                                          <v-container>
-                                            <v-row>
-                                              <v-spacer></v-spacer>
-                                              <v-col class="mr-n12" sm="1">
-                                                <v-icon
-                                                  dark
-                                                  @click="
-                                                    toggleEducationCertificateDialog
-                                                  "
-                                                  >mdi-close</v-icon
-                                                ></v-col
-                                              >
-                                            </v-row>
-                                            <v-img
-                                              height="82vh"
-                                              src="@/assets/1-crop.jpg"
-                                              contain
-                                              alt="educationCertificateimage"
-                                            ></v-img>
-                                          </v-container>
-                                        </v-dialog>
-                                      </v-col>
-                                      <!-- **************************************************** -->
-
-                                      <!-- Father Section -->
-                                      <template>
-                                        <v-col sm="12" class="mb-n2">
-                                          <div class="title mb-n5 pt-0">
-                                            Father
-                                          </div>
-                                        </v-col>
-                                        <!-- Father Date of Birth field -->
-                                        <v-col cols="12" sm="6" md="6">
-                                          <v-responsive max-width="" class="">
-                                            <v-menu
-                                              ref="fatherDateOfBirthMenu"
-                                              v-model="fatherDateOfBirthMenu"
-                                              :close-on-content-click="false"
-                                              transition="scale-transition"
-                                              offset-y
-                                              min-width="auto"
-                                              disabled
-                                            >
-                                              <template
-                                                v-slot:activator="{ on, attrs }"
-                                              >
-                                                <v-text-field
-                                                  v-model="
-                                                    fatherDateOfBirthDate
-                                                  "
-                                                  label="Date of Birth"
-                                                  prepend-icon="mdi-calendar"
-                                                  readonly
-                                                  v-bind="attrs"
-                                                  v-on="on"
-                                                ></v-text-field>
-                                              </template>
-                                              <v-date-picker
-                                                ref="fatherDateOfBirthPicker"
-                                                v-model="fatherDateOfBirthDate"
-                                                no-title
-                                                scrollable
-                                                :max="
-                                                  new Date()
-                                                    .toISOString()
-                                                    .substr(0, 10)
-                                                "
-                                                min="1950-01-01"
-                                              >
-                                              </v-date-picker>
-                                            </v-menu>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Father Date of Death field -->
-                                        <v-col cols="12" sm="6" md="6">
-                                          <v-responsive max-width="" class="">
-                                            <v-menu
-                                              ref="fatherDateOfDeathMenu"
-                                              v-model="fatherDateOfDeathMenu"
-                                              :close-on-content-click="false"
-                                              transition="scale-transition"
-                                              offset-y
-                                              min-width="auto"
-                                              disabled
-                                            >
-                                              <template
-                                                v-slot:activator="{ on, attrs }"
-                                              >
-                                                <v-text-field
-                                                  v-model="
-                                                    fatherDateOfDeathDate
-                                                  "
-                                                  label="Date of Death"
-                                                  prepend-icon="mdi-calendar"
-                                                  readonly
-                                                  v-bind="attrs"
-                                                  v-on="on"
-                                                ></v-text-field>
-                                              </template>
-                                              <v-date-picker
-                                                ref="fatherDateOfDeathPicker"
-                                                v-model="fatherDateOfDeathDate"
-                                                no-title
-                                                scrollable
-                                                :max="
-                                                  new Date()
-                                                    .toISOString()
-                                                    .substr(0, 10)
-                                                "
-                                                min="1950-01-01"
-                                              >
-                                              </v-date-picker>
-                                            </v-menu>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- TODO # change this field to select when provided -->
-                                        <!-- Father Cause of Death field-->
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="6"
-                                          class="pt-0 mt-n3"
-                                        >
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.fatherCauseOfDeath
-                                              "
-                                              label="Cause of Death"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Father death Certificate -->
-                                        <v-col cols="3">
-                                          <v-btn
-                                            class="mt-n2"
-                                            @click="
-                                              toggleFatherDeathCertificateDialog
-                                            "
-                                            >Death Certificate</v-btn
-                                          >
-                                          <v-dialog
-                                            v-model="
-                                              fatherDeathCertificateDialog
-                                            "
-                                          >
-                                            <v-container>
-                                              <v-row>
-                                                <v-spacer></v-spacer>
-                                                <v-col class="mr-n12" sm="1">
-                                                  <v-icon
-                                                    dark
-                                                    @click="
-                                                      toggleFatherDeathCertificateDialog
-                                                    "
-                                                    >mdi-close</v-icon
-                                                  ></v-col
-                                                >
-                                              </v-row>
-                                              <v-img
-                                                height="82vh"
-                                                src="@/assets/29945230.png"
-                                                contain
-                                                alt="fatherDeathCertificateimage"
-                                              ></v-img>
-                                            </v-container>
-                                          </v-dialog>
-                                        </v-col>
-                                      </template>
-                                      <!-- Mother Section -->
-                                      <template>
-                                        <v-col sm="12" class="mt-n4 mb-n2">
-                                          <div class="title mt-n3 mb-n5">
-                                            Mother
-                                          </div>
-                                        </v-col>
-                                        <!-- Mother First Name field-->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.motherFirstName
-                                              "
-                                              label="First Name"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Mather Middle Name field-->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.motherMiddleName
-                                              "
-                                              label="Middle Name"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Mother Last Name field -->
-                                        <v-col cols="12" sm="6" md="4">
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.motherLastName
-                                              "
-                                              label="Last Name"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Mother Date of Birth field -->
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                          class="mt-n6"
-                                        >
-                                          <v-responsive max-width="" class="">
-                                            <v-menu
-                                              ref="motherDateOfBirthMenu"
-                                              v-model="motherDateOfBirthMenu"
-                                              :close-on-content-click="false"
-                                              transition="scale-transition"
-                                              offset-y
-                                              min-width="auto"
-                                              disabled
-                                            >
-                                              <template
-                                                v-slot:activator="{ on, attrs }"
-                                              >
-                                                <v-text-field
-                                                  v-model="
-                                                    motherDateOfBirthDate
-                                                  "
-                                                  label="Date of Birth"
-                                                  prepend-icon="mdi-calendar"
-                                                  readonly
-                                                  v-bind="attrs"
-                                                  v-on="on"
-                                                ></v-text-field>
-                                              </template>
-                                              <v-date-picker
-                                                ref="motherDateOfBirthPicker"
-                                                v-model="motherDateOfBirthDate"
-                                                no-title
-                                                scrollable
-                                                :max="
-                                                  new Date()
-                                                    .toISOString()
-                                                    .substr(0, 10)
-                                                "
-                                                min="1950-01-01"
-                                              >
-                                              </v-date-picker>
-                                            </v-menu>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Mother Vital Status field -->
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                          class="mt-n6"
-                                        >
-                                          <v-responsive max-width="" class="">
-                                            <v-text-field
-                                              v-model="
-                                                orphanItems.motherVitalStatus
-                                              "
-                                              label="Vital Status"
-                                              readonly
-                                            >
-                                            </v-text-field>
-                                          </v-responsive>
-                                        </v-col>
-                                        <!-- Mother Martial Status field -->
-                                        <template
-                                          v-if="
-                                            orphanItems.motherVitalStatus ===
-                                              'alive'
-                                          "
-                                        >
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                            class="mt-n6"
-                                          >
-                                            <v-responsive max-width="" class="">
-                                              <v-text-field
-                                                v-model="
-                                                  orphanItems.motherMaritalStatus
-                                                "
-                                                label="Marital Status"
-                                                readonly
-                                              >
-                                              </v-text-field>
-                                            </v-responsive>
-                                          </v-col>
-                                        </template>
-                                      </template>
-                                      <!-- House and Property Info -->
-                                      <template class="mt-n4">
-                                        <v-col sm="12">
-                                          <div class="title mt-n3 mb-n5">
-                                            Housing and Property
-                                          </div>
-                                        </v-col>
-                                        <!-- TODO # change this field to select -->
-                                        <!-- Housing Situation field -->
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="5"
-                                          class="mb-n3"
-                                        >
-                                          <v-text-field
-                                            v-model="
-                                              orphanItems.housingSituation
-                                            "
-                                            label="Housing Situation"
-                                            readonly
-                                          >
-                                          </v-text-field>
-                                        </v-col>
-                                        <!-- Birth Certificate Dialog -->
-                                        <v-col cols="3">
-                                          <v-dialog
-                                            v-model="birthCertificateDialog"
-                                          >
-                                            <v-container>
-                                              <v-row>
-                                                <v-spacer></v-spacer>
-                                                <v-col class="mr-n12" sm="1">
-                                                  <v-icon
-                                                    dark
-                                                    @click="
-                                                      toggleBirthCertificateDialog
-                                                    "
-                                                  >
-                                                    mdi-close
-                                                  </v-icon>
-                                                </v-col>
-                                              </v-row>
-
-                                              <v-img
-                                                height="82vh"
-                                                src="@/assets/orphanTable_v1.png"
-                                                contain
-                                                alt="birthCertificateimage"
-                                              ></v-img>
-                                            </v-container>
-                                          </v-dialog>
-                                          <v-btn
-                                            class="mb-n10"
-                                            @click="
-                                              toggleBirthCertificateDialog
-                                            "
-                                            >Orphan Birth Certificate</v-btn
-                                          >
-                                        </v-col>
-                                        <!-- Other Properties -->
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                          class="mt-n5"
-                                        >
-                                          <v-responsive max-width="" class="">
-                                            <v-textarea
-                                              v-model="
-                                                orphanItems.otherProperties
-                                              "
-                                              label="Other Properties"
-                                              auto-grow
-                                              rows="1"
-                                              readonly
-                                            ></v-textarea>
-                                          </v-responsive>
-                                        </v-col>
-                                      </template>
-                                    </v-row>
-                                  </v-container>
-                                </v-card-text>
-                                <v-card-actions class="justify-end">
-                                  <v-btn text @click="dialog.value = false"
-                                    >Submit</v-btn
-                                  >
-                                </v-card-actions>
-                              </v-card>
-                            </template>
-                          </v-dialog>
                         </template>
                         <template v-slot:item.fullName="{ item }">
                           {{ fullName(item) }}
@@ -1183,10 +398,10 @@
                         </template>
                         <!-- TODO # fix this coz this is done not to change the header array of objects -->
                         <template v-slot:header.sponsoredDate="{ header }">
-                          {{ changeSponsoredDateHeaderOfProcessing(header) }}
+                          {{ changeSponsoredDateHeaderOfPendingAndProcessing(header) }}
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
-                          {{ displaySelectedOrphanDonor(item) }}
+                          {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
                           <!-- <v-icon @click="showDetails(item)">
@@ -1392,10 +607,16 @@
                         </template>
                         <!-- TODO # fix this coz this is done not to change the header array of objects -->
                         <template v-slot:header.sponsoredDate="{ header }">
-                          {{ changeSponsoredDateHeaderOfPending(header) }}
+                          {{ changeSponsoredDateHeaderOfPendingAndProcessing(header) }}
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ displaySponsoringOrphanDonor(item) }}
+                        </template>
+                        <template v-slot:item.details="{ item }">
+                          <!-- <v-icon @click="showDetails(item)">
+                            mdi-account-details
+                          </v-icon> -->
+                          <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -1601,6 +822,12 @@
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ calcGraduatedDate(item) }}
+                        </template>
+                        <template v-slot:item.details="{ item }">
+                          <!-- <v-icon @click="showDetails(item)">
+                            mdi-account-details
+                          </v-icon> -->
+                          <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -2027,7 +1254,7 @@ export default {
       return this.searchFilter(value, search, item, this.pendingFilterValue);
     },
     graduatedSearchFilter(value, search, item) {
-      return this.searchFilter(value, search, item, this.activeFilterValue);
+      return this.searchFilter(value, search, item, this.graduatedFilterValue);
     },
     searchFilter(value, search, item, filterValue) {
       if (search.length > 0) {
@@ -2060,13 +1287,7 @@ export default {
             } else if (filterVal === this.headers[5].text) {
               return this.calcSponsoredDate(item).indexOf(search) !== -1;
             } else if (
-              filterVal === this.changeSponsoredDateHeaderOfProcessing()
-            ) {
-              return (
-                this.displaySelectedOrphanDonor(item).indexOf(search) !== -1
-              );
-            } else if (
-              filterVal === this.changeSponsoredDateHeaderOfPending()
+              filterVal === this.changeSponsoredDateHeaderOfPendingAndProcessing()
             ) {
               return (
                 this.displaySponsoringOrphanDonor(item).indexOf(search) !== -1
@@ -2171,6 +1392,32 @@ export default {
     donorChoiceReset() {
       this.$refs.donorSelect.reset();
     },
+    async createSponsorshipStatus(orphanId) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createSponsorshipStatus(
+                  $status: sponsorshipStatus
+                  $date: DateTime!
+                  $orphanId: ID
+                ) {
+                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
+                    id
+                    status
+                    date
+                    orphan {
+                      id
+                    }
+                  }
+                }`,
+          variables: {
+            status: "processing",
+            date: new Date().toISOString(),
+            orphanId: orphanId,
+          },
+        })
+        .then((res) => res.data.data.createSponsorshipStatus)
+        .catch((err) => console.warn(err));
+    },
     async selectOrphans() {
       if (!this.orphanShow || !this.orphanPanel) {
         this.selectedOrphanDonorOptions = await axios
@@ -2184,8 +1431,8 @@ export default {
                       }
                     }`,
             variables: {
-              id: this.$route.params.id
-            }
+              id: this.$route.params.id,
+            },
           })
           .then((res) => res.data.data.coordinator)
           .then((coordinator) => coordinator.donors)
@@ -2205,7 +1452,7 @@ export default {
           (cur) => cur.nameInitials === this.selectedOrphanDonor
         )[0];
         let selectedDonorId = donor.id;
-        let orphanIds = this.selectedOrphans.map((orphan) =>
+        let selectedOrphanIds = this.selectedOrphans.map((orphan) =>
           parseInt(orphan.id)
         );
 
@@ -2222,61 +1469,30 @@ export default {
                 }`,
             variables: {
               id: selectedDonorId,
-              orphans: orphanIds,
+              orphans: selectedOrphanIds,
             },
           })
+          // change sponsoreship status
           .then((res) => res.data.data.updateDonor)
+          .then(() => {
+            for (const orphanId of selectedOrphanIds) {
+              this.createSponsorshipStatus(orphanId)
+                .then((sponsorshipStatuse) => {
+                  console.log("SponsoreStatus:", sponsorshipStatuse);
+                })
+                .catch((err) => console.warn(err));
+            }
+          })
           .catch((err) => console.warn(err));
         console.log("recievedOrphanIds", recievedOrphanIds);
         this.selectedOrphans = [];
-
-        // orphanDonorIds = this.selectedOrphans.reduce((acc, orphan) => {
-        //   let key = parseInt(orphan.donor.id);
-        //   if (!acc[key]) acc[key] = [];
-        //   acc[key].push(parseInt(orphan.id));
-        //   return acc;
-        // }, {});
-
-        // for (const donorId in orphanDonorIds) {
-        //   if (Object.hasOwnProperty.call(orphanDonorIds, donorId)) {
-        //     const orphanIds = orphanDonorIds[donorId];
-        //     // console.log(`orphanDonorIds[${donorId}]`, orphanIds);
-        //     if (this.orphanShow === false) {
-        //       let recievedOrphanIds = await axios
-        //         .post("/graphql/", {
-        //           query: `mutation($id: ID!, $orphans: [ID]) {
-        //           updateDonor(id: $id, orphans: $orphans) {
-        //             id
-        //             nameInitials
-        //             orphans {
-        //               id
-        //             }
-        //           }
-        //         }`,
-        //           variables: {
-        //             id: donorId,
-        //             orphans: orphanIds,
-        //           },
-        //         })
-        //         .then((res) => res.data.data.updateDonor)
-        //         .catch((err) => console.warn(err));
-        //       console.log("recievedOrphanIds", recievedOrphanIds);
-        //     }
-        //   }
-        // }
       }
     },
-    changeSponsoredDateHeaderOfProcessing() {
-      return "Selected Donor";
-    },
-    changeSponsoredDateHeaderOfPending() {
+    changeSponsoredDateHeaderOfPendingAndProcessing() {
       return "Sponsoring Donor";
     },
     changeSponsoredDateHeaderOfGraduated() {
       return "Graduated Date";
-    },
-    displaySelectedOrphanDonor(item) {
-      return item.donor ? item.donor.nameInitials : "";
     },
     displaySponsoringOrphanDonor(item) {
       return item.donor ? item.donor.nameInitials : "";
@@ -2420,7 +1636,7 @@ export default {
       this.pendingFilterValue = [...this.pendingFilterValue];
     },
     removeSelectedGraduated(item) {
-      this.graduatedfilterValue.splice(
+      this.graduatedFilterValue.splice(
         this.graduatedFilterValue.indexOf(item),
         1
       );
