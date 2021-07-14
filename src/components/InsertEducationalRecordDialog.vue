@@ -408,14 +408,8 @@ export default {
                     level: this.level,
                     reason: this.reason,
                     yearDivision: this.yearDivision,
-                    quarter:
-                      this.currentDivision == "quarter_term"
-                        ? this.currentDivision
-                        : undefined,
-                    semester:
-                      this.currentDivision == "semester"
-                        ? this.currentDivision
-                        : undefined,
+                    quarter: this.currentDivision,
+                    semester: this.currentDivision,
                     totalMark: parseFloat(this.totalMark),
                     numberOfSubjects: parseInt(this.numberOfSubjects),
                     average: parseFloat(this.average),

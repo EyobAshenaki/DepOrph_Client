@@ -115,13 +115,25 @@
                       </v-row>
                       <v-row>
                         <v-col cols="12">
-                          <v-img :src="item.reportCardUrl"></v-img>
+                          <template>
+                            <custom-image
+                              :url="item.reportCardUrl"
+                              type="EDR"
+                              v-if="!badUrl"
+                              @badUrl="badUrl = true"
+                            ></custom-image>
+                            <p v-else>
+                              Report Card Image Not Found
+                            </p>
+                          </template>
                         </v-col>
-                      </v-row> </v-card-text
-                  ></v-card>
+                      </v-row>
+                    </v-card-text></v-card
+                  >
                 </td>
-              </template> </v-data-table
-          ></v-col>
+              </template>
+            </v-data-table></v-col
+          >
         </v-row>
       </v-card-text>
       <v-divider></v-divider>
@@ -143,8 +155,9 @@
 import axios from "axios";
 import moment from "moment";
 import InsertEducationalRecordDialog from "./InsertEducationalRecordDialog.vue";
+import CustomImage from "./CustomImage.vue";
 export default {
-  components: { InsertEducationalRecordDialog },
+  components: { InsertEducationalRecordDialog, CustomImage },
   props: ["open", "item"],
   data() {
     return {
@@ -216,7 +229,8 @@ export default {
         //   value: "cumulativeGPA"
         // }
       ],
-      educationalRecordsTableExpandedRecords: []
+      educationalRecordsTableExpandedRecords: [],
+      badUrl: false
     };
   },
   computed: {},
