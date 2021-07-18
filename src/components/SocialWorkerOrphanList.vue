@@ -57,13 +57,17 @@
                 :search="search"
                 :custom-filter="searchFilter"
               >
-                <template v-slot:[`item.actions`]="{ item }">
+                <template #[`item.actions`]="{ item }">
+                  <educational-records-dialog
+                    :open="educationalRecordsDialog"
+                    :item="item"
+                  />
                   <insert-images-dialog
                     :open="insertImagesDialog"
                     :item="item"
                   />
-                  <educational-records-dialog
-                    :open="educationalRecordsDialog"
+                  <miscellaneous-social-worker-tasks-dialog
+                    :open="miscellaneousSocialWorkerTasksDialog"
                     :item="item"
                   />
                 </template>
@@ -81,9 +85,14 @@ import axios from "axios";
 import { capitalize, calculateAge } from "@/utils/utils";
 import InsertImagesDialog from "./InsertImagesDialog.vue";
 import EducationalRecordsDialog from "./EducationalRecordsDialog.vue";
+import MiscellaneousSocialWorkerTasksDialog from "./MiscellaneousSocialWorkerTasksDialog.vue";
 export default {
   props: ["socialWorerkId"],
-  components: { InsertImagesDialog, EducationalRecordsDialog },
+  components: {
+    InsertImagesDialog,
+    EducationalRecordsDialog,
+    MiscellaneousSocialWorkerTasksDialog
+  },
   data() {
     return {
       orphans: [],
@@ -132,10 +141,10 @@ export default {
           value: "accountNumber"
         },
         // { text: "Sponsored Date", value: "sponsoredDate" },
-        {
-          text: "District",
-          value: "district"
-        },
+        // {
+        //   text: "District",
+        //   value: "district"
+        // },
         {
           text: "Village",
           align: "Start",
@@ -145,10 +154,10 @@ export default {
         //   text: "Registred on",
         //   value: "registrationDate",
         // },
-        {
-          text: "Donor",
-          value: "donor"
-        },
+        // {
+        //   text: "Donor",
+        //   value: "donor"
+        // },
         {
           text: "Actions",
           value: "actions"
@@ -156,7 +165,8 @@ export default {
       ],
       itemsPerPage: 20,
       insertImagesDialog: false,
-      educationalRecordsDialog: false
+      educationalRecordsDialog: false,
+      miscellaneousSocialWorkerTasksDialog: false
     };
   },
   computed: {},

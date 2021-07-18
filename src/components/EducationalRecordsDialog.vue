@@ -7,15 +7,22 @@
     overlay-color="#000"
     overlay-opacity=".3"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <v-icon
-        class="mr-2"
-        v-bind="attrs"
-        v-on="on"
-        @click="populateEducationalRecordsTable(item)"
-      >
-        mdi-file-plus
-      </v-icon>
+    <template v-slot:activator="{ on: dialog, attrs }">
+      <v-tooltip top>
+        <template #activator="{ on:tooltip }">
+          <v-icon
+            class="mr-2"
+            color="teal darken-2"
+            v-bind="attrs"
+            v-on="{ ...tooltip, ...dialog }"
+            @click="populateEducationalRecordsTable(item)"
+          >
+            mdi-file-plus
+          </v-icon>
+        </template>
+
+        <span>Educational Records</span>
+      </v-tooltip>
     </template>
     <v-card>
       <v-card-title

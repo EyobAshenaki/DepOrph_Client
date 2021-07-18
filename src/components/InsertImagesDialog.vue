@@ -7,10 +7,20 @@
     overlay-color="#000"
     overlay-opacity=".3"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <v-icon class="mr-2" v-bind="attrs" v-on="on">
-        mdi-image-plus
-      </v-icon>
+    <template v-slot:activator="{ on: dialog, attrs }">
+      <v-tooltip top>
+        <template #activator="{ on: tooltip}">
+          <v-icon
+            class="mr-2"
+            color="indigo darken-2"
+            v-bind="attrs"
+            v-on="{ ...tooltip, ...dialog }"
+          >
+            mdi-image-plus
+          </v-icon></template
+        >
+        <span>Insert Images</span>
+      </v-tooltip>
     </template>
     <v-card>
       <v-card-title>Upload Photos</v-card-title>
