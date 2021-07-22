@@ -1693,7 +1693,7 @@ export default {
     AppNavBar,
   },
   data: () => ({
-    showSidebar: false,
+    showSidebar: true,
     sideMenu: false,
     sheet: false,
     group: null,
@@ -2102,6 +2102,7 @@ export default {
         .catch((err) => console.warn(err));
     },
     socialWorkerBirthdateSave(date) {
+      // console.log(this.$refs.menu);
       this.$refs.menu.save(date);
     },
     showCoordinatorRegistration() {
@@ -2387,10 +2388,15 @@ export default {
             password: String(pwd),
           },
         })
+        // .then((res) => console.log(res))
         .then((res) => res.data.data.register.user)
         .catch((err) => console.warn(err));
     },
     async createCoordinator(firstName, middleName, lastName, userId) {
+      console.log("firstName", firstName);
+        console.log("middleName", middleName);
+        console.log("lastName", lastName);
+        console.log("userId", userId);
       //  createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: Int)
       return await axios
         .post("/graphql/", {
@@ -2420,7 +2426,8 @@ export default {
           },
         })
         .then((res) => res.data.data.createCoordinator)
-        .catch((err) => console.warn(err));
+        // .then((res) => console.log(res.data.data.createCoordinator.firstName))
+        .catch((err) => console.log(err));
     },
     async createDonor(companyName, nameInitials, userId, coordinatorId) {
       return await axios
@@ -2428,7 +2435,7 @@ export default {
           query: `mutation createDonor (
                   $companyName: String!, 
                   $nameInitials: String!, 
-                  $userId: ID, 
+                  $userId: ID!, 
                   $coordinatorId: ID
                   ) {
                   createDonor(
@@ -2583,7 +2590,8 @@ export default {
       mobileNumber,
       initDate,
       userId,
-      districtId
+      districtIds,
+      villageIds
     ) {
       return await axios
         .post("/graphql/", {
@@ -2595,8 +2603,9 @@ export default {
                     $dateOfBirth: DateTime
                     $mobileNumber: String!
                     $initDate: DateTime
-                    $userId: ID
-                    $districtId: ID
+                    $userId: ID!
+                    $districts: [ID]
+                    $villages: [ID]
                   ) {
                     createSocialWorker(
                       firstName: $firstName
@@ -2607,7 +2616,8 @@ export default {
                       mobileNumber: $mobileNumber
                       initDate: $initDate
                       userId: $userId
-                      districtId: $districtId
+                      districts: $districts
+                      villages: $villages
                     ) {
                       id
                       firstName
@@ -2617,7 +2627,7 @@ export default {
                         id
                         role
                       }
-                      district {
+                      districts {
                         id
                         coordinator {
                           id
@@ -2637,7 +2647,8 @@ export default {
             mobileNumber: String(mobileNumber),
             initDate: String(initDate),
             userId: userId,
-            districtId: districtId,
+            districts: districtIds,
+            villages: villageIds
           },
         })
         .then((res) => res.data.data.createSocialWorker)
@@ -2658,6 +2669,10 @@ export default {
           password
         );
         const userId = parseInt(user.id);
+        // console.log("firstName", firstName);
+        // console.log("middleName", middleName);
+        // console.log("lastName", lastName);
+        // console.log("userId", userId);
         const coordinator = await this.createCoordinator(
           firstName,
           middleName,
@@ -2768,7 +2783,7 @@ export default {
           zoneId
         );
         this.$refs.districtForm.reset();
-        console.log(`District ${district} created!`);
+        console.log(`District ${district.name} created!`);
       }
     },
     districtCancel() {
@@ -2807,7 +2822,7 @@ export default {
           donorId
         );
         this.$refs.villageForm.reset();
-        console.log(`Village ${village} created!`);
+        console.log(`Village ${village.name} created!`);
       }
     },
     villageCancel() {
@@ -2822,7 +2837,7 @@ export default {
         const lastName = nameSplit[2];
         const password = `${lastName}${this.socialWorkerEmail.split("@")[0]}`;
         const user = await this.registerUser(
-          "SocailWorker",
+          "SocialWorker",
           this.socialWorkerEmail,
           password
         );
@@ -2836,7 +2851,7 @@ export default {
         const district = this.districts.filter(
           (district) => district.name === this.socialWorkerDistrict
         );
-        const districtId = parseInt(district[0].id);
+        const districtIds = district.map(val => parseInt(val.id));
         // const coordinator = this.coordinatorsOptions.filter((coordinator) => {
         //   return (
         //     coordinator.firstName +
@@ -2849,15 +2864,14 @@ export default {
         // });
         // const coordinatorId = parseInt(coordinator[0].id);
 
-        // const villages = this.socialWorkerVillageOptions.filter(village => {
-        //   for (const vlg of this.socialWorkerVillages) {
-        //     return vlg.name === village.name;
-        //   }
-        // })
-        // const villageIds;
-        // for (const village of villages) {
-        //   villageIds.push(village.id);
-        // }
+        const villages = this.socialWorkerVillageOptions.filter(village => {
+          for (const vlg of this.socialWorkerVillages) {
+            return vlg === village.name;
+          }
+        })
+        const villageIds = villages.map(val => val.id);
+        console.log(this.socialWorkerVillages);
+        console.log(villageIds)
 
         const socialWorker = await this.createSocialWorker(
           firstName,
@@ -2868,7 +2882,8 @@ export default {
           this.socialWorkerPhoneNumber,
           socialWorkerInitialDate,
           userId,
-          districtId
+          districtIds,
+          villageIds
         );
         this.$refs.socialWorkerForm.reset();
         console.log(`Social Worker ${socialWorker} created!`);
@@ -2915,10 +2930,8 @@ export default {
     initializeRegionTable() {
       if (this.regionTable.length > 0) this.regionTable.length = 0;
       return axios
-        .post(
-          "/graphql/",
-          {
-            query: `query {
+        .post("/graphql/", {
+          query: `query {
                   allRegions {
                     id
                     name
@@ -2930,11 +2943,12 @@ export default {
                     }
                   }
                 }`,
-          }
+        },
           // {
           //   withCredentials: true,
           // }
         )
+        // .then((res) => console.log(res))
         .then((res) => res.data.data.allRegions)
         .then((res) => this.regionTable.push(...res))
         .catch((err) => console.warn(err));
@@ -3084,6 +3098,7 @@ export default {
     // custom search function based on selected columns
     // TODO: do MultipleFilter
     searchRegionTableFilter(value, search, item) {
+      console.log(value);
       if (search.length > 0) {
         if (this.regionTableFilterValue.length > 0) {
           for (const filterVal of this.regionTableFilterValue) {
@@ -3107,15 +3122,14 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name
-              .toString()
-              .toLowerCase()
-              .indexOf(search.toLowerCase()) !== -1
+            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
+              -1
           );
         }
       }
     },
     searchZoneTableFilter(value, search, item) {
+      console.log(item);
       if (search.length > 0) {
         if (this.zoneTableFilterValue.length > 0) {
           for (const filterVal of this.zoneTableFilterValue) {
@@ -3139,15 +3153,13 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name
-              .toString()
-              .toLowerCase()
-              .indexOf(search) !== -1
+            item.name.toString().toLowerCase().indexOf(search) !== -1
           );
         }
       }
     },
     searchDistrictTableFilter(value, search, item) {
+      console.log("Value: " + value);
       if (search.length > 0) {
         if (this.districtTableFilterValue.length > 0) {
           for (const filterVal of this.districtTableFilterValue) {
@@ -3184,15 +3196,15 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name
-              .toString()
-              .toLowerCase()
-              .indexOf(search.toLowerCase()) !== -1
+            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
+              -1
           );
         }
       }
     },
     searchVillageTableFilter(value, search, item) {
+      console.log(item);
+      // console.log(this.filterValue);
       if (search.length > 0) {
         if (this.villageTableFilterValue.length > 0) {
           for (const filterVal of this.villageTableFilterValue) {
@@ -3200,33 +3212,24 @@ export default {
               return item.id.indexOf(search) !== -1;
             } else if (filterVal === this.villageHeaders[1].text) {
               return (
-                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.name
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[2].text) {
               return (
-                item.district.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.district.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[3].text) {
               return (
-                item.registrationDate
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.registrationDate.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
               // TODO # fix it to be visible as stacked avatars
             } else if (filterVal === this.villageHeaders[4].text) {
-              return (
-                item.donor.nameInitials
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
+              return item.donor.nameInitials.toLowerCase().indexOf(search.toLowerCase()) !== -1
             } else if (filterVal === this.villageHeaders[5].text) {
               let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
-              return (
-                coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
-                -1
-              );
+              return coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
             } else if (filterVal === this.villageHeaders[6].text) {
               return parseInt(item.orphans.length) === parseInt(search);
             }
@@ -3235,10 +3238,7 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name
-              .toString()
-              .toLowerCase()
-              .indexOf(search) !== -1
+            item.name.toString().toLowerCase().indexOf(search) !== -1
           );
         }
       }
@@ -3423,7 +3423,7 @@ export default {
                     user {
                       email
                     }
-                    district {
+                    districts {
                       name
                     }
                     orphans {
@@ -3434,7 +3434,7 @@ export default {
         })
         .then((res) => res.data.data.allSocialWorkers)
         .then((res) => item.children.push(...res))
-        .then((res) => console.log("SocialWorker", res))
+        .then((res) => console.log(res))
         .catch((err) => console.warn(err));
     },
     removeSelectedRegion(item) {

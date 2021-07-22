@@ -15,14 +15,20 @@
 
       <v-spacer></v-spacer>
 
+      <!-- Coordinator part -->
       <template v-if="user.role === 'Coordinator'">
-        <v-btn text class="mr-0 py-8" @click.stop="toggleNewOrphanDialog"
-          >New Orphan</v-btn
-        >
-        <v-btn text class="py-8" @click.stop="toggleSupportPlanComponent">Support Plans</v-btn>
-        <v-btn text class="mr-0 py-8">Change Status</v-btn>
+        <v-btn text class="mr-0 py-8" :class="{active: isNewOrphan}" @click.stop="toggleNewOrphanDialog">
+          New Orphan
+        </v-btn>
+        <v-btn text class="py-8" :class="{active: isSupportPlan}" @click.stop="toggleSupportPlanComponent">
+          Support Plans
+        </v-btn>
+        <v-btn text class="mr-0 py-8" :class="{active: isChangeStatus}" @click.stop="toggleChangeStatusDialog">
+          Change Status
+        </v-btn>
       </template>
 
+      <!-- Donor part -->
       <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
@@ -61,6 +67,7 @@
         </v-tooltip>
       </template>
 
+      <!-- Head Part -->
       <template v-else-if="user.role === 'Head'">
         <v-btn text class="mr-0 py-8">View</v-btn>
         <v-btn text class="mr-0 py-8">Register</v-btn>
@@ -138,6 +145,7 @@
         </v-card>
       </v-menu>
     </v-app-bar>
+
     <!-- <v-navigation-drawer v-model="drawer" absolute temporary style="color: #FF9983;">
       <v-list nav dense>
         <v-list-item-group
@@ -174,10 +182,16 @@
 export default {
   props: {
     user: {
-      type: Object,
+      type: Object
     },
     dialog: {
-      type: Boolean,
+      type: Boolean
+    },
+    newOrphanView: {
+      type: Boolean
+    },
+    changeStatusDialogValue: {
+      type: Boolean
     }
   },
 
@@ -188,25 +202,55 @@ export default {
       drawer: false,
       newOrphanDialog: true,
       supportPlanTable: true,
+      changeStatusDialog: true,
       state: "",
+      isNewOrphan: false,
+      isSupportPlan: false,
+      isChangeStatus: false,
       isProcessing: false,
       isPending: false,
       isSponsored: false,
       isGraduated: false,
     };
   },
+  watch: {
+    dialog(val) {
+      this.isNewOrphan = val;
+    },
+    newOrphanView (val) {
+      this.isNewOrphan = val;
+    },
+    changeStatusDialogValue(val) {
+      this.isChangeStatus = val
+    },
+  },
   methods: {
     toggleNewOrphanDialog() {
-      // because when the dialog closes this function don't get the memo
-      // if(this.newOrphanDialog === false) this.newOrphanDialog = true;
+      // because when the dialog closes this function don't get the memo so do it manually like a noob same goes for toggleChangeStatusDialog
       if(this.newOrphanDialog === false) this.newOrphanDialog = !this.dialog;
       this.$emit("toggleNewOrphanDialog", this.newOrphanDialog);
       this.newOrphanDialog = !this.newOrphanDialog;
+      
+      this.isSupportPlan = false;
+      this.isChangeStatus = false;
     },
     toggleSupportPlanComponent() {
+      console.log(this.supportPlanTable)
       // if(this.supportPlanTable === false) this.supportPlanTable = true;
       this.$emit("toggleSupportPlanComponent", this.supportPlanTable);
       this.supportPlanTable = !this.supportPlanTable;
+
+      this.isSupportPlan = !this.supportPlanTable;
+      this.isNewOrphan = false;
+      this.isChangeStatus = false;
+    },
+    toggleChangeStatusDialog() {
+      if(this.changeStatusDialog === false) this.changeStatusDialog = !this.changeStatusDialogValue;
+      this.$emit("toggleChangeStatusDialog", this.changeStatusDialog);
+      this.changeStatusDialog = !this.changeStatusDialog;
+
+      this.isSupportPlan = false;
+      this.isNewOrphan = false;
     },
     displayName() {
       if (Object.hasOwnProperty.call(this.user, "companyName")) {
