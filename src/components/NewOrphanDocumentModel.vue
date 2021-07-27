@@ -71,7 +71,7 @@
 
                               <v-img
                                 height="82vh"
-                                :src="birthCertificateFile"
+                                :src="birthCertificatePreview"
                                 contain
                                 alt="birthCertificateimage"
                               ></v-img>
@@ -124,55 +124,6 @@
                                 :src="portraitPhotoPreview"
                                 contain
                                 alt="portraitPhotoimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Education Certificate -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="educationCertificateFile"
-                        accept="image/*, .pdf"
-                        counter
-                        chips
-                        prepend-icon="mdi-file-document-outline"
-                        label="Education Certificate"
-                        @change="toggleEducationCertificateInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleEducationCertificateDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="educationCertificateDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="toggleEducationCertificateDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="educationCertificatePreview"
-                                contain
-                                alt="educationCertificateimage"
                               ></v-img>
                             </v-container>
                           </v-dialog>
@@ -433,7 +384,7 @@
                         </template>
                       </v-file-input>
                     </v-col>
-                    <!-- Guardian Confirmation Letter -->
+                    <!-- Guardian Legal Confirmation Letter -->
                     <v-col cols="12" sm="6" md="4">
                       <v-file-input
                         v-model="guardianLegalConfirmationLetterFile"
@@ -441,7 +392,7 @@
                         counter
                         prepend-icon="mdi-file-document-outline"
                         :rules="[rules.required]"
-                        label="Guardian Confirmation Letter"
+                        label="Guardian Legal Confirmation Letter"
                         @change="toggleGuardianLegalConfirmationLetterInput"
                       >
                         <template v-slot:append>
@@ -451,7 +402,9 @@
                                 class="ml-auto"
                                 v-bind="attrs"
                                 v-on="on"
-                                @click="toggleGuardianLegalConfirmationLetterDialog"
+                                @click="
+                                  toggleGuardianLegalConfirmationLetterDialog
+                                "
                               >
                                 mdi-file-eye-outline
                               </v-icon>
@@ -459,7 +412,9 @@
                             <span>Preview</span>
                           </v-tooltip>
                           <!-- preview image popup -->
-                          <v-dialog v-model="guardianLegalConfirmationLetterDialog">
+                          <v-dialog
+                            v-model="guardianLegalConfirmationLetterDialog"
+                          >
                             <v-container>
                               <v-row>
                                 <v-spacer></v-spacer>
@@ -528,7 +483,17 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
+  props: {
+    updatedOrphan: {
+      type: Object,
+    },
+    orphanVillageId: {
+      type: String,
+    },
+  },
   data() {
     return {
       // dialog
@@ -543,13 +508,13 @@ export default {
           deathCertificateUrl: null,
         },
         guardian: {
-          guardianIDCardUrl: null,
-          guardianConfirmationLetterUrl: null,
-          guardianLegalConfirmationLetterUrl: null,
+          iDCardUrl: null,
+          confirmationLetterUrl: null,
+          legalConfirmationLetterUrl: null,
         },
         photos: {
-          photoPortraitUrl: null,
-        }
+          portraitUrl: null,
+        },
       },
       rules: {
         required: (value) => !!value || "Required.",
@@ -560,9 +525,6 @@ export default {
       portraitPhotoDialog: false,
       portraitPhotoFile: null,
       portraitPhotoPreview: null,
-      educationCertificateDialog: false,
-      educationCertificateFile: null,
-      educationCertificatePreview: false,
       orphanIdDialog: false,
       orphanIdFile: null,
       orphanIdPreview: null,
@@ -591,11 +553,9 @@ export default {
     },
   },
   methods: {
-    // dialog
     // assign the entered image to preview
     // Birth Certificate
     toggleBirthCertificateInput() {
-      console.log(this.birthCertificateFile);
       if (this.birthCertificateFile) {
         this.birthCertificatePreview = URL.createObjectURL(
           this.birthCertificateFile
@@ -608,7 +568,6 @@ export default {
     },
     // Portrait Photo
     togglePortraitPhotoInput() {
-      console.log(this.portraitPhotoFile);
       if (this.portraitPhotoFile) {
         this.portraitPhotoPreview = URL.createObjectURL(this.portraitPhotoFile);
       }
@@ -616,21 +575,8 @@ export default {
     togglePortraitPhotoDialog() {
       this.portraitPhotoDialog = !this.portraitPhotoDialog;
     },
-    // Education Certificate
-    toggleEducationCertificateInput() {
-      console.log(this.educationCertificateFile);
-      if (this.educationCertificateFile) {
-        this.educationCertificatePreview = URL.createObjectURL(
-          this.educationCertificateFile
-        );
-      }
-    },
-    toggleEducationCertificateDialog() {
-      this.educationCertificateDialog = !this.educationCertificateDialog;
-    },
     // Orphan Id
     toggleOrphanIdInput() {
-      console.log(this.orphanIdFile);
       if (this.orphanIdFile) {
         this.orphanIdPreview = URL.createObjectURL(this.orphanIdFile);
       }
@@ -640,7 +586,6 @@ export default {
     },
     // Orphan Passport
     toggleOrphanPassportInput() {
-      console.log(this.orphanPassportFile);
       if (this.orphanPassportFile) {
         this.orphanPassportPreview = URL.createObjectURL(
           this.orphanPassportFile
@@ -652,7 +597,6 @@ export default {
     },
     // Father Death Certificate
     toggleFatherDeathCertificateInput() {
-      console.log(this.fatherDeathCertificateFile);
       if (this.fatherDeathCertificateFile) {
         this.fatherDeathCertificatePreview = URL.createObjectURL(
           this.fatherDeathCertificateFile
@@ -664,7 +608,6 @@ export default {
     },
     // Guardian Id
     toggleGuardianIdInput() {
-      console.log(this.guardianIdFile);
       if (this.guardianIdFile) {
         this.guardianIdPreview = URL.createObjectURL(this.guardianIdFile);
       }
@@ -674,7 +617,6 @@ export default {
     },
     // Guardian Confirmation Letter
     toggleGuardianConfirmationLetterInput() {
-      console.log(this.guardianConfirmationLetterFile);
       if (this.guardianConfirmationLetterFile) {
         this.guardianConfirmationLetterPreview = URL.createObjectURL(
           this.guardianConfirmationLetterFile
@@ -687,7 +629,6 @@ export default {
     },
     // Guardian Legal Confirmation Letter
     toggleGuardianLegalConfirmationLetterInput() {
-      console.log(this.guardianLegalConfirmationLetterFile);
       if (this.guardianLegalConfirmationLetterFile) {
         this.guardianLegalConfirmationLetterPreview = URL.createObjectURL(
           this.guardianLegalConfirmationLetterFile
@@ -699,13 +640,421 @@ export default {
         .guardianLegalConfirmationLetterDialog;
     },
 
+    getOrphanFather(
+      firstName,
+      lastName,
+      dateOfDeath,
+      causeOfDeath,
+      dateOfBirth,
+      deathCertificateUrl
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createFather(
+                    $firstName: String!
+                    $lastName: String!
+                    $dateOfDeath: DateTime!
+                    $causeOfDeath: String!
+                    $dateOfBirth: DateTime!
+                    $deathCertificateUrl: String!
+                  ) {
+                    createFather(
+                      firstName: $firstName
+                      lastName: $lastName
+                      dateOfDeath: $dateOfDeath
+                      causeOfDeath: $causeOfDeath
+                      dateOfBirth: $dateOfBirth
+                      deathCertificateUrl: $deathCertificateUrl
+                    ) {
+                      id
+                      firstName
+                      lastName
+                      deathCertificateUrl
+                    }
+                  }`,
+          variables: {
+            firstName: firstName,
+            lastName: lastName,
+            dateOfDeath: dateOfDeath,
+            causeOfDeath: causeOfDeath,
+            dateOfBirth: dateOfBirth,
+            deathCertificateUrl: deathCertificateUrl,
+          },
+        })
+        .then((res) => res.data.data.createFather)
+        .catch((err) => console.warn(err));
+    },
+
+    getOrphanMother(
+      firstName,
+      middleName,
+      lastName,
+      vitalStatus,
+      dateOfBirth,
+      dateOfDeath,
+      causeOfDeath,
+      maritalStatus,
+      mobileNumber,
+      monthlyExpense
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createMother(
+                  $firstName: String!
+                  $middleName: String!
+                  $lastName: String!
+                  $vitalStatus: motherVitalStatus!
+                  $dateOfBirth: DateTime!
+                  $dateOfDeath: DateTime
+                  $causeOfDeath: String
+                  $maritalStatus: motherMaritalStatus
+                  $mobileNumber: String!
+                  $monthlyExpense: Float!
+                ) {
+                  createMother(
+                    firstName: $firstName
+                    middleName: $middleName
+                    lastName: $lastName
+                    vitalStatus: $vitalStatus
+                    dateOfBirth: $dateOfBirth
+                    dateOfDeath: $dateOfDeath
+                    causeOfDeath: $causeOfDeath
+                    maritalStatus: $maritalStatus
+                    mobileNumber: $mobileNumber
+                    monthlyExpense: $monthlyExpense
+                  ) {
+                    id
+                    firstName
+                    vitalStatus
+                  }
+                }`,
+          variables: {
+            firstName: firstName,
+            middleName: middleName,
+            lastName: lastName,
+            vitalStatus: vitalStatus,
+            dateOfBirth: dateOfBirth,
+            dateOfDeath: dateOfDeath || null,
+            causeOfDeath: causeOfDeath || null,
+            maritalStatus: maritalStatus || null,
+            mobileNumber: mobileNumber,
+            monthlyExpense: monthlyExpense,
+          },
+        })
+        .then((res) => res.data.data.createMother)
+        .catch((err) => console.warn(err));
+    },
+
+    getOrphanEducation(
+      enrollmentStatus,
+      schoolName,
+      typeOfSchool,
+      year,
+      level,
+      reason
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createEducation(
+                  $enrollmentStatus: educationEnrollmentStatus!
+                  $schoolName: String
+                  $typeOfSchool: educationTypeOfSchool
+                  $year: String
+                  $level: educationLevel
+                  $reason: String
+                ) {
+                  createEducation(
+                    enrollmentStatus: $enrollmentStatus
+                    schoolName: $schoolName
+                    typeOfSchool: $typeOfSchool
+                    year: $year
+                    level: $level
+                    reason: $reason
+                  ) {
+                    id
+                    enrollmentStatus
+                    reason
+                  }
+                }`,
+          variables: {
+            enrollmentStatus: enrollmentStatus,
+            schoolName: schoolName || null,
+            typeOfSchool: typeOfSchool || "N_A",
+            year: String(year) || null,
+            level: level || "N_A",
+            reason: reason || null,
+          },
+        })
+        .then((res) => res.data.data.createEducation)
+        .catch((err) => console.warn(err));
+    },
+
+    getOrphanGuardian(
+      firstName,
+      middleName,
+      lastName,
+      dateOfBirth,
+      gender,
+      relationToOrphan,
+      nationality,
+      mobileNumber,
+      telephoneNumber,
+      email,
+      iDCardUrl,
+      confirmationLetterUrl,
+      legalConfirmationLetterUrl
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createGuardian(
+                  $firstName: String!
+                  $middleName: String!
+                  $lastName: String!
+                  $dateOfBirth: DateTime!
+                  $gender: guardianGender!
+                  $relationToOrphan: guardianRelationToOrphan!
+                  $nationality: guardianNationality!
+                  $mobileNumber: String!
+                  $telephoneNumber: String
+                  $email: String!
+                  $iDCardUrl: String!
+                  $confirmationLetterUrl: String!
+                  $legalConfirmationLetterUrl: String!
+                ) {
+                  createGuardian(
+                    firstName: $firstName
+                    middleName: $middleName
+                    lastName: $lastName
+                    dateOfBirth: $dateOfBirth
+                    gender: $gender
+                    relationToOrphan: $relationToOrphan
+                    nationality: $nationality
+                    mobileNumber: $mobileNumber
+                    telephoneNumber: $telephoneNumber
+                    email: $email
+                    iDCardUrl: $iDCardUrl
+                    confirmationLetterUrl: $confirmationLetterUrl
+                    legalConfirmationLetterUrl: $legalConfirmationLetterUrl
+                  ) {
+                    id
+                    firstName
+                    email
+                  }
+                }`,
+          variables: {
+            firstName: firstName,
+            middleName: middleName,
+            lastName: lastName,
+            dateOfBirth: dateOfBirth,
+            gender: gender,
+            relationToOrphan: relationToOrphan,
+            nationality: nationality,
+            mobileNumber: mobileNumber,
+            telephoneNumber: telephoneNumber,
+            email: email,
+            iDCardUrl: iDCardUrl,
+            confirmationLetterUrl: confirmationLetterUrl,
+            legalConfirmationLetterUrl: legalConfirmationLetterUrl,
+          },
+        })
+        .then((res) => res.data.data.createGuardian)
+        .catch((err) => console.warn(err));
+    },
+
+    getHouseProperty(housingSituation, otherProperty) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createHouse_property(
+                  $housingSituation: String!
+                  $otherProperty: String
+                ) {
+                  createHouse_property(
+                    housingSituation: $housingSituation
+                    otherProperty: $otherProperty
+                  ) {
+                    id
+                    housingSituation
+                  }
+                }`,
+          variables: {
+            housingSituation: housingSituation,
+            otherProperty: otherProperty,
+          },
+        })
+        .then((res) => res.data.data.createHouse_property)
+        .catch((err) => console.warn(err));
+    },
+
+    registerOrphan(
+      firstName,
+      gender,
+      placeOfBirth,
+      dateOfBirth,
+      spokenLanguages,
+      hobbies,
+      religion,
+      healthDescription,
+      psychologicalStatus,
+      idCardUrl,
+      passportUrl,
+      birthCertificateUrl,
+      fatherId,
+      educationId,
+      guardianId,
+      motherId,
+      house_propertyId,
+      villageId
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createOrphan(
+                    $firstName: String!
+                    $gender: orphanGender!
+                    $placeOfBirth: String!
+                    $dateOfBirth: DateTime!
+                    $spokenLanguages: String
+                    $hobbies: String
+                    $religion: orphanReligion
+                    $healthDescription: String!
+                    $psychologicalStatus: orphanPsychologicalStatus
+                    $idCardUrl: String
+                    $passportUrl: String
+                    $birthCertificateUrl: String!
+                    $fatherId: ID
+                    $motherId: ID
+                    $educationId: ID
+                    $guardianId: ID
+                    $house_propertyId: ID
+                    $villageId: ID
+                  ) {
+                    createOrphan(
+                      firstName: $firstName
+                      gender: $gender
+                      placeOfBirth: $placeOfBirth
+                      dateOfBirth: $dateOfBirth
+                      spokenLanguages: $spokenLanguages
+                      hobbies: $hobbies
+                      religion: $religion
+                      healthDescription: $healthDescription
+                      psychologicalStatus: $psychologicalStatus
+                      idCardUrl: $idCardUrl
+                      passportUrl: $passportUrl
+                      birthCertificateUrl: $birthCertificateUrl
+                      fatherId: $fatherId
+                      motherId: $motherId
+                      educationId: $educationId
+                      guardianId: $guardianId
+                      house_propertyId: $house_propertyId
+                      villageId: $villageId
+                    ) {
+                      id
+                      firstName
+                      gender
+                      placeOfBirth
+                      dateOfBirth
+                      spokenLanguages
+                      hobbies
+                      religion
+                      healthDescription
+                      psychologicalStatus
+                      father {
+                        id
+                        firstName
+                        lastName
+                        dateOfBirth
+                        dateOfDeath
+                        causeOfDeath
+                      }
+                      mother {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                        vitalStatus
+                        dateOfBirth
+                      }
+                      education {
+                        enrollmentStatus
+                        schoolName
+                        typeOfSchool
+                        level
+                        year
+                      }
+                      guardian {
+                        firstName
+                        middleName
+                        lastName
+                        gender
+                        dateOfBirth
+                        relationToOrphan
+                        email
+                        nationality
+                        mobileNumber
+                        telephoneNumber
+                      }
+                      house_property {
+                        housingSituation
+                        otherProperty
+                      }
+                      village{
+                        id
+                      }
+                    }
+                  }`,
+          variables: {
+            firstName: firstName,
+            gender: gender,
+            placeOfBirth: placeOfBirth,
+            dateOfBirth: dateOfBirth,
+            spokenLanguages: spokenLanguages,
+            hobbies: hobbies,
+            religion: religion,
+            healthDescription: healthDescription,
+            psychologicalStatus: psychologicalStatus,
+            idCardUrl: idCardUrl,
+            passportUrl: passportUrl,
+            birthCertificateUrl: birthCertificateUrl,
+            fatherId: fatherId,
+            educationId: educationId,
+            guardianId: guardianId,
+            motherId: motherId,
+            house_propertyId: house_propertyId,
+            villageId: villageId,
+          },
+        })
+        .then((res) => res.data.data.createOrphan)
+        .catch((err) => console.warn(err));
+    },
+
+    async createSponsorshipStatus(orphanId) {
+      return await axios
+        .post("/graphql", {
+          query: `mutation createSponsorshipStatus(
+                  $status: sponsorshipStatus
+                  $date: DateTime!
+                  $orphanId: ID
+                ) {
+                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
+                    id
+                    status
+                    date
+                    orphan {
+                      id
+                    }
+                  }
+                }`,
+          variables: {
+            status: "new",
+            date: new Date().toISOString(),
+            orphanId: orphanId,
+          },
+        })
+        .then((res) => res.data.data.createSponsorshipStatus)
+        .catch((err) => console.warn(err));
+    },
+
     documentDialogClose() {
       this.dialog = false;
-
-      // this.$nextTick(() => {
-      //   this.orphanItem = Object.assign({}, this.defaultItem);
-      //   this.orphanIndex = -1;
-      // });
     },
 
     documentDialogReset() {
@@ -713,26 +1062,284 @@ export default {
       this.$refs.documentForm.reset();
     },
 
-    documentDialogSave() {
-      // if (this.orphanIndex > -1) {
-      //   Object.assign(this.orphans[this.orphanIndex], this.orphanItem);
-      // } else {
-      //   this.orphans.push(this.orphanItem);
-      // }
-
+    async documentDialogSave() {
       this.formHasErrors = false;
-
       if (this.$refs.documentForm.validate()) {
-        // console.log(this.orphan);
-        // this.orphanDialogReset();
-      } else if (!this.$refs.documentForm.validate()) {
+        const birthCertificateFormData = new FormData();
+        birthCertificateFormData.append(
+          "orphanBirthCertificate",
+          this.birthCertificateFile,
+          this.birthCertificateFile.name
+        );
+
+        const fatherDeathCertificateFormData = new FormData();
+        fatherDeathCertificateFormData.append(
+          "fatherDeathCertificate",
+          this.fatherDeathCertificateFile,
+          this.fatherDeathCertificateFile.name
+        );
+        const guardianIdFormData = new FormData();
+        guardianIdFormData.append(
+          "guardianIDCard",
+          this.guardianIdFile,
+          this.guardianIdFile.name
+        );
+        const guardianConfirmationLetterFormData = new FormData();
+        guardianConfirmationLetterFormData.append(
+          "guardianConfirmationLetter",
+          this.guardianConfirmationLetterFile,
+          this.guardianConfirmationLetterFile.name
+        );
+        const guardianLegalConfirmationLetterFormData = new FormData();
+        guardianLegalConfirmationLetterFormData.append(
+          "guardianLegalConfirmationLetter",
+          this.guardianLegalConfirmationLetterFile,
+          this.guardianLegalConfirmationLetterFile.name
+        );
+
+        this.orphan = Object.assign(this.orphan ?? {}, this.updatedOrphan);
+
+        this.orphan.dateOfBirth = this.isoDateFormatter(
+          this.orphan.dateOfBirth
+        );
+
+        this.orphan.father = Object.assign(
+          this.orphan.father ?? {},
+          this.updatedOrphan?.father
+        );
+
+        this.orphan.mother = Object.assign(
+          this.orphan.mother ?? {},
+          this.updatedOrphan?.mother
+        );
+
+        this.orphan.House_property = Object.assign(
+          this.orphan.House_property ?? {},
+          this.updatedOrphan?.House_property
+        );
+
+        this.orphan.education = Object.assign(
+          this.orphan.education ?? {},
+          this.updatedOrphan?.education
+        );
+
+        this.orphan.guardian = Object.assign(
+          this.orphan.guardian ?? {},
+          this.updatedOrphan?.guardian
+        );
+
+        this.orphan.father.dateOfDeath = this.isoDateFormatter(
+          this.orphan.father.dateOfDeath
+        );
+        this.orphan.father.dateOfBirth = this.isoDateFormatter(
+          this.orphan.father.dateOfBirth
+        );
+
+        this.orphan.father.deathCertificateUrl = await axios
+          .post(
+            `/public/images/fatherDeathCertificate/`,
+            fatherDeathCertificateFormData
+          )
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        const father = await this.getOrphanFather(
+          this.orphan.father.firstName,
+          this.orphan.father.lastName,
+          this.orphan.father.dateOfDeath,
+          this.orphan.father.causeOfDeath,
+          this.orphan.father.dateOfBirth,
+          this.orphan.father.deathCertificateUrl
+        );
+
+        const education = await this.getOrphanEducation(
+          this.orphan.education.enrollmentStatus,
+          this.orphan.education.schoolName,
+          this.orphan.education.typeOfSchool,
+          this.orphan.education.year,
+          this.orphan.education.level,
+          this.orphan.education.reason
+        );
+
+        this.orphan.mother.dateOfBirth = this.isoDateFormatter(
+          this.orphan.mother.dateOfBirth
+        );
+        this.orphan.mother.dateOfDeath = this.isoDateFormatter(
+          this.orphan.mother.dateOfDeath
+        );
+
+        const mother = await this.getOrphanMother(
+          this.orphan.mother.firstName,
+          this.orphan.mother.middleName,
+          this.orphan.mother.lastName,
+          this.orphan.mother.vitalStatus,
+          this.orphan.mother.dateOfBirth,
+          this.orphan.mother.dateOfDeath,
+          this.orphan.mother.causeOfDeath,
+          this.orphan.mother.maritalStatus,
+          this.orphan.mother.mobileNumber,
+          this.orphan.mother.monthlyExpense
+        );
+
+        this.orphan.guardian.dateOfBirth = this.isoDateFormatter(
+          this.orphan.guardian.dateOfBirth
+        );
+
+        this.orphan.guardian.idCardUrl = await axios
+          .post(`/public/images/guardianIDCard/`, guardianIdFormData)
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        this.orphan.guardian.confirmationLetterUrl = await axios
+          .post(
+            `/public/images/guardianConfirmationLetter/`,
+            guardianConfirmationLetterFormData
+          )
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        this.orphan.guardian.legalConfirmationLetterUrl = await axios
+          .post(
+            `/public/images/guardianLegalConfirmationLetter/`,
+            guardianLegalConfirmationLetterFormData
+          )
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        const guardian = await this.getOrphanGuardian(
+          this.orphan.guardian.firstName,
+          this.orphan.guardian.middleName,
+          this.orphan.guardian.lastName,
+          this.orphan.guardian.dateOfBirth,
+          this.orphan.guardian.gender,
+          this.orphan.guardian.relationToOrphan,
+          this.orphan.guardian.nationality,
+          this.orphan.guardian.mobileNumber,
+          this.orphan.guardian.telephoneNumber,
+          this.orphan.guardian.email,
+          this.orphan.guardian.idCardUrl,
+          this.orphan.guardian.confirmationLetterUrl,
+          this.orphan.guardian.legalConfirmationLetterUrl
+        );
+
+        const houseProperty = await this.getHouseProperty(
+          this.orphan.House_property.housingSituation,
+          this.orphan.House_property.otherProperty
+        );
+
+        this.orphan.birthCertificateUrl = await axios
+          .post(
+            `/public/images/orphanBirthCertificate/`,
+            birthCertificateFormData
+          )
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        if (this.orphanIdFile) {
+          const orphanIdFormData = new FormData();
+          orphanIdFormData.append(
+            "orphanIdCard",
+            this.orphanIdFile,
+            this.orphanIdFile.name
+          );
+          this.orphan.idCardUrl = await axios
+            .post(`/public/images/orphanIdCard/`, orphanIdFormData)
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
+        }
+
+        if (this.orphanPassportFile) {
+          const orphanPassportFormData = new FormData();
+          orphanPassportFormData.append(
+            "orphanPassport",
+            this.orphanPassportFile,
+            this.orphanPassportFile.name
+          );
+          this.orphan.passportUrl = await axios
+            .post(`/public/images/orphanPassport/`, orphanPassportFormData)
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
+        }
+
+        const registeredOrphan = await this.registerOrphan(
+          this.orphan.firstName,
+          this.orphan.gender,
+          this.orphan.placeOfBirth,
+          this.orphan.dateOfBirth,
+          this.orphan.spokenLanguages,
+          this.orphan.hobbies,
+          this.orphan.religion,
+          this.orphan.healthDescription || "N/A",
+          this.orphan.psychologicalStatus,
+          this.orphan.idCardUrl || "idCardUrlPlaceHolder",
+          this.orphan.passportUrl || "passportUrlPlaceHolder",
+          this.orphan.birthCertificateUrl,
+          father.id,
+          education.id,
+          guardian.id,
+          mother.id,
+          houseProperty.id,
+          parseInt(this.orphanVillageId)
+        );
+
+        const status = await this.createSponsorshipStatus(registeredOrphan.id);
+
+        console.log("Status", status);
+
+        if (this.portraitPhotoFile) {
+          const portraitPhotoFormData = new FormData();
+          portraitPhotoFormData.append(
+            "orphanPhotosPhotoPortrait",
+            this.portraitPhotoFile,
+            this.portraitPhotoFile.name
+          );
+
+          axios
+            .post(
+              `/public/images/orphanPhotosPhotoPortrait/`,
+              portraitPhotoFormData
+            )
+            .then((res) => {
+              axios.post(`/graphql/`, {
+                query: `mutation createPhotos(
+                      $photoPortraitUrl: String!
+                      $orphanId: ID
+                      ) {
+                        createOrphanPhotos(
+                          photoPortraitUrl: $photoPortraitUrl
+                          orphanId: $orphanId
+                          ) { id }
+                      }`,
+                variables: {
+                  photoPortraitUrl: res.data,
+                  orphanId: registeredOrphan.id,
+                },
+              })
+              .then(res => console.log(res.data))
+              .catch(err => console.warn(err));
+            })
+            .catch((err) => console.warn(err));
+        }
+
+        this.$emit("registrationDone", this.$refs.documentForm);
+        this.documentDialogClose();
+      } else {
         this.formHasErrors = true;
       }
     },
 
+    isoDateFormatter(dateString) {
+      return new Date(dateString).toISOString();
+    },
+
+    // dashDateFormatter(dateString) {
+    //   let dateFormat = new Date(dateString);
+    //   return `${dateFormat.getFullYear()}-${dateFormat.getMonth()}-${dateFormat.getDate()}`;
+    // },
+
     documentDialogCancel() {
       this.documentDialogReset();
-      // this.documentDialogClose();
+      this.documentDialogClose();
     },
   },
 };

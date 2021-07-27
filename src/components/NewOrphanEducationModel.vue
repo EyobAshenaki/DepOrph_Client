@@ -36,6 +36,7 @@
                         }"
                         :rules="[rules.required, rules.underAge]"
                         label="Enrollment Status*"
+                        :readonly="disableEnrollmentStatus"
                         validate-no-blur
                       ></v-select>
                     </v-responsive>
@@ -128,8 +129,9 @@
                       <v-responsive max-width="" class="">
                         <v-text-field
                           v-model="orphan.education.reason"
-                          :rules="[rules.required, rules.name]"
+                          :rules="[rules.required]"
                           label="Reason for not enrolling*"
+                          :readonly="disableEducationReason"
                         >
                         </v-text-field>
                       </v-responsive>
@@ -236,10 +238,10 @@ export default {
         underAge: (value) => {
           const age =
             new Date().getFullYear() -
-            new Date(this.updatedOrphan.dateOfBirth).getFullYear();
+            new Date(this.updatedOrphan?.dateOfBirth).getFullYear();
 
           if (age < 4 && value !== "Un-Enrolled") {
-            return "Orphan is not eligeble for school yet";
+            return "Orphan is not eligible for school yet";
           } else return true;
         },
       },
@@ -260,7 +262,12 @@ export default {
       ],
       orphanEducationYearStateOptions: [],
       enrollmentStatusDisplay: "",
+      disableEnrollmentStatus: false,
+      disableEducationReason: false,
     };
+  },
+  beforeUpdate() {
+    this.orphanAgeEligiblity();
   },
   computed: {},
   watch: {
@@ -303,7 +310,7 @@ export default {
     orphanEducationYear(val) {
       let age =
         new Date().getFullYear() -
-        new Date(this.updatedOrphan.dateOfBirth).getFullYear();
+        new Date(this.updatedOrphan?.dateOfBirth).getFullYear();
         
       console.log(age);
 
@@ -434,6 +441,18 @@ export default {
     },
   },
   methods: {
+    orphanAgeEligiblity() {
+      const age =
+        new Date().getFullYear() -
+        new Date(this.updatedOrphan?.dateOfBirth).getFullYear();
+
+      if (age < 3) {
+        this.orphanEducationEnrollmentStatus = "Un-Enrolled";
+        this.disableEnrollmentStatus = true;
+        this.orphan.education.reason = "Age of orphan is not eligible for school yet"
+        this.disableEducationReason = true;
+      }
+    },
     educationDialogClose() {
       this.dialog = false;
 
@@ -517,6 +536,7 @@ export default {
         this.orphan.education.typeOfSchool = this.orphan.education.typeOfSchool?.toLowerCase();
 
         this.$emit("educationDone", this.orphan);
+        this.$emit("educationRefs", this.$refs.educationForm)
         this.educationDialogClose();
       } else if (!this.$refs.educationForm.validate()) {
         this.formHasErrors = true;

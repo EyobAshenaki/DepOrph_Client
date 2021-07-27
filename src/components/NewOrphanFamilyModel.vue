@@ -48,7 +48,15 @@
                           v-model="fatherDateOfBirth"
                           no-title
                           scrollable
-                          :max="new Date().toISOString().substr(0, 10)"
+                          :max="
+                            new Date(
+                              new Date().setFullYear(
+                                new Date().getFullYear() - this.FATHER_AGE_LIMIT
+                              )
+                            )
+                              .toISOString()
+                              .substr(0, 10)
+                          "
                           min="1950-01-01"
                           @change="fatherDateOfBirthSave"
                         >
@@ -85,7 +93,15 @@
                           no-title
                           scrollable
                           :max="new Date().toISOString().substr(0, 10)"
-                          min="1950-01-01"
+                          :min="
+                            new Date(
+                              new Date().setFullYear(
+                                new Date().getFullYear() - this.FATHER_AGE_LIMIT
+                              )
+                            )
+                              .toISOString()
+                              .substr(0, 10)
+                          "
                           @change="fatherDateOfDeathSave"
                         >
                         </v-date-picker>
@@ -171,7 +187,15 @@
                           v-model="orphan.mother.dateOfBirth"
                           no-title
                           scrollable
-                          :max="new Date().toISOString().substr(0, 10)"
+                          :max="
+                            new Date(
+                              new Date().setFullYear(
+                                new Date().getFullYear() - this.MOTHER_AGE_LIMIT
+                              )
+                            )
+                              .toISOString()
+                              .substr(0, 10)
+                          "
                           min="1950-01-01"
                           @change="motherDateOfBirthSave"
                         >
@@ -240,7 +264,16 @@
                             no-title
                             scrollable
                             :max="new Date().toISOString().substr(0, 10)"
-                            min="1950-01-01"
+                            :min="
+                              new Date(
+                                new Date().setFullYear(
+                                  new Date().getFullYear() -
+                                    this.MOTHER_AGE_LIMIT
+                                )
+                              )
+                                .toISOString()
+                                .substr(0, 10)
+                            "
                             @change="motherDateOfDeathSave"
                           >
                           </v-date-picker>
@@ -350,12 +383,17 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
-  props: ["updatedOrphan", "orphanVillageId"],
+  props: {
+    updatedOrphan: {
+      type: Object,
+    },
+  },
   data() {
     return {
+      FATHER_AGE_LIMIT: 15,
+      MOTHER_AGE_LIMIT: 13,
       // dialog
       dialog: false,
       validFamilyForm: null,
@@ -401,10 +439,14 @@ export default {
         "Rental",
         "With Relative",
         "Dependent",
+        "Other",
       ],
     };
   },
   created() {},
+  mounted() {
+    // this.test();
+  },
   computed: {},
   watch: {
     // dialog
@@ -441,6 +483,7 @@ export default {
     },
   },
   methods: {
+    // test() {console.log("updatedOrphanFamily", this.updatedOrphan)},
     // dialog
     fatherDateOfBirthSave(date) {
       // console.log(this.$refs.menu);
@@ -471,426 +514,8 @@ export default {
       ];
     },
 
-    async getOrphanFather(
-      firstName,
-      lastName,
-      dateOfDeath,
-      causeOfDeath,
-      dateOfBirth,
-      deathCertificateUrl
-    ) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createFather(
-                    $firstName: String!
-                    $lastName: String!
-                    $dateOfDeath: DateTime!
-                    $causeOfDeath: String!
-                    $dateOfBirth: DateTime!
-                    $deathCertificateUrl: String!
-                  ) {
-                    createFather(
-                      firstName: $firstName
-                      lastName: $lastName
-                      dateOfDeath: $dateOfDeath
-                      causeOfDeath: $causeOfDeath
-                      dateOfBirth: $dateOfBirth
-                      deathCertificateUrl: $deathCertificateUrl
-                    ) {
-                      id
-                      firstName
-                      lastName
-                      deathCertificateUrl
-                    }
-                  }`,
-          variables: {
-            firstName: firstName,
-            lastName: lastName,
-            dateOfDeath: dateOfDeath,
-            causeOfDeath: causeOfDeath,
-            dateOfBirth: dateOfBirth,
-            deathCertificateUrl: deathCertificateUrl,
-          },
-        })
-        .then((res) => res.data.data.createFather)
-        .catch((err) => console.warn(err));
-    },
-
-    async getOrphanMother(
-      firstName,
-      middleName,
-      lastName,
-      vitalStatus,
-      dateOfBirth,
-      dateOfDeath,
-      causeOfDeath,
-      maritalStatus,
-      mobileNumber,
-      monthlyExpense
-    ) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createMother(
-                  $firstName: String!
-                  $middleName: String!
-                  $lastName: String!
-                  $vitalStatus: motherVitalStatus!
-                  $dateOfBirth: DateTime!
-                  $dateOfDeath: DateTime
-                  $causeOfDeath: String
-                  $maritalStatus: motherMaritalStatus
-                  $mobileNumber: String!
-                  $monthlyExpense: Float!
-                ) {
-                  createMother(
-                    firstName: $firstName
-                    middleName: $middleName
-                    lastName: $lastName
-                    vitalStatus: $vitalStatus
-                    dateOfBirth: $dateOfBirth
-                    dateOfDeath: $dateOfDeath
-                    causeOfDeath: $causeOfDeath
-                    maritalStatus: $maritalStatus
-                    mobileNumber: $mobileNumber
-                    monthlyExpense: $monthlyExpense
-                  ) {
-                    id
-                    firstName
-                    vitalStatus
-                  }
-                }`,
-          variables: {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            vitalStatus: vitalStatus,
-            dateOfBirth: dateOfBirth,
-            dateOfDeath: dateOfDeath || null,
-            causeOfDeath: causeOfDeath || null,
-            maritalStatus: maritalStatus || null,
-            mobileNumber: mobileNumber,
-            monthlyExpense: monthlyExpense,
-          },
-        })
-        .then((res) => res.data.data.createMother)
-        .catch((err) => console.warn(err));
-    },
-
-    async getOrphanEducation(
-      enrollmentStatus,
-      schoolName,
-      typeOfSchool,
-      year,
-      level,
-      reason
-    ) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createEducation(
-                  $enrollmentStatus: educationEnrollmentStatus!
-                  $schoolName: String
-                  $typeOfSchool: educationTypeOfSchool
-                  $year: String
-                  $level: educationLevel
-                  $reason: String
-                ) {
-                  createEducation(
-                    enrollmentStatus: $enrollmentStatus
-                    schoolName: $schoolName
-                    typeOfSchool: $typeOfSchool
-                    year: $year
-                    level: $level
-                    reason: $reason
-                  ) {
-                    id
-                    enrollmentStatus
-                    reason
-                  }
-                }`,
-          variables: {
-            enrollmentStatus: enrollmentStatus,
-            schoolName: schoolName || null,
-            typeOfSchool: typeOfSchool || "N_A",
-            year: String(year) || null,
-            level: level || "N_A",
-            reason: reason || null,
-          },
-        })
-        .then((res) => res.data.data.createEducation)
-        .catch((err) => console.warn(err));
-    },
-
-    async getOrphanGuardian(
-      firstName,
-      middleName,
-      lastName,
-      dateOfBirth,
-      gender,
-      relationToOrphan,
-      nationality,
-      mobileNumber,
-      telephoneNumber,
-      email,
-      guardianIDCardUrl,
-      guardianConfirmationLetterUrl,
-      guardianLegalConfirmationLetterUrl
-    ) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createGuardian(
-                  $firstName: String!
-                  $middleName: String!
-                  $lastName: String!
-                  $dateOfBirth: DateTime!
-                  $gender: guardianGender!
-                  $relationToOrphan: guardianRelationToOrphan!
-                  $nationality: guardianNationality!
-                  $mobileNumber: String!
-                  $telephoneNumber: String
-                  $email: String!
-                  $guardianIDCardUrl: String!
-                  $guardianConfirmationLetterUrl: String!
-                  $guardianLegalConfirmationLetterUrl: String!
-                ) {
-                  createGuardian(
-                    firstName: $firstName
-                    middleName: $middleName
-                    lastName: $lastName
-                    dateOfBirth: $dateOfBirth
-                    gender: $gender
-                    relationToOrphan: $relationToOrphan
-                    nationality: $nationality
-                    mobileNumber: $mobileNumber
-                    telephoneNumber: $telephoneNumber
-                    email: $email
-                    guardianIDCardUrl: $guardianIDCardUrl
-                    guardianConfirmationLetterUrl: $guardianConfirmationLetterUrl
-                    guardianLegalConfirmationLetterUrl: $guardianLegalConfirmationLetterUrl
-                  ) {
-                    id
-                    firstName
-                    email
-                  }
-                }`,
-          variables: {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            dateOfBirth: dateOfBirth,
-            gender: gender,
-            relationToOrphan: relationToOrphan,
-            nationality: nationality,
-            mobileNumber: mobileNumber,
-            telephoneNumber: telephoneNumber,
-            email: email,
-            guardianIDCardUrl: guardianIDCardUrl,
-            guardianConfirmationLetterUrl: guardianConfirmationLetterUrl,
-            guardianLegalConfirmationLetterUrl: guardianLegalConfirmationLetterUrl,
-          },
-        })
-        .then((res) => res.data.data.createGuardian)
-        .catch((err) => console.warn(err));
-    },
-
-    async getHouseProperty(housingSituation, otherProperty) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createHouse_property(
-                  $housingSituation: String!
-                  $otherProperty: String
-                ) {
-                  createHouse_property(
-                    housingSituation: $housingSituation
-                    otherProperty: $otherProperty
-                  ) {
-                    id
-                    housingSituation
-                  }
-                }`,
-          variables: {
-            housingSituation: housingSituation,
-            otherProperty: otherProperty,
-          },
-        })
-        .then((res) => res.data.data.createHouse_property)
-        .catch((err) => console.warn(err));
-    },
-
-    async registerOrphan(
-      firstName,
-      gender,
-      placeOfBirth,
-      dateOfBirth,
-      spokenLanguages,
-      hobbies,
-      religion,
-      healthDescription,
-      psychologicalStatus,
-      idCardUrl,
-      passportUrl,
-      birthCertificateUrl,
-      fatherId,
-      educationId,
-      guardianId,
-      motherId,
-      house_propertyId,
-      villageId
-    ) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createOrphan(
-                    $firstName: String!
-                    $gender: orphanGender!
-                    $placeOfBirth: String!
-                    $dateOfBirth: DateTime!
-                    $spokenLanguages: String
-                    $hobbies: String
-                    $religion: orphanReligion
-                    $healthDescription: String!
-                    $psychologicalStatus: orphanPsychologicalStatus
-                    $idCardUrl: String
-                    $passportUrl: String
-                    $birthCertificateUrl: String!
-                    $fatherId: ID
-                    $motherId: ID
-                    $educationId: ID
-                    $guardianId: ID
-                    $house_propertyId: ID
-                    $villageId: ID
-                  ) {
-                    createOrphan(
-                      firstName: $firstName
-                      gender: $gender
-                      placeOfBirth: $placeOfBirth
-                      dateOfBirth: $dateOfBirth
-                      spokenLanguages: $spokenLanguages
-                      hobbies: $hobbies
-                      religion: $religion
-                      healthDescription: $healthDescription
-                      psychologicalStatus: $psychologicalStatus
-                      idCardUrl: $idCardUrl
-                      passportUrl: $passportUrl
-                      birthCertificateUrl: $birthCertificateUrl
-                      fatherId: $fatherId
-                      motherId: $motherId
-                      educationId: $educationId
-                      guardianId: $guardianId
-                      house_propertyId: $house_propertyId
-                      villageId: $villageId
-                    ) {
-                      id
-                      firstName
-                      gender
-                      placeOfBirth
-                      dateOfBirth
-                      spokenLanguages
-                      hobbies
-                      religion
-                      healthDescription
-                      psychologicalStatus
-                      father {
-                        id
-                        firstName
-                        lastName
-                        dateOfBirth
-                        dateOfDeath
-                        causeOfDeath
-                      }
-                      mother {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                        vitalStatus
-                        dateOfBirth
-                      }
-                      education {
-                        enrollmentStatus
-                        schoolName
-                        typeOfSchool
-                        level
-                        year
-                      }
-                      guardian {
-                        firstName
-                        middleName
-                        lastName
-                        gender
-                        dateOfBirth
-                        relationToOrphan
-                        email
-                        nationality
-                        mobileNumber
-                        telephoneNumber
-                      }
-                      house_property {
-                        housingSituation
-                        otherProperty
-                      }
-                      village{
-                        id
-                      }
-                    }
-                  }`,
-          variables: {
-            firstName: firstName,
-            gender: gender,
-            placeOfBirth: placeOfBirth,
-            dateOfBirth: dateOfBirth,
-            spokenLanguages: spokenLanguages,
-            hobbies: hobbies,
-            religion: religion,
-            healthDescription: healthDescription,
-            psychologicalStatus: psychologicalStatus,
-            idCardUrl: idCardUrl,
-            passportUrl: passportUrl,
-            birthCertificateUrl: birthCertificateUrl,
-            fatherId: fatherId,
-            educationId: educationId,
-            guardianId: guardianId,
-            motherId: motherId,
-            house_propertyId: house_propertyId,
-            villageId: villageId,
-          },
-        })
-        .then((res) => res.data.data.createOrphan)
-        .catch((err) => console.warn(err));
-    },
-
-    async createSponsorshipStatus(orphanId) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createSponsorshipStatus(
-                  $status: sponsorshipStatus
-                  $date: DateTime!
-                  $orphanId: ID
-                ) {
-                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
-                    id
-                    status
-                    date
-                    orphan {
-                      id
-                    }
-                  }
-                }`,
-          variables: {
-            status: "processing",
-            date: new Date().toISOString(),
-            orphanId: orphanId,
-          },
-        })
-        .then((res) => res.data.data.createSponsorshipStatus)
-        .catch((err) => console.warn(err));
-    },
-
     familyDialogClose() {
       this.dialog = false;
-
-      // this.$nextTick(() => {
-      //   this.orphanItem = Object.assign({}, this.defaultItem);
-      //   this.orphanIndex = -1;
-      // });
     },
 
     familyDialogReset() {
@@ -899,17 +524,10 @@ export default {
     },
 
     familyDialogNext() {
-      // if (this.orphanIndex > -1) {
-      //   Object.assign(this.orphans[this.orphanIndex], this.orphanItem);
-      // } else {
-      //   this.orphans.push(this.orphanItem);
-      // }
       this.formHasErrors = false;
 
       if (this.$refs.familyForm.validate()) {
         this.orphan = Object.assign(this.orphan ?? {}, this.updatedOrphan);
-
-        this.orphan.dateOfBirth = this.isoDateFormatter(this.orphan.dateOfBirth);
 
         this.orphan.father = Object.assign(
           this.orphan.father ?? {},
@@ -920,192 +538,26 @@ export default {
         this.orphan.father.dateOfBirth = this.fatherDateOfBirth;
         this.orphan.father.dateOfDeath = this.fatherDateOfDeath;
 
-        // this.orphan.mother = Object.assign(
-        //   this.orphan.mother ?? {},
-        //   this.updatedOrphan?.mother
-        // );
-
-        // this.orphan.House_property = Object.assign(
-        //   this.orphan.House_property ?? {},
-        //   this.updatedOrphan?.House_property
-        // );
-
-        this.orphan.education = Object.assign(
-          this.orphan.education ?? {},
-          this.updatedOrphan?.education
-        );
-
-        this.orphan.guardian = Object.assign(
-          this.orphan.guardian ?? {},
-          this.updatedOrphan?.guardian
-        );
-
-        this.orphan.father.dateOfDeath = this.isoDateFormatter(
-          this.orphan.father.dateOfDeath
-        );
-        this.orphan.father.dateOfBirth = this.isoDateFormatter(
-          this.orphan.father.dateOfBirth
-        );
-
-        const father = this.getOrphanFather(
-          this.orphan.father.firstName,
-          this.orphan.father.lastName,
-          this.orphan.father.dateOfDeath,
-          this.orphan.father.causeOfDeath,
-          this.orphan.father.dateOfBirth,
-          "deathCertificateUrlPlaceholder"
-        );
-
-        const education = this.getOrphanEducation(
-          this.orphan.education.enrollmentStatus,
-          this.orphan.education.schoolName,
-          this.orphan.education.typeOfSchool,
-          this.orphan.education.year,
-          this.orphan.education.level,
-          this.orphan.education.reason
-        );
-
-        this.orphan.mother.dateOfBirth = this.isoDateFormatter(
-          this.orphan.mother.dateOfBirth
-        );
         this.orphan.mother.vitalStatus = this.orphan.mother.vitalStatus
           .split(" ")[0]
           .toString()
           .toLowerCase();
-        console.log(this.orphan.mother.vitalStatus);
-        if(this.orphan.mother.vitalStatus === "alive"){
+
+        if (this.orphan.mother.vitalStatus === "alive") {
           this.orphan.mother.dateOfDeath = null;
         } else this.orphan.mother.maritalStatus = null;
-        
+
         this.orphan.mother.maritalStatus = this.orphan.mother.maritalStatus?.toLowerCase();
-        this.orphan.mother.dateOfDeath = this.isoDateFormatter(
-          this.orphan.mother.dateOfDeath
-        );
+
         this.orphan.mother.mobileNumber = "0974671463";
         this.orphan.mother.monthlyExpense = parseFloat(987.76);
 
-        const mother = this.getOrphanMother(
-          this.orphan.mother.firstName,
-          this.orphan.mother.middleName,
-          this.orphan.mother.lastName,
-          this.orphan.mother.vitalStatus,
-          this.orphan.mother.dateOfBirth,
-          this.orphan.mother.dateOfDeath,
-          this.orphan.mother.causeOfDeath,
-          this.orphan.mother.maritalStatus,
-          this.orphan.mother.mobileNumber,
-          this.orphan.mother.monthlyExpense
-        );
-
-        this.orphan.guardian.dateOfBirth = this.isoDateFormatter(this.orphan.guardian.dateOfBirth);
-
-        const guardian = this.getOrphanGuardian(
-          this.orphan.guardian.firstName,
-          this.orphan.guardian.middleName,
-          this.orphan.guardian.lastName,
-          this.orphan.guardian.dateOfBirth,
-          this.orphan.guardian.gender,
-          this.orphan.guardian.relationToOrphan,
-          this.orphan.guardian.nationality,
-          this.orphan.guardian.mobileNumber,
-          this.orphan.guardian.telephoneNumber,
-          this.orphan.guardian.email,
-          "guardianIDCardUrl2",
-          "guardianConfirmationLetterUrl2",
-          "guardianLegalConfirmationLetterUrl2"
-        );
-
-        const houseProperty = this.getHouseProperty(
-          this.orphan.House_property.housingSituation,
-          this.orphan.House_property.otherProperty
-        );
-
-        // let registeredOrphan = undefined;
-
-        father
-          .then((fatherRes) => {
-            console.log("fatherId", fatherRes.id);
-            education
-              .then((educationRes) => {
-                console.log("educationId", educationRes.id);
-                guardian
-                  .then((guardianRes) => {
-                    console.log("guardianId", guardianRes.id);
-                    mother
-                      .then((motherRes) => {
-                        console.log("motherId", motherRes.id);
-                        houseProperty
-                          .then((housePropertyRes) => {
-                            console.log("housePropertyId", housePropertyRes.id);
-                            // registeredOrphan = this.registerOrphan(
-                            this.registerOrphan(
-                              this.orphan.firstName,
-                              this.orphan.gender,
-                              this.orphan.placeOfBirth,
-                              this.orphan.dateOfBirth,
-                              this.orphan.spokenLanguages,
-                              this.orphan.hobbies,
-                              this.orphan.religion,
-                              this.orphan.healthDescription || "N/A",
-                              this.orphan.psychologicalStatus,
-                              this.orphan.idCardUrl || "idCardUrl2",
-                              this.orphan.passportUrl || "passportUrl2 ",
-                              this.orphan.birthCertificateUrl ||
-                                "birthCertificateUrl2",
-                              fatherRes.id,
-                              educationRes.id,
-                              guardianRes.id,
-                              motherRes.id,
-                              housePropertyRes.id,
-                              this.orphanVillageId
-                            )
-                              .then((registeredOrphan) => {
-                                console.log(
-                                  "registeredOrphan",
-                                  registeredOrphan
-                                );
-                                this.createSponsorshipStatus(
-                                  registeredOrphan.id
-                                )
-                                  .then((sponsorshipStatus) => {
-                                    console.log(
-                                      "sponsorshipStatus",
-                                      sponsorshipStatus
-                                    );
-                                  })
-                                  .catch((err) => console.warn(err));
-                              })
-                              .catch((err) => console.warn(err));
-                          })
-                          .catch((err) => console.warn(err));
-                      })
-                      .catch((err) => console.warn(err));
-                  })
-                  .catch((err) => console.warn(err));
-              })
-              .catch((err) => console.warn(err));
-          })
-          .catch((err) => console.warn(err));
-
         this.$emit("familyDone", this.orphan);
-        // this.orphan.dateOfBirth = this.dashDateFormatter(this.orphan.dateOfBirth);
-        // this.orphan.guardian.dateOfBirth = this.dashDateFormatter(this.orphan.guardian.dateOfBirth);
-        this.orphan.father.dateOfBirth = this.dashDateFormatter(this.orphan.father.dateOfBirth);
-        this.orphan.father.dateOfDeath = this.dashDateFormatter(this.orphan.father.dateOfDeath);
-        this.orphan.mother.dateOfBirth = this.dashDateFormatter(this.orphan.mother.dateOfBirth);
-        this.orphan.mother.dateOfDeath = this.dashDateFormatter(this.orphan.mother.dateOfDeath);
+        this.$emit("familyRefs", this.$refs.familyForm)
         this.familyDialogClose();
       } else if (!this.$refs.familyForm.validate()) {
         this.formHasErrors = true;
       }
-    },
-
-    isoDateFormatter(dateString) {
-      return new Date(dateString).toISOString();
-    },
-    dashDateFormatter(dateString) {
-      let dateFormat = new Date(dateString);
-      return `${dateFormat.getFullYear()}-${dateFormat.getMonth()}-${dateFormat.getDate()}`;
     },
 
     familyDialogCancel() {

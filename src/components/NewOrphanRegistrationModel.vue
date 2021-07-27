@@ -33,6 +33,7 @@
           <NewOrphanPersonalModel
             ref="personalModel"
             @personalDone="printPersonal($event)"
+            @personalRefs="personalRefsHandler($event)"
           />
         </v-col>
         <v-col cols="12" md="6" lg="4" align="center">
@@ -40,24 +41,31 @@
             ref="educationModel"
             :updatedOrphan="orphan"
             @educationDone="printEducation($event)"
+            @educationRefs="educationRefsHandler($event)"
           />
         </v-col>
         <v-col cols="12" md="6" lg="4" align="center">
           <NewOrphanGuardianModel
             ref="guardianModel"
             @guardianDone="printGuardian($event)"
+            @guardianRefs="guardianRefsHandler($event)"
           />
         </v-col>
         <v-col cols="12" md="6" lg="4" align="center">
           <NewOrphanFamilyModel
             ref="familyModel"
             :updatedOrphan="orphan"
-            :orphanVillageId="orphanVillageId"
             @familyDone="printFamily($event)"
+            @familyRefs="familyRefsHandler($event)"
           />
         </v-col>
         <v-col cols="12" md="6" lg="4" align="center">
-          <NewOrphanDocumentModel ref="documentModel" />
+          <NewOrphanDocumentModel
+            ref="documentModel"
+            :orphanVillageId="orphanVillageId"
+            :updatedOrphan="orphan"
+            @registrationDone="registrationDone($event)"
+          />
         </v-col>
       </v-row>
     </v-card>
@@ -88,7 +96,7 @@ export default {
       type: Boolean,
     },
     orphanVillageId: {
-      type: Number,
+      type: String,
     }
   },
 
@@ -104,12 +112,18 @@ export default {
     dialog: false,
     personalModelData: null,
     orphan: null,
+    personalForm: null,
+    educationForm: null,
+    guardianForm: null,
+    familyForm: null,
   }),
 
   mounted() {
     this.displayOrphan();
   },
   computed: {},
+  created() {
+  },
   watch: {
     newOrphanDialog(val) {
       this.dialog = val;
@@ -120,6 +134,25 @@ export default {
     },
   },
   methods: {
+    personalRefsHandler(personalForm) {
+      this.personalForm = personalForm;
+    },
+    educationRefsHandler(educationForm) {
+      this.educationForm = educationForm;
+    },
+    guardianRefsHandler(guardianForm) {
+      this.guardianForm = guardianForm;
+    },
+    familyRefsHandler(familyForm) {
+      this.familyForm = familyForm;
+    },
+    registrationDone(documentForm) {
+      this.personalForm.reset();
+      this.educationForm.reset();
+      this.guardianForm.reset();
+      this.familyForm.reset();
+      documentForm.reset();
+    },
     displayOrphan() {
       // console.log("personalModel", this.$refs.personalModel);
       // console.log("educationModel", this.$refs.educationModel);

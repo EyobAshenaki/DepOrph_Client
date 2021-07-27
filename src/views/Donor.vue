@@ -126,13 +126,13 @@
                         </v-card-text>
                         <v-card-actions class="justify-center">
                           <v-btn
-                            class="error"
+                            color="error"
                             text
                             @click="cancelRejection(dialog)"
                             >Cancel</v-btn
                           >
                           <v-btn
-                            class="primary"
+                            color="primary"
                             text
                             @click="confirmRejection(dialog)"
                             >Confirm</v-btn
@@ -155,12 +155,13 @@
                         v-bind="attrs"
                         v-on="on"
                         :disabled="selectedProcessingOrphans.length <= 0"
-                        >Sponsore</v-btn
+                        >Sponsor</v-btn
                       >
                     </template>
                     <template v-slot:default="dialog">
                       <v-card max-width="">
-                        <v-toolbar color="primary" dark>
+                        <!-- <v-toolbar> -->
+                        <v-card-title class="pb-0">
                           <span class="mx-auto">
                             {{
                               singleProcessingSelect === true
@@ -168,7 +169,8 @@
                                 : "Support Plan for Multiple Orphans"
                             }}
                           </span>
-                        </v-toolbar>
+                        </v-card-title>
+                        <!-- </v-toolbar> -->
                         <v-card-text class="pb-0">
                           <v-container>
                             <v-row>
@@ -197,8 +199,8 @@
                                 </v-responsive>
                               </v-col>
                               <!-- currency -->
-                              <v-col cols="8">
-                                <v-responsive max-width="238" class="">
+                              <v-col cols="8" class="pt-0">
+                                <v-responsive max-width="238">
                                   <v-select
                                     v-model="currency"
                                     :items="currencyOptions"
@@ -209,7 +211,7 @@
                                 </v-responsive>
                               </v-col>
                               <!-- adminPercent -->
-                              <v-col cols="4">
+                              <v-col cols="4" class="pt-0">
                                 <v-responsive max-width="238" class="">
                                   <v-select
                                     v-model="adminPercent"
@@ -224,9 +226,12 @@
                           </v-container>
                         </v-card-text>
                         <v-card-actions class="justify-end">
-                          <v-btn text @click="supportPlanSubmit(dialog)"
-                            >Submit</v-btn
-                          >
+                          <v-btn text color="error" @click="supportPlanCancel(dialog)"> 
+                            Cancel
+                          </v-btn>
+                          <v-btn text color="primary" @click="supportPlanSubmit(dialog)"> 
+                            Submit
+                          </v-btn>
                         </v-card-actions>
                       </v-card>
                     </template>
@@ -248,7 +253,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <v-icon @click="showDetails(item)"> mdi-account-details </v-icon>
+              <OrphanDetail :details="item" />
             </template>
           </v-data-table>
         </v-sheet>
@@ -367,7 +372,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <v-icon @click="showDetails(item)"> mdi-account-details </v-icon>
+              <OrphanDetail :details="item" />
             </template>
           </v-data-table>
         </v-sheet>
@@ -484,7 +489,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <v-icon @click="showDetails(item)"> mdi-account-details </v-icon>
+              <OrphanDetail :details="item" />
             </template>
           </v-data-table>
         </v-sheet>
@@ -601,7 +606,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <v-icon @click="showDetails(item)"> mdi-account-details </v-icon>
+              <OrphanDetail :details="item" />
             </template>
           </v-data-table>
         </v-sheet>
@@ -615,10 +620,12 @@
 <script>
 import axios from "axios";
 import AppNavBar from "@/components/AppNavBar";
+import OrphanDetail from "@/components/OrphanDetail.vue";
 
 export default {
   components: {
     AppNavBar,
+    OrphanDetail,
   },
 
   data() {
@@ -870,12 +877,16 @@ export default {
                           firstName
                           middleName
                           lastName
+                          gender
                           email
                           mobileNumber
+                          nationality
+                          telephoneNumber
+                          dateOfBirth
                           relationToOrphan
-                          guardianIDCardUrl
-                          guardianConfirmationLetterUrl
-                          guardianLegalConfirmationLetterUrl
+                          iDCardUrl
+                          confirmationLetterUrl
+                          legalConfirmationLetterUrl
                         }
                         mother {
                           id
@@ -885,6 +896,18 @@ export default {
                           dateOfBirth
                           vitalStatus
                           maritalStatus
+                        }
+                        sponsorshipStatuses {
+                          status
+                          date
+                        }
+                        donor {
+                          id
+                          nameInitials
+                        }
+                        village {
+                          id
+                          name
                         }
                       }
                     }
@@ -1048,15 +1071,15 @@ export default {
     },
     confirmRejection(dialog) {
       dialog.value = false;
-      // change the status to new --- needs version-2
-      // for (const orphan of this.selectedProcessingOrphans) {
-      //   const orphanId = orphan.id;
-      //   this.createSponsorshipStatus(orphanId, "new")
-      //     .then((sponsorshipStatuse) => {
-      //       console.log("SponsoreStatus:", sponsorshipStatuse);
-      //     })
-      //     .catch((err) => console.warn(err));
-      // }
+      
+      for (const orphan of this.selectedProcessingOrphans) {
+        const orphanId = orphan.id;
+        this.createSponsorshipStatus(orphanId, "new")
+          .then((sponsorshipStatuse) => {
+            console.log("SponsoreStatus:", sponsorshipStatuse);
+          })
+          .catch((err) => console.warn(err));
+      }
     },
     async createSponsorshipStatus(orphanId, status) {
       return axios
@@ -1086,7 +1109,7 @@ export default {
     },
     supportPlanSubmit(dialog) {
       dialog.value = false;
-      this.adminPercent; // will be added in version 2
+
       let collectiveFund_fc,
         individualFund_fc,
         foreignCurrency,
@@ -1119,14 +1142,16 @@ export default {
                     $collectiveFund_fc: Float
                     $foreignCurrency: String
                     $supportPeriod: Int
-                    $donorId: ID
-                    $orphans: [ID]
+                    $adminFeePercentage: Float
+                    $donorId: ID!
+                    $orphans: [ID!]!
                   ) {
                     createSupportPlan(
                       individualFund_fc: $individualFund_fc
                       collectiveFund_fc: $collectiveFund_fc
                       foreignCurrency: $foreignCurrency
                       supportPeriod: $supportPeriod
+                      adminFeePercentage: $adminFeePercentage
                       donorId: $donorId
                       orphans: $orphans
                     ) {
@@ -1149,6 +1174,7 @@ export default {
             collectiveFund_fc: parseInt(collectiveFund_fc),
             foreignCurrency: foreignCurrency,
             supportPeriod: parseInt(supportPeriod),
+            adminFeePercentage: parseInt(this.adminPercent),
             donorId: parseInt(this.donor.id),
             orphans: orphanIds,
           },
@@ -1166,6 +1192,13 @@ export default {
         })
         .catch((err) => console.warn(err));
     },
+    supportPlanCancel(dialog) {
+      dialog.value = false;
+      this.currency = "";
+      this.supportPeriod = "";
+      this.fund_fc = "";
+      this.adminPercent = "";
+    }
   },
 };
 </script>

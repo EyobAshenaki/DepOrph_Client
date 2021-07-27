@@ -11,8 +11,9 @@
         </v-avatar>
       </v-row> -->
 
-        <h2 class="text-h3 text-center pt-3">Login</h2>
 
+        <h2 class="text-h3 text-center pt-3">Login</h2>
+        <v-form>
         <v-text-field
           v-model="loginEmail"
           class="mt-7"
@@ -30,9 +31,10 @@
           outlined
           color="#FF9983"
         ></v-text-field>
-
+        </v-form>
         <v-row justify="space-between" class="mb-1">
           <!-- <v-checkbox
+        
             class="mt-0 ml-3"
             v-model="selected"
             label="Remember me"
@@ -251,6 +253,7 @@ export default {
           }
         })
         .then(res => res.data.data.login.user)
+        
         .then(user => {
           sessionStorage.setItem("loggedIn", true);
           sessionStorage.setItem("loggedInAs", user.role);
