@@ -67,12 +67,12 @@
           </v-col>
           <v-col cols="12">
             <v-expansion-panels popout v-model="orphanPanel">
-              <!-- Active -->
+              <!-- New -->
               <v-expansion-panel>
                 <v-expansion-panel-header>
                   <template v-slot:default="{ open }">
                     <v-row no-gutters>
-                      <v-col cols="4"> Active </v-col>
+                      <v-col cols="4"> New </v-col>
                       <v-col cols="8" class="text--secondary">
                         <v-fade-transition leave-absolute>
                           <span v-if="open" key="0"></span>
@@ -82,27 +82,30 @@
                     </v-row>
                   </template>
                 </v-expansion-panel-header>
-                <v-expansion-panel-content style="padding-right: 0px">
+                <v-expansion-panel-content>
                   <v-card elevation="16">
                     <v-sheet
                       id="scrolling-techniques-3"
                       class="overflow-y-auto"
-                      max-height="70vh"
+                      max-height="56vh"
                     >
                       <v-data-table
+                        v-model="selectedOrphans"
                         :headers="headers"
-                        :items="activeOrphans"
+                        :items="newOrphans"
                         item-key="id"
-                        :search="activeSearch"
+                        :search="newSearch"
                         append-icon="mdi-magnify"
-                        :custom-filter="activeSearchFilter"
+                        :custom-filter="newSearchFilter"
+                        :show-select="orphanShow"
                         multi-sort
                         class="elevation-1"
                       >
                         <template v-slot:top>
                           <v-row style="margin: 0px">
                             <!-- Filter/Search Selection -->
-                            <!-- TODO: # add tooltip maybe -->
+                            <!-- TODO: # add close icon and function to remove from selection -->
+                            <!--       # add tooltip maybe -->
                             <v-col
                               sm="5"
                               offset="0"
@@ -116,9 +119,9 @@
                                 class="mx-xs-auto ml-sm-auto mt-sm-2"
                               >
                                 <v-select
-                                  v-model="activeFilterValue"
+                                  v-model="newFilterValue"
                                   hint="select field/s to filter explicity"
-                                  :items="activeFilterItems"
+                                  :items="newFilterItems"
                                   :menu-props="{ bottom: true, offsetY: true }"
                                   solo
                                   outlined
@@ -134,7 +137,7 @@
                                       label
                                       close
                                       close-icon="mdi-close-outline"
-                                      @click:close="removeSelectedActive(item)"
+                                      @click:close="removeSelectedNew(item)"
                                       v-if="index === 0"
                                     >
                                       <span>{{ item }}</span>
@@ -143,7 +146,7 @@
                                       v-if="index === 1"
                                       class="grey--text caption"
                                     >
-                                      (+{{ activeFilterValue.length - 1 }}
+                                      (+{{ newFilterValue.length - 1 }}
                                       others)
                                     </span>
                                   </template>
@@ -165,7 +168,7 @@
                                 class="ml-sm-3 mt-sm-4"
                               >
                                 <v-text-field
-                                  v-model="activeSearch"
+                                  v-model="newSearch"
                                   placeholder="Search"
                                   dense
                                   flat
@@ -178,60 +181,6 @@
                             </v-col>
                           </v-row>
                         </template>
-                        <!-- edit dialog pop-up for Full Name column -->
-                        <!-- TODO: impliment this functionality for all the other columns if needed -->
-                        <template v-slot:item.fullName="props">
-                          <!-- "large" for the buttons, "persistent" for blocking closing of edit-dialog when clicked outside -->
-                          <v-edit-dialog
-                            :return-value.sync="props.item.fullName"
-                            large
-                            persistent
-                            cancel-text="Cancel"
-                            save-text="Save"
-                            @save="save"
-                            @cancel="cancel"
-                            @open="open"
-                            @close="close"
-                          >
-                            {{ props.item.fullName }}
-                            <template v-slot:input>
-                              <v-text-field
-                                v-model="props.item.fullName"
-                                :rules="[max25chars]"
-                                label="Edit"
-                                single-line
-                                counter
-                                autofocus
-                              ></v-text-field>
-                            </template>
-                          </v-edit-dialog>
-                        </template>
-                        <!-- edit dialog pop-up for Sponsorship Status column -->
-                        <template v-slot:item.sponsorshipStatus="props">
-                          <v-edit-dialog
-                            :return-value.sync="props.item.sponsorshipStatus"
-                            large
-                            persistent
-                            cancel-text="Cancel"
-                            save-text="Save"
-                            @save="save"
-                            @cancel="cancel"
-                            @open="open"
-                            @close="close"
-                          >
-                            {{ props.item.sponsorshipStatus }}
-                            <template v-slot:input>
-                              <v-text-field
-                                v-model="props.item.sponsorshipStatus"
-                                :rules="[max25chars]"
-                                label="Edit"
-                                single-line
-                                counter
-                                autofocus
-                              ></v-text-field>
-                            </template>
-                          </v-edit-dialog>
-                        </template>
                         <template v-slot:item.fullName="{ item }">
                           {{ fullName(item) }}
                         </template>
@@ -241,13 +190,14 @@
                         <template v-slot:item.sponsorshipStatus="{ item }">
                           {{ calcSponsorshipStatus(item) }}
                         </template>
+                        <!-- TODO # fix this coz this is done not to change the header array of objects -->
+                        <template v-slot:header.sponsoredDate="{ header }">
+                          {{ changeSponsoredDateHeaderOfNew(header) }}
+                        </template>
                         <template v-slot:item.sponsoredDate="{ item }">
-                          {{ calcSponsoredDate(item) }}
+                          {{ displayOrphanRegistrationDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <!-- <v-icon @click="showDetails(item)">
-                            mdi-account-details
-                          </v-icon> -->
                           <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
@@ -294,7 +244,6 @@
                       max-height="56vh"
                     >
                       <v-data-table
-                        v-model="selectedOrphans"
                         :headers="headers"
                         :items="processingOrphans"
                         item-key="id"
@@ -398,15 +347,16 @@
                         </template>
                         <!-- TODO # fix this coz this is done not to change the header array of objects -->
                         <template v-slot:header.sponsoredDate="{ header }">
-                          {{ changeSponsoredDateHeaderOfPendingAndProcessing(header) }}
+                          {{
+                            changeSponsoredDateHeaderOfPendingAndProcessing(
+                              header
+                            )
+                          }}
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <!-- <v-icon @click="showDetails(item)">
-                            mdi-account-details
-                          </v-icon> -->
                           <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
@@ -607,15 +557,217 @@
                         </template>
                         <!-- TODO # fix this coz this is done not to change the header array of objects -->
                         <template v-slot:header.sponsoredDate="{ header }">
-                          {{ changeSponsoredDateHeaderOfPendingAndProcessing(header) }}
+                          {{
+                            changeSponsoredDateHeaderOfPendingAndProcessing(
+                              header
+                            )
+                          }}
                         </template>
                         <template v-slot:item.sponsoredDate="{ item }">
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <!-- <v-icon @click="showDetails(item)">
-                            mdi-account-details
-                          </v-icon> -->
+                          <orphan-detail :details="item" />
+                        </template>
+                      </v-data-table>
+                      <!-- becomes visble when full name is edited -->
+                      <!-- TODO: # Impliment a loding functionality -->
+                      <!--       # maybe server side validation also -->
+                      <v-snackbar
+                        v-model="snack"
+                        :timeout="3000"
+                        :color="snackColor"
+                      >
+                        {{ snackText }}
+
+                        <template v-slot:action="{ attrs }">
+                          <v-btn v-bind="attrs" text @click="snack = false">
+                            Close
+                          </v-btn>
+                        </template>
+                      </v-snackbar>
+                    </v-sheet>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <!-- Active -->
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col cols="4"> Active </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open" key="0"></span>
+                          <span v-else key="1"></span>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content style="padding-right: 0px">
+                  <v-card elevation="16">
+                    <v-sheet
+                      id="scrolling-techniques-3"
+                      class="overflow-y-auto"
+                      max-height="70vh"
+                    >
+                      <v-data-table
+                        :headers="headers"
+                        :items="activeOrphans"
+                        item-key="id"
+                        :search="activeSearch"
+                        append-icon="mdi-magnify"
+                        :custom-filter="activeSearchFilter"
+                        multi-sort
+                        class="elevation-1"
+                      >
+                        <template v-slot:top>
+                          <v-row style="margin: 0px">
+                            <!-- Filter/Search Selection -->
+                            <!-- TODO: # add tooltip maybe -->
+                            <v-col
+                              sm="5"
+                              offset="0"
+                              offset-sm="0"
+                              offset-md="0"
+                              class="mt-4 mt-sm-0"
+                            >
+                              <v-responsive
+                                min-width="300"
+                                max-width="300"
+                                class="mx-xs-auto ml-sm-auto mt-sm-2"
+                              >
+                                <v-select
+                                  v-model="activeFilterValue"
+                                  hint="select field/s to filter explicity"
+                                  :items="activeFilterItems"
+                                  :menu-props="{ bottom: true, offsetY: true }"
+                                  solo
+                                  outlined
+                                  dense
+                                  persistent-hint
+                                  multiple
+                                  placeholder="Filter By"
+                                >
+                                  <template v-slot:selection="{ item, index }">
+                                    <v-chip
+                                      color="primary"
+                                      dark
+                                      label
+                                      close
+                                      close-icon="mdi-close-outline"
+                                      @click:close="removeSelectedActive(item)"
+                                      v-if="index === 0"
+                                    >
+                                      <span>{{ item }}</span>
+                                    </v-chip>
+                                    <span
+                                      v-if="index === 1"
+                                      class="grey--text caption"
+                                    >
+                                      (+{{ activeFilterValue.length - 1 }}
+                                      others)
+                                    </span>
+                                  </template>
+                                </v-select>
+                              </v-responsive>
+                            </v-col>
+                            <!-- Search Input -->
+                            <!-- TODO: # add search icon and close icon -->
+                            <v-col
+                              sm="7"
+                              md="4"
+                              offset="1"
+                              offset-sm="3"
+                              offset-md="1"
+                              offset-lg="0"
+                            >
+                              <v-responsive
+                                max-width="300"
+                                class="ml-sm-3 mt-sm-4"
+                              >
+                                <v-text-field
+                                  v-model="activeSearch"
+                                  placeholder="Search"
+                                  dense
+                                  flat
+                                  clearable
+                                  append-icon="mdi-filter-minus"
+                                >
+                                  <template v-slot:prepend> </template>
+                                </v-text-field>
+                              </v-responsive>
+                            </v-col>
+                          </v-row>
+                        </template>
+                        <!-- edit dialog pop-up for Full Name column -->
+                        <!-- TODO: impliment this functionality for all the other columns if needed -->
+                        <template v-slot:item.fullName="props">
+                          <!-- "large" for the buttons, "persistent" for blocking closing of edit-dialog when clicked outside -->
+                          <v-edit-dialog
+                            :return-value.sync="props.item.fullName"
+                            large
+                            persistent
+                            cancel-text="Cancel"
+                            save-text="Save"
+                            @save="save"
+                            @cancel="cancel"
+                            @open="open"
+                            @close="close"
+                          >
+                            {{ props.item.fullName }}
+                            <template v-slot:input>
+                              <v-text-field
+                                v-model="props.item.fullName"
+                                :rules="[max25chars]"
+                                label="Edit"
+                                single-line
+                                counter
+                                autofocus
+                              ></v-text-field>
+                            </template>
+                          </v-edit-dialog>
+                        </template>
+                        <!-- edit dialog pop-up for Sponsorship Status column -->
+                        <template v-slot:item.sponsorshipStatus="props">
+                          <v-edit-dialog
+                            :return-value.sync="props.item.sponsorshipStatus"
+                            large
+                            persistent
+                            cancel-text="Cancel"
+                            save-text="Save"
+                            @save="save"
+                            @cancel="cancel"
+                            @open="open"
+                            @close="close"
+                          >
+                            {{ props.item.sponsorshipStatus }}
+                            <template v-slot:input>
+                              <v-text-field
+                                v-model="props.item.sponsorshipStatus"
+                                :rules="[max25chars]"
+                                label="Edit"
+                                single-line
+                                counter
+                                autofocus
+                              ></v-text-field>
+                            </template>
+                          </v-edit-dialog>
+                        </template>
+                        <template v-slot:item.fullName="{ item }">
+                          {{ fullName(item) }}
+                        </template>
+                        <template v-slot:item.age="{ item }">
+                          {{ calcAge(item) }}
+                        </template>
+                        <template v-slot:item.sponsorshipStatus="{ item }">
+                          {{ calcSponsorshipStatus(item) }}
+                        </template>
+                        <template v-slot:item.sponsoredDate="{ item }">
+                          {{ calcSponsoredDate(item) }}
+                        </template>
+                        <template v-slot:item.details="{ item }">
                           <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
@@ -824,9 +976,6 @@
                           {{ calcGraduatedDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <!-- <v-icon @click="showDetails(item)">
-                            mdi-account-details
-                          </v-icon> -->
                           <orphan-detail :details="item" />
                         </template>
                       </v-data-table>
@@ -887,9 +1036,10 @@ export default {
 
   data() {
     return {
-      activeSearch: "", // used for activeFilter
+      newSearch: "", // used for newFilter
       processingSearch: "", // used for processingFilter
       pendingSearch: "", // used for pendingFilter
+      activeSearch: "", // used for activeFilter
       graduatedSearch: "", // used for graduatedFilter
       drawer: false, // constroles the sidebar
       // test fields *****************
@@ -998,13 +1148,13 @@ export default {
       selectedOrphanDonorOptions: [],
       validDonorChoice: false,
       // used in filter selection items
-      activeFilterItems: [
+      newFilterItems: [
         "Id",
         "Full Name",
         "Age",
         "Gender",
         "Sponsorship Status",
-        "Sponsored Date",
+        "Selected Donor",
       ],
       processingFilterItems: [
         "Id",
@@ -1022,6 +1172,14 @@ export default {
         "Sponsorship Status",
         "Sponsoring Donor",
       ],
+      activeFilterItems: [
+        "Id",
+        "Full Name",
+        "Age",
+        "Gender",
+        "Sponsorship Status",
+        "Sponsored Date",
+      ],
       graduatedFilterItems: [
         "Id",
         "Full Name",
@@ -1030,9 +1188,10 @@ export default {
         "Sponsorship Status",
         "Graduated Date",
       ],
-      activeFilterValue: [],
+      newFilterValue: [],
       processingFilterValue: [],
       pendingFilterValue: [],
+      activeFilterValue: [],
       graduatedFilterValue: [],
       // used for filter selection
       // table headers if that wasn't clear enough LOL
@@ -1064,9 +1223,10 @@ export default {
       ],
       // table rows/items
       orphans: [],
-      activeOrphans: [],
+      newOrphans: [],
       processingOrphans: [],
       pendingOrphans: [],
+      activeOrphans: [],
       graduatedOrphans: [],
     };
   },
@@ -1085,11 +1245,11 @@ export default {
   },
   watch: {
     orphans() {
-      this.activeOrphans = this.orphans.filter((orphan) => {
+      this.newOrphans = this.orphans.filter((orphan) => {
         return (
           orphan.sponsorshipStatuses[
             orphan.sponsorshipStatuses.length - 1
-          ].status.toLowerCase() === "active"
+          ].status.toLowerCase() === "new"
         );
       });
       this.processingOrphans = this.orphans.filter((orphan) => {
@@ -1104,6 +1264,13 @@ export default {
           orphan.sponsorshipStatuses[
             orphan.sponsorshipStatuses.length - 1
           ].status.toLowerCase() === "pending"
+        );
+      });
+      this.activeOrphans = this.orphans.filter((orphan) => {
+        return (
+          orphan.sponsorshipStatuses[
+            orphan.sponsorshipStatuses.length - 1
+          ].status.toLowerCase() === "active"
         );
       });
       this.graduatedOrphans = this.orphans.filter((orphan) => {
@@ -1150,8 +1317,10 @@ export default {
               query: `query orphan($id: ID!) {
                         orphan(id: $id) {
                           id
+                          created_at
                           firstName
                           father {
+                            id
                             firstName
                             lastName
                             dateOfDeath
@@ -1167,6 +1336,7 @@ export default {
                           psychologicalStatus
                           healthDescription
                           education {
+                            id
                             enrollmentStatus
                             level
                             year
@@ -1187,6 +1357,7 @@ export default {
                           }
                           hobbies
                           house_property {
+                            id
                             housingSituation
                             otherProperty
                           }
@@ -1207,9 +1378,9 @@ export default {
                             telephoneNumber
                             dateOfBirth
                             relationToOrphan
-                            guardianIDCardUrl
-                            guardianConfirmationLetterUrl
-                            guardianLegalConfirmationLetterUrl
+                            iDCardUrl
+                            confirmationLetterUrl
+                            legalConfirmationLetterUrl
                           }
                           mother {
                             id
@@ -1217,8 +1388,11 @@ export default {
                             middleName
                             lastName
                             dateOfBirth
+                            dateOfDeath
+                            causeOfDeath
                             vitalStatus
                             maritalStatus
+                            mobileNumber
                           }
                           sponsorshipStatuses {
                             status
@@ -1246,6 +1420,9 @@ export default {
     // custom search function based on selected columns
     activeSearchFilter(value, search, item) {
       return this.searchFilter(value, search, item, this.activeFilterValue);
+    },
+    newSearchFilter(value, search, item) {
+      return this.searchFilter(value, search, item, this.newFilterValue);
     },
     processingSearchFilter(value, search, item) {
       return this.searchFilter(value, search, item, this.processingFilterValue);
@@ -1286,8 +1463,13 @@ export default {
               );
             } else if (filterVal === this.headers[5].text) {
               return this.calcSponsoredDate(item).indexOf(search) !== -1;
+            } else if (filterVal === this.changeSponsoredDateHeaderOfNew()) {
+              return (
+                this.displayOrphanRegistrationDate(item).indexOf(search) !== -1
+              );
             } else if (
-              filterVal === this.changeSponsoredDateHeaderOfPendingAndProcessing()
+              filterVal ===
+              this.changeSponsoredDateHeaderOfPendingAndProcessing()
             ) {
               return (
                 this.displaySponsoringOrphanDonor(item).indexOf(search) !== -1
@@ -1378,10 +1560,8 @@ export default {
       if (this.$refs.donorSelect.validate()) {
         this.orphanShow = true;
         this.orphanSelectBtnLable = "Send Orphans";
-        this.orphanPanel = 1;
+        this.orphanPanel = 0;
         this.donorChoiceClose();
-        // this.donorChoiceReset();
-        console.log("selectedOrphanDonor", this.selectedOrphanDonor);
       } else {
         // handle err and show some kind of notification
       }
@@ -1392,7 +1572,7 @@ export default {
     donorChoiceReset() {
       this.$refs.donorSelect.reset();
     },
-    async createSponsorshipStatus(orphanId) {
+    async createSponsorshipStatus(orphanId, status) {
       return axios
         .post("/graphql", {
           query: `mutation createSponsorshipStatus(
@@ -1410,7 +1590,7 @@ export default {
                   }
                 }`,
           variables: {
-            status: "processing",
+            status: status,
             date: new Date().toISOString(),
             orphanId: orphanId,
           },
@@ -1419,7 +1599,7 @@ export default {
         .catch((err) => console.warn(err));
     },
     async selectOrphans() {
-      if (!this.orphanShow || !this.orphanPanel) {
+      if (!this.orphanShow || this.orphanPanel === null) {
         this.selectedOrphanDonorOptions = await axios
           .post("/graphql/", {
             query: `query coordinator($id: ID!) {
@@ -1437,10 +1617,6 @@ export default {
           .then((res) => res.data.data.coordinator)
           .then((coordinator) => coordinator.donors)
           .catch((err) => console.warn(err));
-        console.log(
-          "selectedOrphanDonorOptions",
-          this.selectedOrphanDonorOptions
-        );
         this.showDonorSelectionDialog = true;
         this.selectedOrphans = [];
       } else {
@@ -1476,7 +1652,7 @@ export default {
           .then((res) => res.data.data.updateDonor)
           .then(() => {
             for (const orphanId of selectedOrphanIds) {
-              this.createSponsorshipStatus(orphanId)
+              this.createSponsorshipStatus(orphanId, "processing")
                 .then((sponsorshipStatuse) => {
                   console.log("SponsoreStatus:", sponsorshipStatuse);
                 })
@@ -1488,93 +1664,29 @@ export default {
         this.selectedOrphans = [];
       }
     },
+    changeSponsoredDateHeaderOfNew() {
+      return "Registred Date";
+    },
     changeSponsoredDateHeaderOfPendingAndProcessing() {
       return "Sponsoring Donor";
     },
     changeSponsoredDateHeaderOfGraduated() {
       return "Graduated Date";
     },
+    displayOrphanRegistrationDate(item) {
+      const options = {
+        // weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return new Date(Date.parse(item.created_at.toString())).toLocaleDateString(
+        undefined,
+        options
+      );
+    },
     displaySponsoringOrphanDonor(item) {
       return item.donor ? item.donor.nameInitials : "";
-    },
-    // old showDetails(item) {
-    showDetails(item) {
-      this.detailIndex = item.id;
-      // this.detailItem = Object.assign({}, item);
-      console.log("Show Details", item);
-      this.orphanItems.orphanName = item.firstName;
-      this.orphanItems.fatherName = item.father.firstName;
-      this.orphanItems.grandFatherName = item.father.lastName;
-      this.orphanDateOfBirth = item.dateOfBirth;
-      this.orphanItems.gender = item.gender;
-      this.orphanItems.placeOfBirth = item.placeOfBirth || "N/A";
-      this.orphanItems.religion = item.religion || "N/A";
-      this.orphanItems.spokenLanguages = item.spokenLanguages || "N/A";
-      this.orphanItems.psychologicalStatus = item.psychologicalStatus || "N/A";
-      this.orphanHealthDescription = item.healthDescription || "N/A";
-      if (item.education !== undefined && item.education !== null) {
-        this.orphanItems.enrollmentStatus =
-          item.education.enrollmentStatus || "N/A";
-        this.orphanItems.educationLevel = item.education.level || "N/A";
-        this.orphanItems.educationYearState = item.education.year || "N/A";
-        this.orphanItems.schoolType = item.education.typeOfSchool || "N/A";
-        this.orphanItems.schoolName = item.education.schoolName || "N/A";
-        this.orphanItems.reasonForDropout = item.education.reason || "N/A";
-        this.orphanItems.reasonForUnenrolled = item.education.reason || "N/A";
-      } else {
-        this.orphanItems.enrollmentStatus = "N/A";
-        this.orphanItems.educationLevel = "N/A";
-        this.orphanItems.educationYearState = "N/A";
-        this.orphanItems.schoolType = "N/A";
-        this.orphanItems.schoolName = "N/A";
-        this.orphanItems.reasonForDropout = "N/A";
-        this.orphanItems.reasonForUnenrolled = "N/A";
-      }
-      this.orphanItems.hobbies = item.hobbies || "N/A";
-      if (item.father !== undefined && item.father !== null) {
-        this.fatherDateOfBirthDate = item.father.dateOfBirth || "N/A";
-        this.fatherDateOfDeathDate = item.father.dateOfDeath || "N/A";
-        this.orphanItems.fatherCauseOfDeath = item.father.causeOfDeath || "N/A";
-        this.orphanItems.fatherCauseofDeath = item.father.causeOfDeath || "N/A";
-      } else {
-        this.fatherDateOfBirthDate = "N/A";
-        this.fatherDateOfDeathDate = "N/A";
-        this.orphanItems.fatherCauseOfDeath = "N/A";
-        this.orphanItems.fatherCauseofDeath = "N/A";
-      }
-      if (item.mother !== undefined && item.mother !== null) {
-        this.orphanItems.motherFirstName = item.mother.firstName || "N/A";
-        this.orphanItems.motherMiddleName = item.mother.middleName || "N/A";
-        this.orphanItems.motherLastName = item.mother.lastName || "N/A";
-        this.motherDateOfBirthDate = item.mother.dateOfBirth || "N/A";
-        this.orphanItems.motherVitalStatus = item.mother.vitalStatus || "N/A";
-        this.orphanItems.motherMaritalStatus =
-          item.mother.maritalStatus || "N/A";
-      } else {
-        this.orphanItems.motherFirstName = "N/A";
-        this.orphanItems.motherMiddleName = "N/A";
-        this.orphanItems.motherLastName = "N/A";
-        this.motherDateOfBirthDate = "N/A";
-        this.orphanItems.motherVitalStatus = "N/A";
-        this.orphanItems.motherMaritalStatus = "N/A";
-      }
-      if (item.house_property !== undefined && item.house_property !== null) {
-        this.orphanItems.housingSituation =
-          item.house_property.housingSituation || "N/A";
-        this.orphanItems.otherProperties =
-          item.house_property.otherProperties || "N/A";
-      } else {
-        this.orphanItems.housingSituation = "N/A";
-        this.orphanItems.otherProperties = "N/A";
-      }
-      this.detailDialog = true;
-      if (this.orphanItems.enrollmentStatus === "enrolled") {
-        this.enrollmentStatusDisplay = "Enrolled";
-      } else if (this.orphanItems.enrollmentStatus === "drop-Out") {
-        this.enrollmentStatusDisplay = "Dropout";
-      } else if (this.orphanItems.enrollmentStatus === "un-enrolled") {
-        this.enrollmentStatusDisplay = "Unenrolled";
-      }
     },
     // new showDetal
     showDetail(item) {
@@ -1620,9 +1732,9 @@ export default {
     toggleBirthCertificateDialog() {
       this.birthCertificateDialog = !this.birthCertificateDialog;
     },
-    removeSelectedActive(item) {
-      this.activeFilterValue.splice(this.activeFilterValue.indexOf(item), 1);
-      this.activeFilterValue = [...this.activeFilterValue];
+    removeSelectedNew(item) {
+      this.newFilterValue.splice(this.newFilterValue.indexOf(item), 1);
+      this.newFilterValue = [...this.newFilterValue];
     },
     removeSelectedProcessing(item) {
       this.processingFilterValue.splice(
@@ -1634,6 +1746,10 @@ export default {
     removeSelectedPending(item) {
       this.pendingFilterValue.splice(this.pendingFilterValue.indexOf(item), 1);
       this.pendingFilterValue = [...this.pendingFilterValue];
+    },
+    removeSelectedActive(item) {
+      this.activeFilterValue.splice(this.activeFilterValue.indexOf(item), 1);
+      this.activeFilterValue = [...this.activeFilterValue];
     },
     removeSelectedGraduated(item) {
       this.graduatedFilterValue.splice(

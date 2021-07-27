@@ -83,7 +83,15 @@
                       no-title
                       scrollable
                       :max="new Date().toISOString().substr(0, 10)"
-                      :min="new Date(new Date().setFullYear(new Date().getFullYear() - this.AGE_LIMIT)).toISOString().substr(0,10)"
+                      :min="
+                        new Date(
+                          new Date().setFullYear(
+                            new Date().getFullYear() - this.ORPHAN_AGE_LIMIT
+                          )
+                        )
+                          .toISOString()
+                          .substr(0, 10)
+                      "
                       @change="orphanDateOfBirthSave"
                     >
                       <!-- <v-spacer></v-spacer>
@@ -264,9 +272,14 @@
 
 <script>
 export default {
+  props: {
+    registrationDone: {
+      type: Object,
+    },
+  },
   data() {
     return {
-      AGE_LIMIT: 12,
+      ORPHAN_AGE_LIMIT: 12,
       dialog: false,
       validPersonalForm: false,
       formHasErrors: false,
@@ -330,6 +343,11 @@ export default {
   mounted() {},
   computed: {},
   watch: {
+    registrationDone(val) {
+      if (val.reset) {
+        this.orphanDialogReset();
+      }
+    },
     orphanDateOfBirthMenu(val) {
       // console.log(this.$refs.picker);
       // console.log(
@@ -401,7 +419,9 @@ export default {
         }
 
         this.$emit("personalDone", this.orphan);
+        this.$emit("personalRefs", this.$refs.personalForm);
         this.orphanDialogClose();
+        // this.orphanDialogReset();
       } else if (!this.$refs.personalForm.validate()) {
         this.formHasErrors = true;
       }

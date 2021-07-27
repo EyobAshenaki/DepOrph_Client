@@ -79,7 +79,15 @@
                         v-model="orphan.guardian.dateOfBirth"
                         no-title
                         scrollable
-                        :max="new Date().toISOString().substr(0, 10)"
+                        :max="
+                          new Date(
+                            new Date().setFullYear(
+                              new Date().getFullYear() - this.GUARDIAN_AGE_LIMIT
+                            )
+                          )
+                            .toISOString()
+                            .substr(0, 10)
+                        "
                         min="1950-01-01"
                         @change="guardianDateOfBirthSave"
                       >
@@ -222,6 +230,7 @@
 export default {
   data() {
     return {
+      GUARDIAN_AGE_LIMIT: 18,
       // dialog
       dialog: false,
       validGuardianForm: false,
@@ -273,6 +282,8 @@ export default {
         "Cousin",
         "Niece",
         "Nephew",
+        "Legal Guardian",
+        "Other",
       ],
       guardianNationalityOptions: [
         "Ethiopian",
@@ -339,9 +350,18 @@ export default {
         // console.log(this.orphan);
 
         this.orphan.guardian.gender = this.orphan.guardian.gender.slice(0, 1);
-        this.orphan.guardian.relationToOrphan = this.orphan.guardian.relationToOrphan.slice(0, 1).toLowerCase() + this.orphan.guardian.relationToOrphan.slice(1);
 
-        this.$emit('guardianDone', this.orphan);
+        this.orphan.guardian.relationToOrphan =
+          this.orphan.guardian.relationToOrphan.slice(0, 1).toLowerCase() +
+          this.orphan.guardian.relationToOrphan.slice(1);
+        if (this.orphan.guardian.relationToOrphan.includes(" ")) {
+          this.orphan.guardian.relationToOrphan = this.orphan.guardian.relationToOrphan
+            .split(" ")
+            .join("");
+        }
+
+        this.$emit("guardianDone", this.orphan);
+        this.$emit("guardianRefs", this.$refs.guardianForm);
         this.guardianDialogClose();
       } else if (!this.$refs.guardianForm.validate()) {
         this.formHasErrors = true;
@@ -351,7 +371,7 @@ export default {
     guardianDialogCancel() {
       this.guardianDialogReset();
       this.guardianDialogClose();
-    }
+    },
   },
 };
 </script>

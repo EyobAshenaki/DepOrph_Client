@@ -12,7 +12,7 @@
       </v-row> -->
 
         <h2 class="text-h3 text-center pt-3" style="color: #ff9983">Login</h2>
-
+        <v-form>
         <v-text-field
           v-model="loginEmail"
           class="mt-7"
@@ -30,7 +30,7 @@
           outlined
           color="#FF9983"
         ></v-text-field>
-
+        </v-form>
         <v-row justify="space-between">
           <v-checkbox
             class="mt-0 ml-3"
@@ -176,6 +176,7 @@ export default {
           //   withCredentials: true,
           // }
         )
+        // .then((res) => console.log(res))
         .then((res) => res.data.data.login.user)
         .then(user => {
           if (user.role === "Head") {
