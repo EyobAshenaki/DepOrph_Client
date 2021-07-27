@@ -23,7 +23,7 @@
                   <v-text-field
                     v-model="orphan.firstName"
                     :rules="[rules.required, rules.name]"
-                    label="Orphan Name"
+                    label="Orphan Name*"
                   >
                   </v-text-field>
                   <!-- </v-responsive> -->
@@ -32,7 +32,7 @@
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
                     v-model="orphan.father.firstName"
-                    label="Father Name"
+                    label="Father Name*"
                     :rules="[rules.required, rules.name]"
                   >
                   </v-text-field>
@@ -41,7 +41,7 @@
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
                     v-model="orphan.father.lastName"
-                    label="Grand Father Name"
+                    label="Grand Father Name*"
                     :rules="[rules.required, rules.name]"
                   >
                   </v-text-field>
@@ -52,7 +52,7 @@
                     v-model="orphan.gender"
                     :items="genderOptions"
                     :menu-props="{ bottom: true, offsetY: true }"
-                    label="Gender"
+                    label="Gender*"
                     :rules="[rules.required]"
                   ></v-select>
                 </v-col>
@@ -69,7 +69,7 @@
                     <template v-slot:activator="{ on, attrs }">
                       <v-text-field
                         v-model="orphan.dateOfBirth"
-                        label="Date of Birth"
+                        label="Date of Birth*"
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
@@ -83,7 +83,15 @@
                       no-title
                       scrollable
                       :max="new Date().toISOString().substr(0, 10)"
-                      min="1950-01-01"
+                      :min="
+                        new Date(
+                          new Date().setFullYear(
+                            new Date().getFullYear() - this.ORPHAN_AGE_LIMIT
+                          )
+                        )
+                          .toISOString()
+                          .substr(0, 10)
+                      "
                       @change="orphanDateOfBirthSave"
                     >
                       <!-- <v-spacer></v-spacer>
@@ -140,7 +148,7 @@
                   </v-responsive> -->
                   <v-text-field
                     v-model="orphan.placeOfBirth"
-                    label="Place of Birth"
+                    label="Place of Birth*"
                     :rules="[rules.required, rules.name]"
                   ></v-text-field>
                 </v-col>
@@ -184,7 +192,7 @@
                   </v-responsive> -->
                   <v-text-field
                     v-model="orphan.spokenLanguages"
-                    label="Spoken Language(s)"
+                    label="Spoken Language(s)*"
                     :rules="[rules.required, rules.name]"
                   ></v-text-field>
                 </v-col>
@@ -194,7 +202,7 @@
                     v-model="orphan.religion"
                     :items="orphanReligionOptions"
                     :menu-props="{ bottom: true, offsetY: true }"
-                    label="Religion"
+                    label="Religion*"
                     :rules="[rules.required]"
                   ></v-select>
                 </v-col>
@@ -204,7 +212,7 @@
                     v-model="orphan.psychologicalStatus"
                     :items="orphanPsychologicalStatusOptions"
                     :menu-props="{ bottom: true, offsetY: true }"
-                    label="Psychological Status"
+                    label="Psychological Status*"
                     :rules="[rules.required]"
                   ></v-select>
                 </v-col>
@@ -215,7 +223,6 @@
                     label="Health Description"
                     auto-grow
                     rows="1"
-                    :rules="[rules.required]"
                   ></v-textarea>
                 </v-col>
               </v-row>
@@ -265,8 +272,14 @@
 
 <script>
 export default {
+  props: {
+    registrationDone: {
+      type: Object,
+    },
+  },
   data() {
     return {
+      ORPHAN_AGE_LIMIT: 12,
       dialog: false,
       validPersonalForm: false,
       formHasErrors: false,
@@ -330,6 +343,11 @@ export default {
   mounted() {},
   computed: {},
   watch: {
+    registrationDone(val) {
+      if (val.reset) {
+        this.orphanDialogReset();
+      }
+    },
     orphanDateOfBirthMenu(val) {
       // console.log(this.$refs.picker);
       // console.log(
@@ -388,9 +406,6 @@ export default {
         // console.log(this.orphan);
 
         this.orphan.gender = this.orphan.gender.slice(0, 1).toUpperCase();
-        this.orphan.dateOfBirth = new Date(
-          this.orphan.dateOfBirth
-        ).toISOString();
         if (this.orphan.psychologicalStatus) {
           const words = this.orphan.psychologicalStatus.split(" ");
           this.orphan.psychologicalStatus = "";
@@ -404,7 +419,9 @@ export default {
         }
 
         this.$emit("personalDone", this.orphan);
+        this.$emit("personalRefs", this.$refs.personalForm);
         this.orphanDialogClose();
+        // this.orphanDialogReset();
       } else if (!this.$refs.personalForm.validate()) {
         this.formHasErrors = true;
       }

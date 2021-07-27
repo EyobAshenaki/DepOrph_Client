@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <v-app-bar absolute elevate-on-scroll style="background: #eee;"> -->
     <v-app-bar absolute dark elevate-on-scroll>
       <template v-slot:img="{ props }">
         <v-img
@@ -14,16 +15,45 @@
 
       <v-spacer></v-spacer>
 
+      <!-- Coordinator part -->
       <template v-if="user.role === 'Coordinator'">
-        <v-btn text class="mr-0 py-8">New Orphan</v-btn>
-        <v-btn text class="py-8">Support Plans</v-btn>
-        <v-btn text class="mr-0 py-8">Change Status</v-btn>
+        <v-btn
+          text
+          class="mr-0 py-8"
+          :class="{ active: isNewOrphan }"
+          @click.stop="toggleNewOrphanDialog"
+        >
+          New Orphan
+        </v-btn>
+        <v-btn
+          text
+          class="py-8"
+          :class="{ active: isSupportPlan }"
+          @click.stop="toggleSupportPlanComponent"
+        >
+          Support Plans
+        </v-btn>
+        <v-btn
+          text
+          class="mr-0 py-8"
+          :class="{ active: isChangeStatus }"
+          @click.stop="toggleChangeStatusDialog"
+        >
+          Change Status
+        </v-btn>
       </template>
 
+      <!-- Donor part -->
       <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isProcessing }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="processingActive"
               >Processing</v-btn
             >
           </template>
@@ -32,7 +62,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isPending }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="pendingActive"
               >Pending</v-btn
             >
           </template>
@@ -41,7 +77,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isSponsored }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="sponsoredActive"
               >Sponsored</v-btn
             >
           </template>
@@ -50,7 +92,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" v-bind="attrs" v-on="on"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isGraduated }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="graduatedActive"
               >Graduated</v-btn
             >
           </template>
@@ -58,6 +106,7 @@
         </v-tooltip>
       </template>
 
+      <!-- Head Part -->
       <template v-else-if="user.role === 'Head'">
         <v-btn text class="mr-0 py-8">View</v-btn>
         <v-btn text class="mr-0 py-8">Register</v-btn>
@@ -81,6 +130,7 @@
           color="orange"
         ></v-text-field>
       </v-responsive>
+      <!-- user profile menu -->
       <v-menu
         v-model="accountMenu"
         :close-on-content-click="false"
@@ -134,6 +184,7 @@
         </v-card>
       </v-menu>
     </v-app-bar>
+
     <!-- <v-navigation-drawer v-model="drawer" absolute temporary style="color: #FF9983;">
       <v-list nav dense>
         <v-list-item-group
@@ -160,12 +211,28 @@
   </div>
 </template>
 
+<style scoped>
+.active {
+  background-color: rgba(100, 115, 201, 0.5);
+}
+</style>
+
 <script>
+import axios from "axios";
 export default {
   props: {
     user: {
-      type: Object,
+      type: Object
     },
+    dialog: {
+      type: Boolean
+    },
+    newOrphanView: {
+      type: Boolean
+    },
+    changeStatusDialogValue: {
+      type: Boolean
+    }
   },
 
   data() {
@@ -173,14 +240,63 @@ export default {
       accountMenu: false,
       search: "",
       drawer: false,
+      newOrphanDialog: true,
+      supportPlanTable: true,
+      changeStatusDialog: true,
+      state: "",
+      isNewOrphan: false,
+      isSupportPlan: false,
+      isChangeStatus: false,
+      isProcessing: false,
+      isPending: false,
+      isSponsored: false,
+      isGraduated: false
     };
   },
+  watch: {
+    dialog(val) {
+      this.isNewOrphan = val;
+    },
+    newOrphanView(val) {
+      this.isNewOrphan = val;
+    },
+    changeStatusDialogValue(val) {
+      this.isChangeStatus = val;
+    }
+  },
   methods: {
+    toggleNewOrphanDialog() {
+      // because when the dialog closes this function don't get the memo so do it manually like a noob same goes for toggleChangeStatusDialog
+      if (this.newOrphanDialog === false) this.newOrphanDialog = !this.dialog;
+      this.$emit("toggleNewOrphanDialog", this.newOrphanDialog);
+      this.newOrphanDialog = !this.newOrphanDialog;
+
+      this.isSupportPlan = false;
+      this.isChangeStatus = false;
+    },
+    toggleSupportPlanComponent() {
+      console.log(this.supportPlanTable);
+      // if(this.supportPlanTable === false) this.supportPlanTable = true;
+      this.$emit("toggleSupportPlanComponent", this.supportPlanTable);
+      this.supportPlanTable = !this.supportPlanTable;
+
+      this.isSupportPlan = !this.supportPlanTable;
+      this.isNewOrphan = false;
+      this.isChangeStatus = false;
+    },
+    toggleChangeStatusDialog() {
+      if (this.changeStatusDialog === false)
+        this.changeStatusDialog = !this.changeStatusDialogValue;
+      this.$emit("toggleChangeStatusDialog", this.changeStatusDialog);
+      this.changeStatusDialog = !this.changeStatusDialog;
+
+      this.isSupportPlan = false;
+      this.isNewOrphan = false;
+    },
     displayName() {
       if (Object.hasOwnProperty.call(this.user, "companyName")) {
         return this.user.companyName;
-      } else
-        return `${this.user.firstName} ${this.user.middleName}`;
+      } else return `${this.user.firstName} ${this.user.middleName}`;
     },
     displayNameInitials() {
       if (Object.hasOwnProperty.call(this.user, "nameInitials")) {
@@ -195,8 +311,49 @@ export default {
       this.accountMenu = false;
     },
     logOut() {
-      console.log("Logging out...");
+      (async () => {
+        const query = `mutation{logout}`;
+        const loggedOut = await axios.post("/graphql", { query });
+        console.log();
+        if (loggedOut.data.data.logout) {
+          sessionStorage.clear();
+          this.$router.push("/");
+        }
+      })();
     },
-  },
+    // -------------Donor----------------
+    processingActive() {
+      this.state = "processing";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = true;
+      this.isPending = false;
+      this.isSponsored = false;
+      this.isGraduated = false;
+    },
+    pendingActive() {
+      this.state = "pending";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = true;
+      this.isSponsored = false;
+      this.isGraduated = false;
+    },
+    sponsoredActive() {
+      this.state = "sponsored";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = false;
+      this.isSponsored = true;
+      this.isGraduated = false;
+    },
+    graduatedActive() {
+      this.state = "graduated";
+      this.$emit("activeTab", this.state);
+      this.isProcessing = false;
+      this.isPending = false;
+      this.isSponsored = false;
+      this.isGraduated = true;
+    }
+  }
 };
 </script>
