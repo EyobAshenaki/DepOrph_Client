@@ -13,7 +13,7 @@
         min-height: 83.5vh;
         max-height: 90.5vh;
         margin-top: 4rem;
-        width: 22%;
+        width: 15%;
       "
       color="rgba(25,32,72, 0.5)"
     >
@@ -797,6 +797,46 @@
       </v-list>
     </v-navigation-drawer>
     <v-container>
+      <!-- Info Dialog -->
+      <template>
+        <v-dialog
+          v-model="infoDialog"
+          persistent
+          max-width="750px"
+          transition="dialog-transition"
+        >
+          <v-card>
+            <v-card-title primary-title>
+              <div>
+                <h3 class="headline mb-0">
+                  {{ infoDialogOwner }} account created for
+                  {{ infoDialogOwnerName }}
+                </h3>
+              </div>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <div class="text-h6">
+                Email:
+                <span v-html="infoDialogOwnerEmail" class="text-body-1" />
+              </div>
+              <div class="text-h6">
+                Password:
+                <span
+                  v-html="infoDialogOwnerPassword"
+                  class="font-weight-black black--text"
+                />
+              </div>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-btn text color="error" @click="infoDialog = false"
+                >Close</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </template>
       <!-- Views -->
       <template>
         <!-- Districts -->
@@ -896,25 +936,25 @@
                       </v-col>
                     </v-row>
                   </template>
-                  <template v-slot:item.id="{ item }">
+                  <template v-slot:[`item.id`]="{ item }">
                     {{ getDistrictTableId(item) }}
                   </template>
-                  <template v-slot:item.districtName="{ item }">
+                  <template v-slot:[`item.districtName`]="{ item }">
                     {{ getDistrictTableDistrictName(item) }}
                   </template>
-                  <template v-slot:item.region="{ item }">
+                  <template v-slot:[`item.region`]="{ item }">
                     {{ getDistrictTableRegion(item) }}
                   </template>
-                  <template v-slot:item.zone="{ item }">
+                  <template v-slot:[`item.zone`]="{ item }">
                     {{ getDistrictTableZone(item) }}
                   </template>
-                  <template v-slot:item.numberOfPAs="{ item }">
+                  <template v-slot:[`item.numberOfPAs`]="{ item }">
                     {{ getDistrictTableNumberOfVillage(item) }}
                   </template>
-                  <template v-slot:item.numberOfSocialWorkers="{ item }">
+                  <template v-slot:[`item.numberOfSocialWorkers`]="{ item }">
                     {{ getDistrictTableNumberOfSocialWorkers(item) }}
                   </template>
-                  <template v-slot:item.coordinator="{ item }">
+                  <template v-slot:[`item.coordinator`]="{ item }">
                     {{ getDistrictTableCoordinator(item) }}
                   </template>
                 </v-data-table>
@@ -1017,16 +1057,16 @@
                       </v-col>
                     </v-row>
                   </template>
-                  <template v-slot:item.id="{ item }">
+                  <template v-slot:[`item.id`]="{ item }">
                     {{ getRegionTableId(item) }}
                   </template>
-                  <template v-slot:item.regionName="{ item }">
+                  <template v-slot:[`item.regionName`]="{ item }">
                     {{ getRegionTableRegionName(item) }}
                   </template>
-                  <template v-slot:item.numberOfZones="{ item }">
+                  <template v-slot:[`item.numberOfZones`]="{ item }">
                     {{ getRegionTableNumberOfZones(item) }}
                   </template>
-                  <template v-slot:item.numberOfDistricts="{ item }">
+                  <template v-slot:[`item.numberOfDistricts`]="{ item }">
                     {{ getRegionTableNumberOfDistricts(item) }}
                   </template>
                 </v-data-table>
@@ -1129,16 +1169,16 @@
                       </v-col>
                     </v-row>
                   </template>
-                  <template v-slot:item.id="{ item }">
+                  <template v-slot:[`item.id`]="{ item }">
                     {{ getZoneTableId(item) }}
                   </template>
-                  <template v-slot:item.zoneName="{ item }">
+                  <template v-slot:[`item.zoneName`]="{ item }">
                     {{ getZoneTableZoneName(item) }}
                   </template>
-                  <template v-slot:item.region="{ item }">
+                  <template v-slot:[`item.region`]="{ item }">
                     {{ getZoneTableRegion(item) }}
                   </template>
-                  <template v-slot:item.numberOfDistricts="{ item }">
+                  <template v-slot:[`item.numberOfDistricts`]="{ item }">
                     {{ getZoneTableNumberOfDistricts(item) }}
                   </template>
                 </v-data-table>
@@ -1241,25 +1281,25 @@
                       </v-col>
                     </v-row>
                   </template>
-                  <template v-slot:item.id="{ item }">
+                  <template v-slot:[`item.id`]="{ item }">
                     {{ getVillageTableId(item) }}
                   </template>
-                  <template v-slot:item.villageName="{ item }">
+                  <template v-slot:[`item.villageName`]="{ item }">
                     {{ getVillageTableVillageName(item) }}
                   </template>
-                  <template v-slot:item.district="{ item }">
+                  <template v-slot:[`item.district`]="{ item }">
                     {{ getVillageTableDistrict(item) }}
                   </template>
-                  <template v-slot:item.registrationDate="{ item }">
+                  <template v-slot:[`item.registrationDate`]="{ item }">
                     {{ getVillageTableRegistrationDate(item) }}
                   </template>
-                  <template v-slot:item.donor="{ item }">
+                  <template v-slot:[`item.donor`]="{ item }">
                     {{ getVillageTableDonor(item) }}
                   </template>
-                  <template v-slot:item.coordinator="{ item }">
+                  <template v-slot:[`item.coordinator`]="{ item }">
                     {{ getVillageTableCoordinator(item) }}
                   </template>
-                  <template v-slot:item.numberOfOrphans="{ item }">
+                  <template v-slot:[`item.numberOfOrphans`]="{ item }">
                     {{ getVillageTableNumberOfOrphans(item) }}
                   </template>
                 </v-data-table>
@@ -1596,6 +1636,181 @@
         </v-card>
       </template>
 
+      <!-- Account Maintainence -->
+      <template
+        v-if="
+          !showRegionTable &&
+            !showZoneTable &&
+            !showDistrictTable &&
+            !showVillageTable &&
+            !showDonorTree &&
+            !showCoordinatorTree &&
+            !showSocialWorkerTree
+        "
+      >
+        <v-card
+          style="margin-left: 15rem;"
+          elevation="0"
+          min-height="85vh"
+          max-height="85vh"
+          color="grey lighten-2"
+        >
+          <v-row class="px-3">
+            <v-col cols="8">
+              <v-card cols="6" max-height="80vh" min-height="82vh">
+                <v-card-title primary-title>
+                  Pending Requests
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-row class="mx-0 px-2">
+                  <v-col cols="6">
+                    <v-card flat>
+                      <v-card-title primary-title>
+                        Registration
+                      </v-card-title>
+                      <v-divider></v-divider>
+                      <v-list max-height="66vh" style="overflow-y: auto">
+                        <v-list-item
+                          v-for="(item, index) in filteredAccountMaintainences(
+                            'register',
+                            'pending'
+                          )"
+                          :key="index"
+                        >
+                          <v-list-item-icon
+                            ><v-icon>mdi-account</v-icon></v-list-item-icon
+                          >
+                          <v-list-item-content>
+                            <v-list-item-title
+                              v-html="
+                                `${item.firstName} ${item.middleName} ${item.lastName} - ${item.role}`
+                              "
+                            ></v-list-item-title>
+                            <v-list-item-subtitle
+                              v-html="`${item.email} - ${item.mobileNumber}`"
+                            ></v-list-item-subtitle>
+                          </v-list-item-content>
+                          <v-list-item-action>
+                            <v-list-item-icon class="mx-0"
+                              ><v-icon
+                                color="success"
+                                @click="approveRequest(item)"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-icon
+                                class="ml-3"
+                                color="red lighten-2"
+                                @click="rejectRequest(item)"
+                                >mdi-close-circle</v-icon
+                              ></v-list-item-icon
+                            >
+                          </v-list-item-action>
+                        </v-list-item>
+                      </v-list>
+                    </v-card>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-card flat>
+                      <v-card-title primary-title>
+                        Password Recovery
+                      </v-card-title>
+                      <v-divider></v-divider>
+                      <v-list max-height="66vh" style="overflow-y: auto">
+                        <v-list-item
+                          v-for="(item, index) in filteredAccountMaintainences(
+                            'passwordRecovery',
+                            'pending'
+                          )"
+                          :key="index"
+                        >
+                          <v-list-item-icon
+                            ><v-icon>mdi-key</v-icon></v-list-item-icon
+                          >
+                          <v-list-item-content>
+                            <v-list-item-title
+                              v-html="
+                                `${item.firstName} ${item.middleName} ${item.lastName} - ${item.role}`
+                              "
+                            ></v-list-item-title>
+                            <v-list-item-subtitle
+                              v-html="`${item.email} - ${item.mobileNumber}`"
+                            ></v-list-item-subtitle>
+                          </v-list-item-content>
+                          <v-list-item-action>
+                            <v-list-item-icon class="mx-0"
+                              ><v-icon
+                                color="success"
+                                @click="approveRequest(item)"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-icon
+                                class="ml-3"
+                                color="red lighten-2"
+                                @click="rejectRequest(item)"
+                                >mdi-close-circle</v-icon
+                              ></v-list-item-icon
+                            >
+                          </v-list-item-action>
+                        </v-list-item>
+                      </v-list></v-card
+                    >
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+            <v-col cols="4">
+              <v-card
+                cols="6"
+                elevation="2"
+                max-height="80vh"
+                min-height="82vh"
+              >
+                <v-card-title primary-title>
+                  Aproved / Rejected Requests
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-list max-height="74vh" style="overflow-y: auto">
+                  <v-list-item
+                    v-for="(item, index) in filteredAccountMaintainences(
+                      'er',
+                      'ed'
+                    )"
+                    :key="index"
+                  >
+                    <v-list-item-icon
+                      ><v-icon
+                        >mdi-{{
+                          item.type == "register" ? "account" : "key"
+                        }}</v-icon
+                      ></v-list-item-icon
+                    >
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-html="
+                          `${item.firstName} ${item.middleName} ${item.lastName} - ${item.role}`
+                        "
+                      ></v-list-item-title>
+                      <v-list-item-subtitle
+                        v-html="`${item.email} - ${item.mobileNumber}`"
+                      ></v-list-item-subtitle>
+                    </v-list-item-content>
+                    <v-chip
+                      small
+                      :class="
+                        item.status === 'approved'
+                          ? 'success darken-1'
+                          : 'red darken-2 white--text'
+                      "
+                      v-html="
+                        item.status === 'approved' ? 'Approved' : 'Rejected'
+                      "
+                    ></v-chip>
+                  </v-list-item>
+                </v-list> </v-card
+            ></v-col> </v-row
+        ></v-card>
+      </template>
+
       <!-- the notification panel -->
       <div class="text-center">
         <v-menu
@@ -1690,9 +1905,15 @@ import AppNavBar from "@/components/AppNavBar";
 
 export default {
   components: {
-    AppNavBar,
+    AppNavBar
   },
   data: () => ({
+    infoDialog: false,
+    infoDialogOwner: null,
+    infoDialogOwnerName: null,
+    infoDialogOwnerEmail: null,
+    infoDialogOwnerPassword: null,
+    allAccountMaintainences: [],
     showSidebar: true,
     sideMenu: false,
     sheet: false,
@@ -1706,25 +1927,25 @@ export default {
     validVillage: false,
     validSocialWorker: false,
     personalNameRules: [
-      (v) => !!v || "Name is required",
-      (v) =>
+      v => !!v || "Name is required",
+      v =>
         /^[A-z]([A-z/]+) ([A-z/]+) ([A-z/]+)$/gi.test(v) ||
-        "Name must include father and grandfather name",
+        "Name must include father and grandfather name"
     ],
     nameRules: [
-      (v) => !!v || "Name is required",
-      (v) => /^[A-z]([A-z/ ]+)*$/.test(v) || "Name must be valid",
+      v => !!v || "Name is required",
+      v => /^[A-z]([A-z/ ]+)*$/.test(v) || "Name must be valid"
     ],
-    requiredRule: [(v) => !!v || "Item is required"],
+    requiredRule: [v => !!v || "Item is required"],
     emailRules: [
-      (v) => !!v || "Email is required",
-      (v) =>
+      v => !!v || "Email is required",
+      v =>
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-        "Email must be valid",
+        "Email must be valid"
     ],
     phoneNumberRules: [
-      (v) => !!v || "Phone Number is required",
-      (v) => /^09[0-9]{8}$/.test(v) || "Phone Number must be in 0945234576",
+      v => !!v || "Phone Number is required",
+      v => /^09[0-9]{8}$/.test(v) || "Phone Number must be in 0945234576"
     ],
     showCoordinator: false,
     showDonor: false,
@@ -1761,7 +1982,7 @@ export default {
     coordinators: [
       "Adem Mohammed Ali",
       "Frost Abdela Belachew",
-      "Biggy Abel Wendosen",
+      "Biggy Abel Wendosen"
     ],
     socialWorkerFullName: "",
     socialWorkerGender: "",
@@ -1802,14 +2023,14 @@ export default {
       "Region",
       "Gender",
       "Zone",
-      "Peasant Associations",
+      "Peasant Associations"
     ],
     filterValue: [],
     regionTableFilterItems: [
       "Id",
       "Region Name",
       "Number of Zones",
-      "Number of Districts",
+      "Number of Districts"
     ],
     regionTableFilterValue: [],
     zoneTableFilterItems: ["Id", "Zone Name", "Region", "Number of Districts"],
@@ -1821,7 +2042,7 @@ export default {
       "Zone",
       "Number of PAs",
       "Number of Social Workers",
-      "Coordinator",
+      "Coordinator"
     ],
     districtTableFilterValue: [],
     villageTableFilterItems: [
@@ -1831,7 +2052,7 @@ export default {
       "Registred on",
       "Donor",
       "Coordinator",
-      "Number of Orphans",
+      "Number of Orphans"
     ],
     villageTableFilterValue: [],
     // used for filter selection
@@ -1841,88 +2062,88 @@ export default {
       {
         text: "District Name",
         align: "start",
-        value: "districtName",
+        value: "districtName"
       },
       {
         text: "Region",
-        value: "region",
+        value: "region"
       },
       {
         text: "Zone",
-        value: "zone",
+        value: "zone"
       },
       {
         text: "Number of PAs",
-        value: "numberOfPAs",
+        value: "numberOfPAs"
       },
       {
         text: "Number of Social Workers",
-        value: "numberOfSocialWorkers",
+        value: "numberOfSocialWorkers"
       },
       {
         text: "Coordinator",
-        value: "coordinator",
-      },
+        value: "coordinator"
+      }
     ],
     regionHeaders: [
       { text: "Id", value: "id" },
       {
         text: "Region Name",
         align: "start",
-        value: "regionName",
+        value: "regionName"
       },
       {
         text: "Number of Zones",
-        value: "numberOfZones",
+        value: "numberOfZones"
       },
       {
         text: "Number of Districts",
-        value: "numberOfDistricts",
-      },
+        value: "numberOfDistricts"
+      }
     ],
     zoneHeaders: [
       { text: "Id", value: "id" },
       {
         text: "Zone Name",
         align: "Start",
-        value: "zoneName",
+        value: "zoneName"
       },
       {
         text: "Region",
-        value: "region",
+        value: "region"
       },
       {
         text: "Number of Districts",
-        value: "numberOfDistricts",
-      },
+        value: "numberOfDistricts"
+      }
     ],
     villageHeaders: [
       { text: "Id", value: "id" },
       {
         text: "Village Name",
         align: "Start",
-        value: "villageName",
+        value: "villageName"
       },
       {
         text: "District",
-        value: "district",
+        value: "district"
       },
       {
         text: "Registred on",
-        value: "registrationDate",
+        value: "registrationDate"
       },
       {
         text: "Donor",
-        value: "donor",
+        value: "donor"
       },
       {
         text: "Coordinator",
-        value: "coordinator",
+        value: "coordinator"
       },
       {
         text: "Number of Orphans",
-        value: "numberOfOrphans",
-      },
+        value: "numberOfOrphans"
+      }
     ],
     head: {},
     headUser: {
@@ -1930,7 +2151,7 @@ export default {
       middleName: "",
       lastName: "",
       email: "",
-      role: "",
+      role: ""
     },
     // table rows/items
     regionTable: [],
@@ -1943,10 +2164,11 @@ export default {
     activeCoordinatorTree: [],
     coordinatorsTree: [],
     activeSocialWorkerTree: [],
-    socialWorkersTree: [],
+    socialWorkersTree: []
   }),
   created() {
     this.initializeHead();
+    this.initializeAccountMaintainenceLists();
     // table
     // this.initializeDistrictTable();
     // this.initializeRegionTable();
@@ -1973,8 +2195,8 @@ export default {
         {
           id: 1,
           name: "Donors",
-          children: this.donorsTree,
-        },
+          children: this.donorsTree
+        }
       ];
     },
     selectedDonor() {
@@ -1982,15 +2204,15 @@ export default {
 
       const id = this.activeDonorTree[0];
 
-      return this.donorsTree.find((donor) => donor.id === id);
+      return this.donorsTree.find(donor => donor.id === id);
     },
     coordinatorItems() {
       return [
         {
           id: 2,
           name: "Coordinators",
-          children: this.coordinatorsTree,
-        },
+          children: this.coordinatorsTree
+        }
       ];
     },
     selectedCoordinator() {
@@ -1998,15 +2220,15 @@ export default {
 
       const id = this.activeCoordinatorTree[0];
 
-      return this.coordinatorsTree.find((coordinator) => coordinator.id === id);
+      return this.coordinatorsTree.find(coordinator => coordinator.id === id);
     },
     socialWorkerItems() {
       return [
         {
           id: 3,
           name: "SocialWorkers",
-          children: this.socialWorkersTree,
-        },
+          children: this.socialWorkersTree
+        }
       ];
     },
     selectedSocialWorker() {
@@ -2015,7 +2237,7 @@ export default {
       const id = this.activeSocialWorkerTree[0];
 
       return this.socialWorkersTree.find(
-        (socialWorker) => socialWorker.id === id
+        socialWorker => socialWorker.id === id
       );
     },
     calcAge(dateOfBirth) {
@@ -2023,7 +2245,7 @@ export default {
         new Date().getUTCFullYear() -
         new Date(Date.parse(dateOfBirth.toString())).getUTCFullYear()
       );
-    },
+    }
   },
   watch: {
     socialWorkerBirthDateMenu(val) {
@@ -2036,11 +2258,11 @@ export default {
     },
     // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently
     districtRegion(val) {
-      const region = this.regionOptions.filter((region) => region.name === val);
+      const region = this.regionOptions.filter(region => region.name === val);
       const regionId = parseInt(region[0].id);
       console.log("regionId", regionId);
       console.log("zoneOptions", this.zoneOptions);
-      this.zoneOptions = this.zoneOptions.filter((zone) => {
+      this.zoneOptions = this.zoneOptions.filter(zone => {
         if (zone.region !== null) {
           return parseInt(zone.region.id) === regionId;
         }
@@ -2052,7 +2274,7 @@ export default {
 
       if (val !== null) {
         const district = this.districts.filter(
-          (district) => district.name === val
+          district => district.name === val
         );
 
         if (district !== undefined) {
@@ -2064,7 +2286,7 @@ export default {
           }
         }
       }
-    },
+    }
   },
   methods: {
     initializeHead() {
@@ -2084,11 +2306,11 @@ export default {
                   }
                 }`,
           variables: {
-            id: this.$route.params.id,
-          },
+            id: this.$route.params.id
+          }
         })
-        .then((res) => res.data.data.head)
-        .then((head) => {
+        .then(res => res.data.data.head)
+        .then(head => {
           this.head = Object.assign({}, head);
           this.headUser = Object.assign(this.headUser, head.user);
           for (const property in this.headUser) {
@@ -2099,7 +2321,73 @@ export default {
           console.log("head", this.head);
           console.log("headUser", this.headUser);
         })
-        .catch((err) => console.warn(err));
+        .catch(err => console.warn(err));
+    },
+    filteredAccountMaintainences(type, status) {
+      return this.allAccountMaintainences.filter(
+        item => item.type.includes(type) && item.status.includes(status)
+      );
+    },
+    initializeAccountMaintainenceLists() {
+      (async () => {
+        const allAccountMaintainences = await axios.post("/graphql", {
+          query: `
+          query allAccountMaintainences {
+            allAccountMaintainences {
+              id
+              type
+              status
+              role
+              firstName
+              middleName
+              lastName
+              email
+              mobileNumber
+              }
+            }
+          `
+        });
+        this.allAccountMaintainences =
+          allAccountMaintainences.data.data.allAccountMaintainences;
+      })();
+    },
+    approveRequest(item) {
+      (async () => {
+        const queryOptions = {
+          query: `
+            mutation approveRequest($id: ID!) {
+                        updateAccountMaintainence(id: $id status: approved){
+                          id
+                          }
+                        }
+                        `,
+          variables: {
+            id: item.id
+          }
+        };
+        const approveRequestRes = await axios.post("/graphql", queryOptions);
+        console.log(approveRequestRes);
+      })();
+      this.initializeAccountMaintainenceLists();
+    },
+    rejectRequest(item) {
+      (async () => {
+        const queryOptions = {
+          query: `
+            mutation rejectRequest($id: ID!) {
+                        updateAccountMaintainence(id: $id status: rejected){
+                          id
+                          }
+                        }
+                        `,
+          variables: {
+            id: item.id
+          }
+        };
+        const approveRequestRes = await axios.post("/graphql", queryOptions);
+        console.log(approveRequestRes);
+      })();
+      this.initializeAccountMaintainenceLists();
     },
     socialWorkerBirthdateSave(date) {
       // console.log(this.$refs.menu);
@@ -2255,11 +2543,11 @@ export default {
                     middleName
                     lastName
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allCoordinators)
-        .then((res) => this.coordinatorsOptions.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allCoordinators)
+        .then(res => this.coordinatorsOptions.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeRegionSelect() {
       axios
@@ -2269,11 +2557,11 @@ export default {
                     id
                     name
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allRegions)
-        .then((res) => this.regionOptions.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allRegions)
+        .then(res => this.regionOptions.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeZoneSelect() {
       axios
@@ -2286,11 +2574,11 @@ export default {
                         id
                       }
                     }
-                  }`,
+                  }`
         })
-        .then((res) => res.data.data.allZones)
-        .then((res) => this.zoneOptions.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allZones)
+        .then(res => this.zoneOptions.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeDonorSelect() {
       axios
@@ -2301,11 +2589,11 @@ export default {
                     nameInitials
                     companyName
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allDonors)
-        .then((res) => this.donorOptions.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allDonors)
+        .then(res => this.donorOptions.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeDistrictSelect() {
       axios
@@ -2325,11 +2613,11 @@ export default {
                       name
                     }
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allDistricts)
-        .then((res) => this.districts.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allDistricts)
+        .then(res => this.districts.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeVillageSelect() {
       axios
@@ -2339,11 +2627,11 @@ export default {
                     id
                     name
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allVillages)
-        .then((res) => this.villages.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allVillages)
+        .then(res => this.villages.push(...res))
+        .catch(err => console.warn(err));
     },
     // selet text and values
     coordinatorText_Value(item) {
@@ -2385,22 +2673,22 @@ export default {
           variables: {
             role: String(role),
             email: String(email),
-            password: String(pwd),
-          },
+            password: String(pwd)
+          }
         })
         // .then((res) => console.log(res))
-        .then((res) => res.data.data.register.user)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.register.user)
+        .catch(err => console.warn(err));
     },
     async createCoordinator(firstName, middleName, lastName, userId) {
       console.log("firstName", firstName);
-        console.log("middleName", middleName);
-        console.log("lastName", lastName);
-        console.log("userId", userId);
+      console.log("middleName", middleName);
+      console.log("lastName", lastName);
+      console.log("userId", userId);
       //  createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: Int)
       return await axios
         .post("/graphql/", {
-          query: `mutation createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: ID) {
+          query: `mutation createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: ID!) {
                   createCoordinator (
                     firstName: $firstName
                     middleName: $middleName
@@ -2422,12 +2710,12 @@ export default {
             firstName: firstName,
             middleName: middleName,
             lastName: lastName,
-            userId: parseInt(userId),
-          },
+            userId: parseInt(userId)
+          }
         })
-        .then((res) => res.data.data.createCoordinator)
+        .then(res => res.data.data.createCoordinator)
         // .then((res) => console.log(res.data.data.createCoordinator.firstName))
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
     },
     async createDonor(companyName, nameInitials, userId, coordinatorId) {
       return await axios
@@ -2458,11 +2746,11 @@ export default {
             companyName: companyName,
             nameInitials: nameInitials,
             userId: userId,
-            coordinatorId: coordinatorId,
-          },
+            coordinatorId: coordinatorId
+          }
         })
-        .then((res) => res.data.data.createDonor)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createDonor)
+        .catch(err => console.warn(err));
     },
     async createRegion(regionName) {
       return await axios
@@ -2476,11 +2764,11 @@ export default {
                   }
                 }`,
           variables: {
-            regionName: regionName,
-          },
+            regionName: regionName
+          }
         })
-        .then((res) => res.data.data.createRegion)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createRegion)
+        .catch(err => console.warn(err));
     },
     async createZone(zoneName, regionId) {
       return await axios
@@ -2496,11 +2784,11 @@ export default {
                 }`,
           variables: {
             zoneName: zoneName,
-            regionId: regionId,
-          },
+            regionId: regionId
+          }
         })
-        .then((res) => res.data.data.createZone)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createZone)
+        .catch(err => console.warn(err));
     },
     async createDistrict(districtName, coordinatorId, zoneId) {
       return await axios
@@ -2527,11 +2815,11 @@ export default {
           variables: {
             districtName: districtName,
             coordinatorId: coordinatorId,
-            zoneId: zoneId,
-          },
+            zoneId: zoneId
+          }
         })
-        .then((res) => res.data.data.createDistrict)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createDistrict)
+        .catch(err => console.warn(err));
     },
     async createVillage(
       registrationDate,
@@ -2575,11 +2863,11 @@ export default {
             villageName: villageName,
             coordinatorId: coordinatorId,
             districtId: districtId,
-            donorId: donorId,
-          },
+            donorId: donorId
+          }
         })
-        .then((res) => res.data.data.createVillage)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createVillage)
+        .catch(err => console.warn(err));
     },
     async createSocialWorker(
       firstName,
@@ -2649,10 +2937,10 @@ export default {
             userId: userId,
             districts: districtIds,
             villages: villageIds
-          },
+          }
         })
-        .then((res) => res.data.data.createSocialWorker)
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.createSocialWorker)
+        .catch(err => console.warn(err));
     },
 
     async coordinatorSave() {
@@ -2669,18 +2957,13 @@ export default {
           password
         );
         const userId = parseInt(user.id);
-        // console.log("firstName", firstName);
-        // console.log("middleName", middleName);
-        // console.log("lastName", lastName);
-        // console.log("userId", userId);
-        const coordinator = await this.createCoordinator(
-          firstName,
-          middleName,
-          lastName,
-          userId
-        );
+        await this.createCoordinator(firstName, middleName, lastName, userId);
+        this.infoDialogOwner = "Coordinator";
+        this.infoDialogOwnerName = `${firstName} ${middleName} ${lastName}`;
+        this.infoDialogOwnerEmail = this.coordinatorEmail;
+        this.infoDialogOwnerPassword = password;
         this.$refs.coordinatorForm.reset();
-        console.log(`Coordinator ${coordinator.firstName} created!`);
+        this.infoDialog = true;
       }
     },
     coordinatorCancel() {
@@ -2700,7 +2983,7 @@ export default {
             nameInitials += namePart.slice(0, 1).toUpperCase();
           }
         }
-        const coordinator = this.coordinatorsOptions.filter((coordinator) => {
+        const coordinator = this.coordinatorsOptions.filter(coordinator => {
           return (
             coordinator.firstName +
               " " +
@@ -2718,14 +3001,18 @@ export default {
           password
         );
         const userId = parseInt(user.id);
-        const donor = await this.createDonor(
+        await this.createDonor(
           this.donorName,
           nameInitials,
           userId,
           coordinatorId
         );
+        this.infoDialogOwner = "Donor";
+        this.infoDialogOwnerName = this.donorName;
+        this.infoDialogOwnerEmail = this.donorEmail;
+        this.infoDialogOwnerPassword = password;
         this.$refs.donorForm.reset();
-        console.log(`Donor ${donor.nameInitials} created!`);
+        this.infoDialog = true;
       }
     },
     donorCancel() {
@@ -2746,7 +3033,7 @@ export default {
     async zoneSave() {
       if (this.$refs.zoneForm.validate()) {
         const region = this.regionOptions.filter(
-          (region) => region.name === this.zoneRegion
+          region => region.name === this.zoneRegion
         );
         const regionId = region[0].id;
         const zone = await this.createZone(this.zoneName, regionId);
@@ -2760,7 +3047,7 @@ export default {
     },
     async districtSave() {
       if (this.$refs.districtForm.validate()) {
-        const coordinator = this.coordinatorsOptions.filter((coordinator) => {
+        const coordinator = this.coordinatorsOptions.filter(coordinator => {
           return (
             coordinator.firstName +
               " " +
@@ -2773,7 +3060,7 @@ export default {
         const coordinatorId = parseInt(coordinator[0].id);
 
         const zone = this.zoneOptions.filter(
-          (zone) => zone.name === this.districtZone
+          zone => zone.name === this.districtZone
         );
         const zoneId = zone[0].id;
 
@@ -2793,16 +3080,16 @@ export default {
     async villageSave() {
       if (this.$refs.villageForm.validate()) {
         const district = this.districts.filter(
-          (district) => district.name === this.villageDistrict
+          district => district.name === this.villageDistrict
         );
         const districtId = district[0].id;
 
         const donor = this.donorOptions.filter(
-          (donor) => donor.nameInitials === this.villageDonor
+          donor => donor.nameInitials === this.villageDonor
         );
         const donorId = donor[0].id;
 
-        const coordinator = this.coordinatorsOptions.filter((coordinator) => {
+        const coordinator = this.coordinatorsOptions.filter(coordinator => {
           return (
             coordinator.firstName +
               " " +
@@ -2849,7 +3136,7 @@ export default {
         const socialWorkerInitialDate = new Date().toISOString();
 
         const district = this.districts.filter(
-          (district) => district.name === this.socialWorkerDistrict
+          district => district.name === this.socialWorkerDistrict
         );
         const districtIds = district.map(val => parseInt(val.id));
         // const coordinator = this.coordinatorsOptions.filter((coordinator) => {
@@ -2868,12 +3155,12 @@ export default {
           for (const vlg of this.socialWorkerVillages) {
             return vlg === village.name;
           }
-        })
+        });
         const villageIds = villages.map(val => val.id);
         console.log(this.socialWorkerVillages);
-        console.log(villageIds)
+        console.log(villageIds);
 
-        const socialWorker = await this.createSocialWorker(
+        await this.createSocialWorker(
           firstName,
           middleName,
           lastName,
@@ -2885,8 +3172,12 @@ export default {
           districtIds,
           villageIds
         );
+        this.infoDialogOwner = "Social Worker";
+        this.infoDialogOwnerName = `${firstName} ${middleName} ${lastName}`;
+        this.infoDialogOwnerEmail = this.socialWorkerEmail;
+        this.infoDialogOwnerPassword = password;
         this.$refs.socialWorkerForm.reset();
-        console.log(`Social Worker ${socialWorker} created!`);
+        this.infoDialog = true;
       }
     },
     socialWorkerCancel() {
@@ -2921,17 +3212,20 @@ export default {
                         id
                       }
                     }
-                  }`,
+                  }`
         })
-        .then((res) => res.data.data.allDistricts)
-        .then((res) => this.districtTable.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allDistricts)
+        .then(res => this.districtTable.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeRegionTable() {
       if (this.regionTable.length > 0) this.regionTable.length = 0;
-      return axios
-        .post("/graphql/", {
-          query: `query {
+      return (
+        axios
+          .post(
+            "/graphql/",
+            {
+              query: `query {
                   allRegions {
                     id
                     name
@@ -2942,16 +3236,17 @@ export default {
                       }
                     }
                   }
-                }`,
-        },
-          // {
-          //   withCredentials: true,
-          // }
-        )
-        // .then((res) => console.log(res))
-        .then((res) => res.data.data.allRegions)
-        .then((res) => this.regionTable.push(...res))
-        .catch((err) => console.warn(err));
+                }`
+            }
+            // {
+            //   withCredentials: true,
+            // }
+          )
+          // .then((res) => console.log(res))
+          .then(res => res.data.data.allRegions)
+          .then(res => this.regionTable.push(...res))
+          .catch(err => console.warn(err))
+      );
     },
     initializeZoneTable() {
       if (this.zoneTable.length > 0) this.zoneTable.length = 0;
@@ -2968,11 +3263,11 @@ export default {
                       name
                     }
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allZones)
-        .then((res) => this.zoneTable.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allZones)
+        .then(res => this.zoneTable.push(...res))
+        .catch(err => console.warn(err));
     },
     initializeVillageTable() {
       if (this.villageTable.length > 0) this.villageTable.length = 0;
@@ -2998,11 +3293,11 @@ export default {
                       id
                     }
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allVillages)
-        .then((res) => this.villageTable.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allVillages)
+        .then(res => this.villageTable.push(...res))
+        .catch(err => console.warn(err));
     },
 
     // district table
@@ -3122,8 +3417,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
-              -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search.toLowerCase()) !== -1
           );
         }
       }
@@ -3153,7 +3450,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search) !== -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search) !== -1
           );
         }
       }
@@ -3196,8 +3496,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search.toLowerCase()) !==
-              -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search.toLowerCase()) !== -1
           );
         }
       }
@@ -3212,24 +3514,33 @@ export default {
               return item.id.indexOf(search) !== -1;
             } else if (filterVal === this.villageHeaders[1].text) {
               return (
-                item.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
+                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[2].text) {
               return (
-                item.district.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.district.name
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
             } else if (filterVal === this.villageHeaders[3].text) {
               return (
-                item.registrationDate.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                item.registrationDate
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
               );
               // TODO # fix it to be visible as stacked avatars
             } else if (filterVal === this.villageHeaders[4].text) {
-              return item.donor.nameInitials.toLowerCase().indexOf(search.toLowerCase()) !== -1
+              return (
+                item.donor.nameInitials
+                  .toLowerCase()
+                  .indexOf(search.toLowerCase()) !== -1
+              );
             } else if (filterVal === this.villageHeaders[5].text) {
               let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
-              return coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+              return (
+                coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
+                -1
+              );
             } else if (filterVal === this.villageHeaders[6].text) {
               return parseInt(item.orphans.length) === parseInt(search);
             }
@@ -3238,7 +3549,10 @@ export default {
           return (
             item.name != null &&
             typeof item.name === "string" &&
-            item.name.toString().toLowerCase().indexOf(search) !== -1
+            item.name
+              .toString()
+              .toLowerCase()
+              .indexOf(search) !== -1
           );
         }
       }
@@ -3369,11 +3683,11 @@ export default {
                     initDate
                   }
                 }
-              }`,
+              }`
         })
-        .then((res) => res.data.data.allDonors)
-        .then((res) => item.children.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allDonors)
+        .then(res => item.children.push(...res))
+        .catch(err => console.warn(err));
     },
     async fetchCoordinators(item) {
       return axios
@@ -3400,11 +3714,11 @@ export default {
                       nameInitials
                     }
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allCoordinators)
-        .then((res) => item.children.push(...res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allCoordinators)
+        .then(res => item.children.push(...res))
+        .catch(err => console.warn(err));
     },
     async fetchSocialWorkers(item) {
       return axios
@@ -3430,12 +3744,12 @@ export default {
                       id
                     }
                   }
-                }`,
+                }`
         })
-        .then((res) => res.data.data.allSocialWorkers)
-        .then((res) => item.children.push(...res))
-        .then((res) => console.log(res))
-        .catch((err) => console.warn(err));
+        .then(res => res.data.data.allSocialWorkers)
+        .then(res => item.children.push(...res))
+        .then(res => console.log(res))
+        .catch(err => console.warn(err));
     },
     removeSelectedRegion(item) {
       this.regionTableFilterValue.splice(
@@ -3465,7 +3779,7 @@ export default {
       );
       this.villageTableFilterValue = [...this.villageTableFilterValue];
     },
-    test() {},
-  },
+    test() {}
+  }
 };
 </script>

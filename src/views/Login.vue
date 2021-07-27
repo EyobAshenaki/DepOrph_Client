@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh; padding-top: 200px;">
-    <v-card dark class="mx-auto" max-width="400" color="rgba(25,32,72,1)">
+    <v-card class="mx-auto" max-width="450">
       <v-card-text class="px-6">
         <!-- <h2 class="text-h3 text-center pt-3">Welcome</h2>
       <h3 class="text-center">To Your Account</h3>
@@ -11,7 +11,8 @@
         </v-avatar>
       </v-row> -->
 
-        <h2 class="text-h3 text-center pt-3" style="color: #ff9983">Login</h2>
+
+        <h2 class="text-h3 text-center pt-3">Login</h2>
         <v-form>
         <v-text-field
           v-model="loginEmail"
@@ -23,7 +24,7 @@
           color="#FF9983"
         ></v-text-field>
         <v-text-field
-        v-model="loginPassword"
+          v-model="loginPassword"
           label="Password"
           dense
           type="password"
@@ -31,15 +32,22 @@
           color="#FF9983"
         ></v-text-field>
         </v-form>
-        <v-row justify="space-between">
-          <v-checkbox
+        <v-row justify="space-between" class="mb-1">
+          <!-- <v-checkbox
+        
             class="mt-0 ml-3"
             v-model="selected"
             label="Remember me"
             value="rememberMeTruthValue"
             color="#ff9983"
-          ></v-checkbox>
-          <a class="mt-1 mr-3" style="color: #ff9983;" href="http://"
+          ></v-checkbox> -->
+          <v-spacer></v-spacer>
+          <a
+            class="mt-1 mr-3"
+            @click="
+              reveal = true;
+              createAccount = false;
+            "
             >Forgot your password?</a
           >
         </v-row>
@@ -59,14 +67,17 @@
           </v-col>
           <v-col cols="12" class="text-center py-0">
             <p>
-              don't have an account?
+              Don't have an account?
               <v-btn
                 class="px-0"
                 text
                 plain
-                color="#FF9983"
-                @click="reveal = true"
-                >create account</v-btn
+                color="primary"
+                @click="
+                  reveal = true;
+                  createAccount = true;
+                "
+                >request for an account</v-btn
               >
             </p>
           </v-col>
@@ -77,40 +88,79 @@
         <v-card
           v-if="reveal"
           class="transition-fast-in-fast-out v-card--reveal"
-          style="height: 100%; width: 100%"
-          color="rgba(25,32,72, 1)"
         >
           <v-card-text class="pb-0">
-            <h2 class="text-h3 text-center pt-3 mb-7" style="color: #ff9983">
-              Signup
+            <h2 class="text-h3 text-center pt-3 mb-7">
+              {{ createAccount ? "Signup Request" : "Reset Password" }}
             </h2>
             <p class="text-center mb-0">
               Please provide an email, we can contact you with
             </p>
             <p class="text-center mb-0">
-              and you can contact us at <a style="color: #ff9983" href="">CDN@gmail.com</a>
+              and you can contact us at
+              <a href="">info@cda-charity.org</a>
             </p>
 
-            <v-text-field
-              class="mt-15"
-              label="Email"
-              dense
-              type="email"
-              outlined
-              color="#FF9983"
-            ></v-text-field>
+            <v-form ref="accountForm" v-model="validAccount" lazy-validation>
+              <v-row>
+                <!-- New Account Full Name -->
+                <v-col cols="12">
+                  <v-responsive max-width="" class="mx-10 mb-n7 mt-5">
+                    <v-text-field
+                      v-model="accountFullName"
+                      :rules="[...rules.personalName]"
+                      label="Full Name"
+                    >
+                    </v-text-field>
+                  </v-responsive>
+                </v-col>
+                <!-- New Account Role -->
+                <v-col cols="12">
+                  <v-responsive max-width="" class="mx-10 mb-n7 mt-5">
+                    <v-select
+                      v-model="accountRole"
+                      :items="accountRoles"
+                      :rules="[...rules.role]"
+                      label="Role"
+                    >
+                    </v-select>
+                  </v-responsive>
+                </v-col>
+                <!-- New Account Email -->
+                <v-col cols="12">
+                  <v-responsive max-width="" class="mx-10 mb-n7">
+                    <v-text-field
+                      v-model="accountEmail"
+                      :rules="[...rules.email]"
+                      label="Email"
+                      type="email"
+                    >
+                    </v-text-field>
+                  </v-responsive>
+                </v-col>
+                <!-- New Account Phone Number -->
+                <v-col cols="12">
+                  <v-responsive max-width="" class="mx-10 mb-n7">
+                    <v-text-field
+                      v-model="accountMobileNumber"
+                      :rules="[...rules.mobileNumber]"
+                      label="Phone Number"
+                    >
+                    </v-text-field>
+                  </v-responsive>
+                </v-col>
+                <v-col align="right" class="mb-5">
+                  <v-btn class="mr-5" @click="reveal = false">Cancel</v-btn>
+                  <v-btn
+                    class="mr-10 primary"
+                    @click="sendRequest"
+                    :disabled="!validAccount"
+                    >Send</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-form>
           </v-card-text>
-          <v-card-actions class="pt-0 mx-2">
-            <v-btn
-              dark
-              block
-              color="rgba(25,32,72, 0.5)"
-              class="mt-9"
-              @click="reveal = false"
-            >
-              Confirm
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-expand-transition>
     </v-card>
@@ -130,67 +180,159 @@
 import axios from "axios";
 
 export default {
-
   data() {
     return {
       reveal: false,
+      createAccount: false,
       selected: false,
       loginEmail: "",
       loginPassword: "",
       role: "",
+      accountFullName: null,
+      accountRole: null,
+      accountRoles: [
+        {
+          text: "Social Worker",
+          value: "SocialWorker"
+        },
+        "Coordinator",
+        "Donor"
+      ],
+      accountEmail: null,
+      accountMobileNumber: null,
+      validAccount: false,
+      rules: {
+        role: [v => !!v || "Role is required"],
+        personalName: [
+          v => !!v || "Name is required",
+          v =>
+            /^[A-z]([A-z/]+) ([A-z/]+) ([A-z/]+)$/gi.test(v.trim()) ||
+            "Name must include father and grandfather name"
+        ],
+        email: [
+          v => !!v || "Email is required",
+          v =>
+            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
+            "Email must be valid"
+        ],
+        mobileNumber: [
+          v => !!v || "Phone Number is required",
+          v => /^09[0-9]{8}$/.test(v.trim()) || "Phone Number must be in 0-9"
+        ]
+      }
     };
   },
   methods: {
     login() {
       axios
-        .post(
-          "/graphql",
-          {
-            query: `mutation login($email: String!, $password: String!) {
+        .post("/graphql", {
+          query: `mutation login($email: String!, $password: String!) {
                       login(email: $email, password: $password) {
                         user {
                           id
                           email
                           role
-                          coordinators {
+                          coordinator {
                             id
                           }
-                          heads {
+                          head {
                             id
                           }
-                          donors {
+                          donor {
                             id
                           }
-                          socialWorkers {
+                          socialWorker {
                             id
                           }
                         }
                       }
                     }`,
-            variables: {
-              email: this.loginEmail,
-              password: this.loginPassword
-            }
-          },
-          // {
-          //   withCredentials: true,
-          // }
-        )
-        // .then((res) => console.log(res))
-        .then((res) => res.data.data.login.user)
-        .then(user => {
-          if (user.role === "Head") {
-            this.$router.push({name: "Head_v2", params: { id: user.heads[0].id}})
-          } else if (user.role === "Donor") {
-            this.$router.push({name: "Donor", params: { id: user.donors[0].id}})
-          } else if (user.role === "Coordinator") {
-            this.$router.push({name: "Coordinator", params: { id: user.coordinators[0].id}})
-          } else if (user.role === "SocialWorker") {
-            this.$router.push({name: "SocialWorker", params: { id: user.socialWorkers[0].id}})
+          variables: {
+            email: this.loginEmail,
+            password: this.loginPassword
           }
-        }) 
-        .catch((err) => console.warn(err));
+        })
+        .then(res => res.data.data.login.user)
+        
+        .then(user => {
+          sessionStorage.setItem("loggedIn", true);
+          sessionStorage.setItem("loggedInAs", user.role);
+          if (user.role === "Head") {
+            this.$router.push({
+              name: "Head_v2",
+              params: { id: user.head.id }
+            });
+          } else if (user.role === "Donor") {
+            this.$router.push({ name: "Donor", params: { id: user.donor.id } });
+          } else if (user.role === "Coordinator") {
+            this.$router.push({
+              name: "Coordinator",
+              params: { id: user.coordinator.id }
+            });
+          } else if (user.role === "SocialWorker") {
+            this.$router.push({
+              name: "SocialWorker",
+              params: { id: user.socialWorker.id }
+            });
+          }
+        })
+        .catch(err => console.warn(err));
     },
-  },
+    sendRequest() {
+      if (this.$refs.accountForm.validate()) {
+        console.log(
+          this.accountFullName.trim(),
+          this.accountRole,
+          this.accountEmail.trim(),
+          this.accountMobileNumber.trim(),
+          this.createAccount
+        );
+        (async () => {
+          const query = `
+                mutation (
+                  $type: accountMaintainenceType!, 
+                  $role: userRoles!
+                  $firstName: String!
+                  $middleName: String!
+                  $lastName: String!
+                  $email: String!
+                  $mobileNumber: String!
+                ) {
+                  createAccountMaintainence(
+                    type: $type
+                    status: pending
+                    role: $role
+                    firstName: $firstName
+                    middleName: $middleName
+                    lastName: $lastName
+                    email: $email
+                    mobileNumber: $mobileNumber
+                  ) {
+                    id
+                  }
+                }
+          `;
+          const queryOptions = {
+            query,
+            variables: {
+              type: this.createAccount ? "register" : "passwordRecovery",
+              role: this.accountRole,
+              firstName: this.accountFullName.split(" ")[0],
+              middleName: this.accountFullName.split(" ")[1],
+              lastName: this.accountFullName.split(" ")[2],
+              email: this.accountEmail,
+              mobileNumber: this.accountMobileNumber
+            }
+          };
+
+          const accountRes = await axios.post("/graphql", queryOptions);
+
+          console.log(accountRes);
+        })();
+        this.reveal = false;
+        this.$refs.accountForm.reset();
+      }
+    }
+  }
 };
 </script>

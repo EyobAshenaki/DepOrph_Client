@@ -17,13 +17,28 @@
 
       <!-- Coordinator part -->
       <template v-if="user.role === 'Coordinator'">
-        <v-btn text class="mr-0 py-8" :class="{active: isNewOrphan}" @click.stop="toggleNewOrphanDialog">
+        <v-btn
+          text
+          class="mr-0 py-8"
+          :class="{ active: isNewOrphan }"
+          @click.stop="toggleNewOrphanDialog"
+        >
           New Orphan
         </v-btn>
-        <v-btn text class="py-8" :class="{active: isSupportPlan}" @click.stop="toggleSupportPlanComponent">
+        <v-btn
+          text
+          class="py-8"
+          :class="{ active: isSupportPlan }"
+          @click.stop="toggleSupportPlanComponent"
+        >
           Support Plans
         </v-btn>
-        <v-btn text class="mr-0 py-8" :class="{active: isChangeStatus}" @click.stop="toggleChangeStatusDialog">
+        <v-btn
+          text
+          class="mr-0 py-8"
+          :class="{ active: isChangeStatus }"
+          @click.stop="toggleChangeStatusDialog"
+        >
           Change Status
         </v-btn>
       </template>
@@ -32,7 +47,13 @@
       <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" :class="{active: isProcessing}" v-bind="attrs" v-on="on" @click.stop="processingActive"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isProcessing }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="processingActive"
               >Processing</v-btn
             >
           </template>
@@ -41,7 +62,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" :class="{active: isPending}" v-bind="attrs" v-on="on" @click.stop="pendingActive"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isPending }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="pendingActive"
               >Pending</v-btn
             >
           </template>
@@ -50,7 +77,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" :class="{active: isSponsored}" v-bind="attrs" v-on="on" @click.stop="sponsoredActive"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isSponsored }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="sponsoredActive"
               >Sponsored</v-btn
             >
           </template>
@@ -59,7 +92,13 @@
 
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text class="mr-0 py-8" :class="{active: isGraduated}" v-bind="attrs" v-on="on" @click.stop="graduatedActive"
+            <v-btn
+              text
+              class="mr-0 py-8"
+              :class="{ active: isGraduated }"
+              v-bind="attrs"
+              v-on="on"
+              @click.stop="graduatedActive"
               >Graduated</v-btn
             >
           </template>
@@ -174,11 +213,12 @@
 
 <style scoped>
 .active {
-  background-color:rgba(100,115,201, 0.5);
+  background-color: rgba(100, 115, 201, 0.5);
 }
 </style>
 
 <script>
+import axios from "axios";
 export default {
   props: {
     user: {
@@ -210,32 +250,32 @@ export default {
       isProcessing: false,
       isPending: false,
       isSponsored: false,
-      isGraduated: false,
+      isGraduated: false
     };
   },
   watch: {
     dialog(val) {
       this.isNewOrphan = val;
     },
-    newOrphanView (val) {
+    newOrphanView(val) {
       this.isNewOrphan = val;
     },
     changeStatusDialogValue(val) {
-      this.isChangeStatus = val
-    },
+      this.isChangeStatus = val;
+    }
   },
   methods: {
     toggleNewOrphanDialog() {
       // because when the dialog closes this function don't get the memo so do it manually like a noob same goes for toggleChangeStatusDialog
-      if(this.newOrphanDialog === false) this.newOrphanDialog = !this.dialog;
+      if (this.newOrphanDialog === false) this.newOrphanDialog = !this.dialog;
       this.$emit("toggleNewOrphanDialog", this.newOrphanDialog);
       this.newOrphanDialog = !this.newOrphanDialog;
-      
+
       this.isSupportPlan = false;
       this.isChangeStatus = false;
     },
     toggleSupportPlanComponent() {
-      console.log(this.supportPlanTable)
+      console.log(this.supportPlanTable);
       // if(this.supportPlanTable === false) this.supportPlanTable = true;
       this.$emit("toggleSupportPlanComponent", this.supportPlanTable);
       this.supportPlanTable = !this.supportPlanTable;
@@ -245,7 +285,8 @@ export default {
       this.isChangeStatus = false;
     },
     toggleChangeStatusDialog() {
-      if(this.changeStatusDialog === false) this.changeStatusDialog = !this.changeStatusDialogValue;
+      if (this.changeStatusDialog === false)
+        this.changeStatusDialog = !this.changeStatusDialogValue;
       this.$emit("toggleChangeStatusDialog", this.changeStatusDialog);
       this.changeStatusDialog = !this.changeStatusDialog;
 
@@ -270,7 +311,15 @@ export default {
       this.accountMenu = false;
     },
     logOut() {
-      console.log("Logging out...");
+      (async () => {
+        const query = `mutation{logout}`;
+        const loggedOut = await axios.post("/graphql", { query });
+        console.log();
+        if (loggedOut.data.data.logout) {
+          sessionStorage.clear();
+          this.$router.push("/");
+        }
+      })();
     },
     // -------------Donor----------------
     processingActive() {
@@ -304,7 +353,7 @@ export default {
       this.isPending = false;
       this.isSponsored = false;
       this.isGraduated = true;
-    },
-  },
+    }
+  }
 };
 </script>
