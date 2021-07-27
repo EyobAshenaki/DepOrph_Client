@@ -243,6 +243,7 @@ export default {
                           }
                           socialWorker {
                             id
+                            firstName
                           }
                         }
                       }
@@ -272,7 +273,7 @@ export default {
           } else if (user.role === "SocialWorker") {
             this.$router.push({
               name: "SocialWorker",
-              params: { id: user.socialWorker.id }
+              params: { id: user.socialWorker.id, firstName: user.socialWorker.firstName }
             });
           }
         })
