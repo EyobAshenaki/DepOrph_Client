@@ -1333,6 +1333,8 @@ export default {
                           placeOfBirth
                           religion
                           spokenLanguages
+                          accountNumber
+                          gradeAgeMismatchReason
                           psychologicalStatus
                           healthDescription
                           education {
@@ -1405,6 +1407,15 @@ export default {
                           village {
                             id
                             name
+                          }
+                          socialWorker {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                            gender
+                            dateOfBirth
+                            mobileNumber
                           }
                         }
                       }`,

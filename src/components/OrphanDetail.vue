@@ -267,7 +267,9 @@
                             >
                               <template v-slot:activator="{ on, attrs }">
                                 <v-text-field
-                                  v-model="orphanSelectedDates.orphanDateOfBirth"
+                                  v-model="
+                                    orphanSelectedDates.orphanDateOfBirth
+                                  "
                                   prepend-icon="mdi-calendar"
                                   solo
                                   readonly
@@ -284,7 +286,8 @@
                                 :min="
                                   new Date(
                                     new Date().setFullYear(
-                                      new Date().getFullYear() - ORPHAN_AGE_LIMIT
+                                      new Date().getFullYear() -
+                                        ORPHAN_AGE_LIMIT
                                     )
                                   )
                                     .toISOString()
@@ -320,7 +323,7 @@
                           <v-col
                             cols="12"
                             sm="6"
-                            lg="4"
+                            lg="3"
                             order-lg=""
                             class="pb-0 pt-0"
                           >
@@ -330,7 +333,7 @@
                           <v-col
                             cols="12"
                             sm="6"
-                            lg="5"
+                            lg="3"
                             order-lg=""
                             class="pb-0 pt-0"
                           >
@@ -346,11 +349,21 @@
                           >
                             Psycological Status
                           </v-col>
+                          <!-- account number label -->
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            lg="3"
+                            order-lg=""
+                            class="pb-0 pt-0"
+                          >
+                            Account Number
+                          </v-col>
                           <!-- religion textfield -->
                           <v-col
                             cols="12"
                             sm="6"
-                            lg="4"
+                            lg="3"
                             order-lg=""
                             class="pt-2 pb-0"
                           >
@@ -371,7 +384,7 @@
                           <v-col
                             cols="12"
                             sm="6"
-                            lg="5"
+                            lg="3"
                             order-lg=""
                             class="pt-2 pb-0"
                           >
@@ -412,6 +425,23 @@
                               :readonly="notEditable"
                             ></v-text-field>
                           </v-col>
+                          <!-- account number textfield -->
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            lg="3"
+                            order-lg=""
+                            class="pt-2 pb-0"
+                          >
+                            <v-text-field
+                              v-model="
+                                orphanEditableFields.orphanAccountNumber
+                              "
+                              solo
+                              
+                              :readonly="notEditable"
+                            ></v-text-field>
+                          </v-col>
                           <!-- health Description label -->
                           <v-col
                             cols="12"
@@ -431,7 +461,9 @@
                             class="pt-2 pb-0"
                           >
                             <v-textarea
-                              v-model="orphanEditableFields.orphanHealthDescription"
+                              v-model="
+                                orphanEditableFields.orphanHealthDescription
+                              "
                               :value="
                                 orphanEditableFields.orphanHealthDescription
                               "
@@ -494,7 +526,8 @@
                           <!-- if enrolled only label-->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'enrolled'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'enrolled'
                             "
                           >
                             <!-- school Type label -->
@@ -521,7 +554,8 @@
                           <!-- if dropout only label-->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'droppedout'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'droppedout'
                             "
                           >
                             <!-- reason for dropout label -->
@@ -538,7 +572,8 @@
                           <!-- if unenrollment only label-->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'unenrolled'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'unenrolled'
                             "
                           >
                             <!-- reason for unenrollment label -->
@@ -564,7 +599,8 @@
                           </v-col>
                           <v-col
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'unenrolled'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'unenrolled'
                             "
                             lg="7"
                             order-lg="9"
@@ -625,7 +661,9 @@
                                 v-model="
                                   orphanSelectedOption.orphanEducationLevel
                                 "
-                                :value="orphanSelectedOption.orphanEducationLevel"
+                                :value="
+                                  orphanSelectedOption.orphanEducationLevel
+                                "
                               ></v-select>
                               <v-text-field
                                 v-else
@@ -658,7 +696,8 @@
                           <!-- if enrolled only textfield-->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'enrolled'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'enrolled'
                             "
                           >
                             <!-- school Type textfield -->
@@ -672,7 +711,7 @@
                               <v-select
                                 v-if="!notEditable"
                                 :items="
-                                  orphanSelectOptions.        orphanEducationTypeOfSchoolOptions
+                                  orphanSelectOptions.orphanEducationTypeOfSchoolOptions
                                 "
                                 solo
                                 v-model="
@@ -709,7 +748,8 @@
                           <!-- if dropout only textfield-->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'droppedout'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'droppedout'
                             "
                           >
                             <!-- reason for dropout textfield -->
@@ -733,7 +773,8 @@
                           <!-- if unenrolled only textfield -->
                           <template
                             v-if="
-                              orphanSelectedOption.orphanEducationEnrollmentStatus === 'unenrolled'
+                              orphanSelectedOption.orphanEducationEnrollmentStatus ===
+                                'unenrolled'
                             "
                           >
                             <!-- reason for unenrollment textfield -->
@@ -851,7 +892,9 @@
                               >
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-text-field
-                                    v-model="orphanSelectedDates.orphanFatherDateOfBirth"
+                                    v-model="
+                                      orphanSelectedDates.orphanFatherDateOfBirth
+                                    "
                                     prepend-icon="mdi-calendar"
                                     solo
                                     readonly
@@ -861,13 +904,16 @@
                                 </template>
                                 <v-date-picker
                                   ref="fatherDateOfBirthPicker"
-                                  v-model="orphanSelectedDates.orphanFatherDateOfBirth"
+                                  v-model="
+                                    orphanSelectedDates.orphanFatherDateOfBirth
+                                  "
                                   no-title
                                   scrollable
                                   :max="
                                     new Date(
                                       new Date().setFullYear(
-                                        new Date().getFullYear() - FATHER_AGE_LIMIT
+                                        new Date().getFullYear() -
+                                          FATHER_AGE_LIMIT
                                       )
                                     )
                                       .toISOString()
@@ -907,7 +953,9 @@
                               >
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-text-field
-                                    v-model="orphanSelectedDates.orphanFatherDateOfDeath"
+                                    v-model="
+                                      orphanSelectedDates.orphanFatherDateOfDeath
+                                    "
                                     prepend-icon="mdi-calendar"
                                     solo
                                     readonly
@@ -917,14 +965,17 @@
                                 </template>
                                 <v-date-picker
                                   ref="fatherDateOfDeathPicker"
-                                  v-model="orphanSelectedDates.orphanFatherDateOfDeath"
+                                  v-model="
+                                    orphanSelectedDates.orphanFatherDateOfDeath
+                                  "
                                   no-title
                                   scrollable
                                   :max="new Date().toISOString().substr(0, 10)"
                                   :min="
                                     new Date(
                                       new Date().setFullYear(
-                                        new Date().getFullYear() - FATHER_AGE_LIMIT
+                                        new Date().getFullYear() -
+                                          FATHER_AGE_LIMIT
                                       )
                                     )
                                       .toISOString()
@@ -1028,7 +1079,10 @@
                             </v-col>
                             <!-- if mother still alive -->
                             <template
-                              v-if="orphanSelectedOption.orphanMotherVitalStatus === 'alive'"
+                              v-if="
+                                orphanSelectedOption.orphanMotherVitalStatus ===
+                                  'alive'
+                              "
                             >
                               <!-- mother marital Status label -->
                               <v-col
@@ -1053,7 +1107,10 @@
                             </template>
                             <!-- if mother passed away -->
                             <template
-                              v-if="orphanSelectedOption.orphanMotherVitalStatus === 'passed'"
+                              v-if="
+                                orphanSelectedOption.orphanMotherVitalStatus ===
+                                  'passed'
+                              "
                             >
                               <!-- mother death date label -->
                               <v-col
@@ -1147,7 +1204,9 @@
                               >
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-text-field
-                                    v-model="orphanSelectedDates.orphanMotherDateOfBirth"
+                                    v-model="
+                                      orphanSelectedDates.orphanMotherDateOfBirth
+                                    "
                                     prepend-icon="mdi-calendar"
                                     solo
                                     readonly
@@ -1157,13 +1216,16 @@
                                 </template>
                                 <v-date-picker
                                   ref="motherDateOfBirthPicker"
-                                  v-model="orphanSelectedDates.orphanMotherDateOfBirth"
+                                  v-model="
+                                    orphanSelectedDates.orphanMotherDateOfBirth
+                                  "
                                   no-title
                                   scrollable
                                   :max="
                                     new Date(
                                       new Date().setFullYear(
-                                        new Date().getFullYear() - MOTHER_AGE_LIMIT
+                                        new Date().getFullYear() -
+                                          MOTHER_AGE_LIMIT
                                       )
                                     )
                                       .toISOString()
@@ -1213,7 +1275,10 @@
                             </v-col>
                             <!-- if mother still alive -->
                             <template
-                              v-if="orphanSelectedOption.orphanMotherVitalStatus === 'alive'"
+                              v-if="
+                                orphanSelectedOption.orphanMotherVitalStatus ===
+                                  'alive'
+                              "
                             >
                               <!-- mother marital status textfield -->
                               <v-col
@@ -1262,7 +1327,10 @@
                             </template>
                             <!-- if mother passed away -->
                             <template
-                              v-if="orphanSelectedOption.orphanMotherVitalStatus === 'passed'"
+                              v-if="
+                                orphanSelectedOption.orphanMotherVitalStatus ===
+                                  'passed'
+                              "
                             >
                               <!-- mother death date textfield -->
                               <v-col
@@ -1283,7 +1351,9 @@
                                 >
                                   <template v-slot:activator="{ on, attrs }">
                                     <v-text-field
-                                      v-model="orphanSelectedDates.orphanMotherDateOfDeath"
+                                      v-model="
+                                        orphanSelectedDates.orphanMotherDateOfDeath
+                                      "
                                       prepend-icon="mdi-calendar"
                                       solo
                                       readonly
@@ -1293,14 +1363,19 @@
                                   </template>
                                   <v-date-picker
                                     ref="motherDateOfDeathPicker"
-                                    v-model="orphanSelectedDates.orphanMotherDateOfDeath"
+                                    v-model="
+                                      orphanSelectedDates.orphanMotherDateOfDeath
+                                    "
                                     no-title
                                     scrollable
-                                    :max="new Date().toISOString().substr(0, 10)"
+                                    :max="
+                                      new Date().toISOString().substr(0, 10)
+                                    "
                                     :min="
                                       new Date(
                                         new Date().setFullYear(
-                                          new Date().getFullYear() - MOTHER_AGE_LIMIT
+                                          new Date().getFullYear() -
+                                            MOTHER_AGE_LIMIT
                                         )
                                       )
                                         .toISOString()
@@ -1652,7 +1727,9 @@
                             >
                               <template v-slot:activator="{ on, attrs }">
                                 <v-text-field
-                                  v-model="orphanSelectedDates.orphanGuardianDateOfBirth"
+                                  v-model="
+                                    orphanSelectedDates.orphanGuardianDateOfBirth
+                                  "
                                   prepend-icon="mdi-calendar"
                                   solo
                                   readonly
@@ -1662,13 +1739,16 @@
                               </template>
                               <v-date-picker
                                 ref="guardianDateOfBirthPicker"
-                                v-model="orphanSelectedDates.orphanGuardianDateOfBirth"
+                                v-model="
+                                  orphanSelectedDates.orphanGuardianDateOfBirth
+                                "
                                 no-title
                                 scrollable
                                 :max="
                                   new Date(
                                     new Date().setFullYear(
-                                      new Date().getFullYear() - GUARDIAN_AGE_LIMIT
+                                      new Date().getFullYear() -
+                                        GUARDIAN_AGE_LIMIT
                                     )
                                   )
                                     .toISOString()
@@ -1699,9 +1779,7 @@
                           >
                             <v-select
                               v-if="!notEditable"
-                              :items="
-                                guardianRelationToOrphan
-                              "
+                              :items="guardianRelationToOrphan"
                               solo
                               v-model="
                                 orphanSelectedOption.orphanGuardianRelationToOrphan
@@ -1731,7 +1809,7 @@
                               "
                               solo
                               v-model="
-                                orphanSelectedOption.orphanGuardianNationality
+                                orphanSelectEditableFields.orphanGuardianNationality
                               "
                             ></v-select>
                             <v-text-field
@@ -2539,6 +2617,466 @@
                       </v-card-text>
                     </v-card>
                   </v-tab-item>
+                  <v-tab> Other </v-tab>
+                  <v-tab-item>
+                    <v-card flat>
+                      <v-card-text>
+                        <v-row>
+                          <v-col cols="12" order-lg="first" class="pt-0">
+                            <v-card-subtitle class="pb-2 pt-1">
+                              SOCIAL WORKER INFORMATION
+                            </v-card-subtitle>
+                          </v-col>
+                          <template cols="12">
+                            <!-- socialWorker fullName label -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="5"
+                              order-lg=""
+                              class="pb-0 pt-0 pl-12"
+                            >
+                              Full Name
+                            </v-col>
+                            <!-- socialWorker gender label -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="2"
+                              order-lg=""
+                              class="pb-0 pt-0"
+                            >
+                              Gender
+                            </v-col>
+                            <!-- socialWorker age label -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="2"
+                              order-lg=""
+                              class="pb-0 pt-0"
+                            >
+                              Age
+                            </v-col>
+                            <!-- socialWorker mobile number label -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="3"
+                              order-lg=""
+                              class="pb-0 pt-0"
+                            >
+                              Mobile Number
+                            </v-col>
+                            <!-- socialWorker fullName textfield -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="5"
+                              order-lg=""
+                              class="pt-2 pb-0 pl-12"
+                            >
+                              <v-select
+                                v-if="!notEditable"
+                                :items="
+                                  orphanSelectOptions.orphanSocialWorkerOptions
+                                "
+                                solo
+                                no-data-text="Select Status"
+                                v-model="
+                                  orphanSelectedSocialWorker
+                                "
+                              ></v-select>
+                              <v-text-field
+                                v-else
+                                :value="
+                                  orphanSelectEditableFields.orphanSocialWorker
+                                "
+                                solo
+                                :readonly="notEditable"
+                              ></v-text-field>
+                            </v-col>
+                            <!-- socialWorker gender textfield -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="2"
+                              order-lg=""
+                              class="pt-2 pb-0"
+                            >
+                            <v-responsive>
+                              <v-text-field
+                                :value="
+                                  genderGenerator(orphanSocialWorkerGender)
+                                "
+                                solo
+                                :readonly="notEditable"
+                              ></v-text-field>
+                            </v-responsive>
+                            </v-col>
+                            <!-- socialWorker age textfield -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="2"
+                              order-lg=""
+                              class="pt-2 pb-0"
+                            >
+                            <v-responsive>
+                              <v-text-field
+                                :value="
+                                  ageGenerator(orphanSocialWorkerDateOfBirth)
+                                "
+                                solo
+                                :readonly="notEditable"
+                              ></v-text-field>
+                            </v-responsive>
+                            </v-col>
+                             <!-- socialWorker mobile number textfield -->
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              lg="3"
+                              order-lg=""
+                              class="pt-2 pb-0"
+                            >
+                            <v-responsive>
+                              <v-text-field
+                                :value="
+                                  orphanSocialWorkerMobileNumber
+                                "
+                                solo
+                                :readonly="notEditable"
+                              ></v-text-field>
+                            </v-responsive>
+                            </v-col>
+                          </template>
+                          <v-col cols="12" class="pt-0">
+                            <v-card-subtitle class="pb-2 pt-1">
+                              PHOTO HISTORY
+                            </v-card-subtitle>
+                          </v-col>
+                          <template cols="12">
+                            <!-- Orphan Photos -->
+                            <!-- TODO: # make the code below show all photos in chronogical order with the year and semister shown as well -->
+
+                            <v-col cols="12">
+                              <v-card elevation="1">
+                                <v-virtual-scroll
+                                  :bench="benchedPhotos"
+                                  :items="orphan.photos"
+                                  item-height="350"
+                                  max-height="350"
+                                  style="overflow-x: hidden; !important"
+                                > 
+                                  <template v-slot:default="{ index, item }">
+                                    <v-row>
+                                      <v-col cols="6">
+                                        <v-list-item :key="index">
+                                          <!-- <v-list-item-action>
+                                            <v-btn fab small depressed color="rgba(19,84,122,.5)" @click="test(index, item)">
+                                            </v-btn>
+                                          </v-list-item-action> -->
+
+                                          <!-- Portrait Photo -->
+                                          <v-list-item-content v-if="item.photoPortraitUrl">
+                                            <!-- <v-list-item-title>
+                                              User Database Record
+                                            </v-list-item-title> -->
+                                            <v-hover>
+                                              <template v-slot:default="{ hover }">
+                                                <v-card height="350" width="250" elevation="4">
+                                                  <v-img
+                                                    :src="imageGenerator(item.photoPortraitUrl)"
+                                                    max-height="350px"
+                                                  ></v-img>
+                                                  <v-fade-transition>
+                                                    <v-overlay v-if="hover" absolute>
+                                                      <v-row class="pb-6">
+                                                        <v-col cols="12" class="text-center">
+                                                          <span>{{
+                                                            notEditable
+                                                              ? "Passport"
+                                                              : "Edit Passport"
+                                                          }}</span>
+                                                        </v-col>
+                                                        <v-col cols="12" class="text-center">
+                                                          <v-btn
+                                                            v-if="notEditable"
+                                                            fab
+                                                            color="primary"
+                                                            @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                          >
+                                                            <v-icon> mdi-magnify-plus </v-icon>
+                                                          </v-btn>
+
+                                                          <!-- <template v-else>
+                                                            <v-avatar color="primary">
+                                                              <v-file-input
+                                                                v-model="orphanPassportFile"
+                                                                accept="image/*"
+                                                                class="pl-3 pb-4"
+                                                                hide-input
+                                                                prepend-icon="mdi-file-document-edit-outline"
+                                                                @change="
+                                                                  toggleOrphanPassportInput()
+                                                                "
+                                                              >
+                                                              </v-file-input>
+                                                            </v-avatar>
+                                                            <v-btn
+                                                              color="info"
+                                                              fab
+                                                              width="48"
+                                                              height="48"
+                                                              class="ml-4"
+                                                              depressed
+                                                              @click="
+                                                                toggleOrphanPassportDialog
+                                                              "
+                                                            >
+                                                              <v-icon>
+                                                                mdi-file-eye-outline
+                                                              </v-icon>
+                                                            </v-btn>
+                                                          </template> -->
+                                                        
+                                                        </v-col>
+                                                      </v-row>
+                                                    </v-overlay>
+                                                  </v-fade-transition>
+                                                </v-card>
+                                              </template>
+                                            </v-hover>
+                                            <v-dialog v-model="orphanPortratAndLongPhotoDialog">
+                                              <v-container>
+                                                <v-row>
+                                                  <v-spacer></v-spacer>
+                                                  <v-col class="pr-n12" sm="1">
+                                                    <v-icon
+                                                      dark
+                                                      @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                    >
+                                                      mdi-close
+                                                    </v-icon>
+                                                  </v-col>
+                                                </v-row>
+                                                <v-img
+                                                  height="82vh"
+                                                  :src="imageGenerator(item.photoPortraitUrl)"
+                                                  contain
+                                                  alt="long photo"
+                                                ></v-img>
+                                              </v-container>
+                                            </v-dialog>
+                                          </v-list-item-content>
+
+                                          <!-- <v-list-item-action>
+                                            <v-icon small> mdi-open-in-new </v-icon>
+                                          </v-list-item-action> -->
+                                        </v-list-item>
+                                      </v-col>
+                                      
+                                      <v-col cols="6">
+                                        <v-list-item :key="index">
+                                          <!-- <v-list-item-action>
+                                            <v-btn fab small depressed color="rgba(19,84,122,.5)" @click="test(index, item)">
+                                            </v-btn>
+                                          </v-list-item-action> -->
+
+                                          <!-- Long Photo -->
+                                          <v-list-item-content v-if="item.photoLongUrl">
+                                            <v-hover class="mb-10">
+                                              <template v-slot:default="{ hover }">
+                                                <v-card height="350" width="250" elevation="4">
+                                                  <v-img
+                                                    :src="imageGenerator(item.photoLongUrl)"
+                                                    max-height="350px"
+                                                  ></v-img>
+                                                  <v-fade-transition>
+                                                    <v-overlay v-if="hover" absolute>
+                                                      <v-row class="pb-6">
+                                                        <v-col cols="12" class="text-center">
+                                                          <span>{{
+                                                            notEditable
+                                                              ? "Passport"
+                                                              : "Edit Passport"
+                                                          }}</span>
+                                                        </v-col>
+                                                        <v-col cols="12" class="text-center">
+                                                          <v-btn
+                                                            v-if="notEditable"
+                                                            fab
+                                                            color="primary"
+                                                            @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                          >
+                                                            <v-icon> mdi-magnify-plus </v-icon>
+                                                          </v-btn>
+                                                          <!-- <template v-else>
+                                                            <v-avatar color="primary">
+                                                              <v-file-input
+                                                                v-model="orphanPassportFile"
+                                                                accept="image/*"
+                                                                class="pl-3 pb-4"
+                                                                hide-input
+                                                                prepend-icon="mdi-file-document-edit-outline"
+                                                                @change="
+                                                                  toggleOrphanPassportInput()
+                                                                "
+                                                              >
+                                                              </v-file-input>
+                                                            </v-avatar>
+                                                            <v-btn
+                                                              color="info"
+                                                              fab
+                                                              width="48"
+                                                              height="48"
+                                                              class="ml-4"
+                                                              depressed
+                                                              @click="
+                                                                toggleOrphanPassportDialog
+                                                              "
+                                                            >
+                                                              <v-icon>
+                                                                mdi-file-eye-outline
+                                                              </v-icon>
+                                                            </v-btn>
+                                                          </template> -->
+                                                        </v-col>
+                                                      </v-row>
+                                                    </v-overlay>
+                                                  </v-fade-transition>
+                                                </v-card>
+                                              </template>
+                                            </v-hover>
+                                            <v-dialog v-model="orphanPortratAndLongPhotoDialog">
+                                              <v-container>
+                                                <v-row>
+                                                  <v-spacer></v-spacer>
+                                                  <v-col class="pr-n12" sm="1">
+                                                    <v-icon
+                                                      dark
+                                                      @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                    >
+                                                      mdi-close
+                                                    </v-icon>
+                                                  </v-col>
+                                                </v-row>
+                                                <v-img
+                                                  height="82vh"
+                                                  :src="imageGenerator(item.photoLongUrl)"
+                                                  contain
+                                                  alt="long photo"
+                                                ></v-img>
+                                              </v-container>
+                                            </v-dialog>
+                                          </v-list-item-content>
+
+                                          <!-- <v-list-item-action>
+                                            <v-icon small> mdi-open-in-new </v-icon>
+                                          </v-list-item-action> -->
+                                        </v-list-item>
+                                      </v-col>
+                                      
+                                    </v-row>
+                                  </template>
+                                </v-virtual-scroll>
+                              </v-card>
+                            </v-col>
+
+
+                            <!-- <v-col cols="4">
+                              <v-hover>
+                                <template v-slot:default="{ hover }">
+                                  <v-card height="350" width="250" elevation="4">
+                                    <v-img
+                                      :src="orphanPassport"
+                                      max-height="350px"
+                                    ></v-img>
+                                    <v-fade-transition>
+                                      <v-overlay v-if="hover" absolute>
+                                        <v-row class="pb-6">
+                                          <v-col cols="12" class="text-center">
+                                            <span>{{
+                                              notEditable
+                                                ? "Passport"
+                                                : "Edit Passport"
+                                            }}</span>
+                                          </v-col>
+                                          <v-col cols="12" class="text-center">
+                                            <v-btn
+                                              v-if="notEditable"
+                                              fab
+                                              color="primary"
+                                              @click="toggleOrphanPassportDialog"
+                                            >
+                                              <v-icon> mdi-magnify-plus </v-icon>
+                                            </v-btn>
+                                            <template v-else>
+                                              <v-avatar color="primary">
+                                                <v-file-input
+                                                  v-model="orphanPassportFile"
+                                                  accept="image/*"
+                                                  class="pl-3 pb-4"
+                                                  hide-input
+                                                  prepend-icon="mdi-file-document-edit-outline"
+                                                  @change="
+                                                    toggleOrphanPassportInput()
+                                                  "
+                                                >
+                                                </v-file-input>
+                                              </v-avatar>
+                                              <v-btn
+                                                color="info"
+                                                fab
+                                                width="48"
+                                                height="48"
+                                                class="ml-4"
+                                                depressed
+                                                @click="
+                                                  toggleOrphanPassportDialog
+                                                "
+                                              >
+                                                <v-icon>
+                                                  mdi-file-eye-outline
+                                                </v-icon>
+                                              </v-btn>
+                                            </template>
+                                          </v-col>
+                                        </v-row>
+                                      </v-overlay>
+                                    </v-fade-transition>
+                                  </v-card>
+                                </template>
+                              </v-hover>
+                              <v-dialog v-model="orphanPassportDialog">
+                                <v-container>
+                                  <v-row>
+                                    <v-spacer></v-spacer>
+                                    <v-col class="pr-n12" sm="1">
+                                      <v-icon
+                                        dark
+                                        @click="toggleOrphanPassportDialog"
+                                      >
+                                        mdi-close
+                                      </v-icon>
+                                    </v-col>
+                                  </v-row>
+                                  <v-img
+                                    height="82vh"
+                                    :src="orphanPassport"
+                                    contain
+                                    alt="long photo"
+                                  ></v-img>
+                                </v-container>
+                              </v-dialog>
+                            </v-col> -->
+                          
+                          </template>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+                  </v-tab-item>
                 </v-tabs>
               </v-card>
             </v-col>
@@ -2551,6 +3089,10 @@
     </template>
   </v-dialog>
 </template>
+
+<style scoped>
+
+</style>
 
 <script>
 import axios from "axios";
@@ -2620,6 +3162,7 @@ export default {
       FATHER_AGE_LIMIT: 15,
       MOTHER_AGE_LIMIT: 14,
       GUARDIAN_AGE_LIMIT: 18,
+      benchedPhotos: 6,
       skeleton: true,
       orphanSelectOptions: {
         genderOptions: gender,
@@ -2632,6 +3175,7 @@ export default {
         orphanMotherMaritalStatusOptions: maritalStatus,
         orphanGuardianNationalityOptions: nationality,
         orphanGuardianRelationToOrphanOptions: relationToOrphan,
+        orphanSocialWorkerOptions: null,
       },
       orphanSelectedOption: {
         orphanGender: "",
@@ -2646,12 +3190,17 @@ export default {
         orphanGuardianNationality: "",
         orphanGuardianRelationToOrphan: "",
       },
+      orphanSelectedSocialWorker: "",
+      orphanSocialWorkerGender: "",
+      orphanSocialWorkerDateOfBirth: "",
+      orphanSocialWorkerMobileNumber: "",
       orphanEditableFields: {
         orphanFirstName: "",
         orphanFatherFirstName: "",
         orphanFatherLastName: "",
         orphanPlaceOfBirth: "",
         orphanSpokenLanguages: "",
+        orphanAccountNumber: "",
         orphanHealthDescription: "",
         orphanEducationYear: "",
         orphanEducationSchoolName: "",
@@ -2684,6 +3233,7 @@ export default {
         orphanGuardianGender: "",
         orphanGuardianRelationToOrphan: "",
         orphanGuardianNationality: "",
+        orphanSocialWorker: "",
       },
       orphanSelectedDates: {
         orphanDateOfBirth: null,
@@ -2776,6 +3326,7 @@ export default {
       motherDateOfDeathMenu: false,
       guardianDateOfBirthMenu: false,
       longPhotoDialog: false,
+      orphanPortratAndLongPhotoDialog:false,
       orphanPassportDialog: false,
       orphanPassportFile: null,
       orphanBirthCertificateDialog: false,
@@ -2807,6 +3358,7 @@ export default {
       guardianIdCard: null,
       confirmationLetter: null,
       legalConfirmationLetter: null,
+      socialWorkers: null
     };
   },
   created() {
@@ -2819,7 +3371,7 @@ export default {
     guardianRelationToOrphan() {
       if (this.orphanSelectedOption.orphanGuardianGender === "M") {
         return ["grandfather", "brother", "uncle", "cousin", "nephew", "legalGuardian"];
-        
+
       } else {
         return ["mother", "grandmother", "sister", "aunt", "cousin", "niece", "legalGuardian"];
       }
@@ -2846,7 +3398,11 @@ export default {
     },
   },
   methods: {
-    initialize() {
+    test(index, item) {
+      console.log(index);
+      console.log(item);
+    },
+    async initialize() {
       this.orphan = this.details;
       axios
         .post("/graphql/", {
@@ -2873,18 +3429,21 @@ export default {
         .then((orphan) => {
           this.orphan = Object.assign(this.orphan, orphan);
 
-          this.orphanPassport = `${
-            axios.defaults.baseURL
-          }${this.orphan.passportUrl.slice(
-            this.orphan.passportUrl.indexOf("/")
-          )}`;
+          // console.log(this.orphan)
 
+          // do error handling and maybe notify user if needed. the code below throws a type error if any of the urls are null
           this.photoPortrait = `${axios.defaults.baseURL}${this.orphan.photos[
             this.orphan.photos.length - 1
           ]?.photoPortraitUrl.slice(
             this.orphan.photos[
               this.orphan.photos.length - 1
             ]?.photoPortraitUrl.indexOf("/")
+          )}`;
+
+          this.orphanPassport = `${
+            axios.defaults.baseURL
+          }${this.orphan.passportUrl.slice(
+            this.orphan.passportUrl.indexOf("/")
           )}`;
 
           this.orphanBirthCertificate = `${
@@ -2934,6 +3493,25 @@ export default {
           )}`;
         })
         .catch((err) => console.warn(err));
+
+        // TODO: # this need to be custom for different users
+        this.orphanSelectOptions.orphanSocialWorkerOptions = await axios.post("/graphql/", {
+          query: `query {
+                    allSocialWorkers {
+                      id
+                      firstName
+                      middleName
+                      lastName
+                      mobileNumber
+                    }
+                  }`
+        })
+        .then(res => res.data.data.allSocialWorkers)
+        .then(socialWorkers => {
+          this.socialWorkers = socialWorkers;
+          return socialWorkers.map(sociaWorker => `${sociaWorker.firstName} ${sociaWorker.middleName} ${sociaWorker.lastName}`)
+        })
+        .catch(err => console.log(err));
     },
     populateFields() {
       this.orphanEditableFields.orphanFirstName = this.orphan.firstName;
@@ -2943,6 +3521,7 @@ export default {
       this.orphanEditableFields.orphanPlaceOfBirth = this.orphan.placeOfBirth;
       this.orphanSelectEditableFields.orphanReligion = this.orphan.religion;
       this.orphanEditableFields.orphanSpokenLanguages = this.orphan.spokenLanguages;
+      this.orphanEditableFields.orphanAccountNumber = this.orphan.accountNumber;
       this.orphanSelectEditableFields.orphanPsychologicalStatus = this.orphan.psychologicalStatus;
       this.orphanEditableFields.orphanHealthDescription = this.orphan.healthDescription;
       this.orphanSelectEditableFields.orphanEducationEnrollmentStatus = this.orphan.education?.enrollmentStatus;
@@ -2971,12 +3550,20 @@ export default {
       this.orphanSelectEditableFields.orphanGuardianRelationToOrphan = this.orphan.guardian?.relationToOrphan;
       this.orphanSelectEditableFields.orphanGuardianNationality = this.orphan.guardian?.nationality;
       this.orphanEditableFields.orphanGuardianTelephoneNumber = this.orphan.guardian?.telephoneNumber;
-      
+
       this.orphanSelectedOption.orphanMotherVitalStatus = this.orphan.mother?.vitalStatus;
       this.orphanSelectedOption.orphanEducationEnrollmentStatus = this.orphan.education?.enrollmentStatus;
+
+      this.orphanSelectEditableFields.orphanSocialWorker = `${this.orphan.socialWorker.firstName} ${this.orphan.socialWorker.middleName} ${this.orphan.socialWorker.lastName}`;
+      this.orphanSocialWorkerGender = this.orphan.socialWorker.gender;
+      this.orphanSocialWorkerDateOfBirth = this.orphan.socialWorker.dateOfBirth;
+      this.orphanSocialWorkerMobileNumber = this.orphan.socialWorker.mobileNumber;
     },
     toggleLongPhotoDialog() {
       this.longPhotoDialog = !this.longPhotoDialog;
+    },
+    toggleOrphanPortraitAndLongPhotoDialog() {
+      this.orphanPortratAndLongPhotoDialog = !this.orphanPortratAndLongPhotoDialog;
     },
     async editProfile() {
       this.notEditable = !this.notEditable;
@@ -3001,6 +3588,8 @@ export default {
         this.orphanSelectedDates.orphanMotherDateOfBirth = this.dashDateFormatter(this.orphan.mother.dateOfBirth);
         this.orphanSelectedDates.orphanMotherDateOfDeath = this.dashDateFormatter(this.orphan.mother.dateOfDeath);
         this.orphanSelectedDates.orphanGuardianDateOfBirth = this.dashDateFormatter(this.orphan.guardian.dateOfBirth);
+
+        this.orphanSelectedSocialWorker = `${this.orphan.socialWorker.firstName} ${this.orphan.socialWorker.middleName} ${this.orphan.socialWorker.lastName}`;
       } else {
         this.copyToOrphan(this.orphan, this.orphanSelectedOption);
         this.copyToOrphan(this.orphan, this.orphanEditableFields);
@@ -3184,6 +3773,8 @@ export default {
           guardianUrls
         );
 
+        const updatedSocialWorker = this.socialWorkers.filter(socialWorker => this.orphanSelectedSocialWorker === `${socialWorker.firstName} ${socialWorker.middleName} ${socialWorker.lastName}`)[0];  
+
         console.log(`updatedGuardian`, updatedGuardian)
 
         let orphanUrls = {};
@@ -3218,7 +3809,7 @@ export default {
             .then((res) => res.data)
             .catch((err) => console.warn(err));
         }
-        
+
         if(this.orphanPassportFile) {
           const orphanPassportFormData = new FormData();
           orphanPassportFormData.append(
@@ -3265,13 +3856,16 @@ export default {
           updatedMother.id,
           updatedGuardian.id,
           updatedHouseProperty.id,
-          null, // updatedSocialWorker.id,
+          updatedSocialWorker.id,
           null, // photosIds
           orphanUrls
         );
 
-        console.log(`updatedOrphan`, updatedOrphan); 
-        
+        this.orphan = Object.assign(this.orphan, updatedOrphan);
+        this.populateFields();
+
+        console.log(`updatedOrphan`, updatedOrphan);
+
       }
       this.educationLevelFormatter();
     },
@@ -3324,7 +3918,7 @@ export default {
         causeOfDeath: causeOfDeath
       }
       variables = Object.assign(variables, fatherUrl);
-      
+
       return axios
         .post("/graphql/", {
           query: query,
@@ -3379,7 +3973,7 @@ export default {
         .then((res) => res.data.data.updateEducation)
         .catch((err) => console.warn(err));
     },
-    
+
     updateGuardian(
       guardianId,
       firstName,
@@ -3434,7 +4028,7 @@ export default {
           id
         }
       }`;
-      
+
       let variables = {
         id: guardianId,
         firstName: firstName,
@@ -3516,6 +4110,7 @@ export default {
         .then((res) => res.data.data.updateMother)
         .catch((err) => console.warn(err));
     },
+
     async updateHouseProperty(
       HousePropertyId,
       housingSituation,
@@ -3545,6 +4140,7 @@ export default {
         .then((res) => res.data.data.updateHouse_property)
         .catch((err) => console.warn(err));
     },
+
     // ??? does the coordinator update photos or create new once or is that the job of social worker
     // Social Worker will be changed by select of all the Social Workers in the village
     async updateOrphan(
@@ -3653,6 +4249,7 @@ export default {
             }
           }
           father {
+            id
             firstName
             lastName
             dateOfDeath
@@ -3662,6 +4259,7 @@ export default {
             deathCertificateUrl
           }
           guardian {
+            id
             firstName
             middleName
             lastName
@@ -3677,10 +4275,12 @@ export default {
             legalConfirmationLetterUrl
           }
           house_property {
+            id
             housingSituation
             otherProperty
           }
           mother {
+            id
             firstName
             middleName
             lastName
@@ -3692,6 +4292,7 @@ export default {
             maritalStatus
           }
           socialWorker {
+            id
             firstName
             middleName
             lastName
@@ -3700,13 +4301,12 @@ export default {
             mobileNumber
           }
           photos {
+            id
             photoLongUrl
             photoPortraitUrl
           }
         }
       }`
-
-      console.log(query)
 
       let variables = {
         id: orphanId,
@@ -3731,8 +4331,6 @@ export default {
       };
       variables = Object.assign(variables, orphanUrls);
 
-      console.log(variables)
-
       return axios
         .post("/graphql/", {
           query: query,
@@ -3741,6 +4339,7 @@ export default {
         .then((res) => res.data.data.updateOrphan)
         .catch((err) => console.warn(err));
     },
+
     orphanIdGenerator() {
       let orphanId = "";
       let splitName = this.orphan.village.name.trim().split(" ");
@@ -3761,6 +4360,16 @@ export default {
     },
     genderGenerator(genderAbbr) {
       return genderAbbr === "M" ? "Male" : "Femail";
+    },
+    ageGenerator(date) {
+      return new Date().getFullYear() - new Date(Date.parse(date.toString())).getFullYear();
+    },
+    imageGenerator(imageUrl) {
+      return `${
+        axios.defaults.baseURL
+        }${imageUrl.slice(
+          imageUrl.indexOf("/")
+        )}`;
     },
     toggleOrphanPassportDialog() {
       this.orphanPassportDialog = !this.orphanPassportDialog;
@@ -4036,7 +4645,7 @@ export default {
     isoDateFormatter(dateString) {
       return new Date(dateString).toISOString();
     },
-  
+
     dashDateFormatter(dateString) {
       let dateFormat = new Date(dateString);
       return `${dateFormat.getFullYear()}-0${dateFormat.getMonth() + 1}-${dateFormat.getDate()}`;
