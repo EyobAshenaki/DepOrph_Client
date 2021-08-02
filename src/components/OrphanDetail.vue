@@ -3432,10 +3432,10 @@ export default {
 
           this.photoLong = `${axios.defaults.baseURL}${this.orphan.photos[
             this.orphan.photos.length - 1
-          ]?.photoLongUrl.slice(
+          ]?.photoLongUrl?.slice(
             this.orphan.photos[
               this.orphan.photos.length - 1
-            ]?.photoLongUrl.indexOf("/")
+            ]?.photoLongUrl?.indexOf("/")
           )}`;
 
           this.orphanPassport = `${
@@ -4056,7 +4056,7 @@ export default {
         .catch((err) => console.warn(err));
     },
 
-    async updateMother(
+    updateMother(
       motherId,
       firstName,
       middleName,
@@ -4114,7 +4114,7 @@ export default {
         .catch((err) => console.warn(err));
     },
 
-    async updateHouseProperty(
+    updateHouseProperty(
       HousePropertyId,
       housingSituation,
       otherProperty
@@ -4146,7 +4146,7 @@ export default {
 
     // ??? does the coordinator update photos or create new once or is that the job of social worker
     // Social Worker will be changed by select of all the Social Workers in the village
-    async updateOrphan(
+    updateOrphan(
       orphanId,
       firstName,
       gender,
