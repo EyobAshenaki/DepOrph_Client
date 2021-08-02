@@ -11,6 +11,7 @@
       <v-tooltip top>
         <template #activator="{ on:tooltip }">
           <v-icon
+            v-if="!isOrphanDetail"
             class="mr-2"
             color="teal darken-2"
             v-bind="attrs"
@@ -19,6 +20,15 @@
           >
             mdi-file-plus
           </v-icon>
+          <v-btn
+            v-else
+            color="teal lighten-4"
+            v-bind="attrs"
+            v-on="{ ...tooltip, ...dialog }"
+            @click="populateEducationalRecordsTable(item)"
+          >
+            Educational Records
+          </v-btn>
         </template>
 
         <span>Educational Records</span>
@@ -27,7 +37,10 @@
     <v-card>
       <v-card-title
         ><span> Educational Records</span> <v-spacer></v-spacer>
-        <insert-educational-record-dialog :educationId="educationId" />
+        <insert-educational-record-dialog
+          v-if="isEditable"
+          :educationId="educationId"
+        />
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
@@ -165,7 +178,7 @@ import InsertEducationalRecordDialog from "./InsertEducationalRecordDialog.vue";
 import CustomImage from "./CustomImage.vue";
 export default {
   components: { InsertEducationalRecordDialog, CustomImage },
-  props: ["open", "item"],
+  props: ["open", "item", "isEditable", "isOrphanDetail"],
   data() {
     return {
       isOpen: false,
@@ -177,7 +190,7 @@ export default {
       educationalRecordsTableHeaders: [
         {
           text: "Date",
-          value: "created_at"
+          value: "created_at",
         },
         // {
         //   text: "Status",
@@ -193,7 +206,7 @@ export default {
         // },
         {
           text: "Grade / Year",
-          value: "year"
+          value: "year",
         },
         // {
         //   text: "Education Level",
@@ -213,20 +226,20 @@ export default {
         // },
         {
           text: "Total",
-          value: "totalMark"
+          value: "totalMark",
         },
         {
           text: "# Subjects",
-          value: "numberOfSubjects"
+          value: "numberOfSubjects",
         },
         {
           text: "Average",
-          value: "average"
+          value: "average",
         },
         {
           text: "Rank",
-          value: "rank"
-        }
+          value: "rank",
+        },
         // {
         //   text: "SGPA",
         //   value: "semesterGPA"
@@ -237,7 +250,7 @@ export default {
         // }
       ],
       educationalRecordsTableExpandedRecords: [],
-      badUrl: false
+      badUrl: false,
     };
   },
   computed: {},
@@ -278,7 +291,7 @@ export default {
           const ERRes = await axios.post(`/graphql/`, requestOptions);
           this.educationId = ERRes.data.data.orphan.education.id;
           let tempRecords = ERRes.data.data.orphan.education.educationalRecords.map(
-            item => {
+            (item) => {
               let returnItem = { ...item };
               returnItem.status = item.enrollmentStatus;
               returnItem.level =
@@ -305,7 +318,7 @@ export default {
           tempRecords.sort((a, b) =>
             moment(b.created_at).diff(a.created_at, `minutes`)
           );
-          tempRecords.forEach(element => {
+          tempRecords.forEach((element) => {
             element.created_at = moment(item.created_at).format("DD/MM/YY");
           });
 
@@ -317,8 +330,8 @@ export default {
     },
     closeEducationalRecordsDialog() {
       this.isOpen = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -198,7 +198,7 @@
                           {{ displayOrphanRegistrationDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator"/>
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -357,7 +357,7 @@
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -567,7 +567,7 @@
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -768,7 +768,7 @@
                           {{ calcSponsoredDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -976,7 +976,7 @@
                           {{ calcGraduatedDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->

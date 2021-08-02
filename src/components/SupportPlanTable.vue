@@ -16,6 +16,7 @@
         >
           mdi-eye
         </v-icon>
+        <!-- Edit support plan dialog -->
         <v-dialog v-model="showEditDialog" width="560px">
           <v-card>
             <v-card-title class="justify-center">
@@ -35,6 +36,7 @@
         </v-dialog>
       </template>
     </v-data-table>
+
     <!-- InitDate ExchangeRate Dialog -->
     <v-dialog v-model="showSetInitDateDialog" width="40%" persistent>
       <v-card>
@@ -100,6 +102,48 @@
             </v-col>
           </v-row>
         </v-form>
+
+        <!-- social worker dialog -->
+        <v-dialog v-model="showAssignSocialWorkerDialog" width="40%" persistent>
+          <v-card>
+            <v-card-title class="justify-center">
+              Assign Social Worker for the Sponsored Orphans
+            </v-card-title>
+            <v-form
+              ref="assignSocialWorkerForm"
+              v-model="validAssignSocialWorkerForm"
+            >
+              <v-row no-gutters class="justify-center">
+                <v-col cols="9">
+                  <v-select
+                    v-model="orphanSocialWorker"
+                    hint="select social worker for sponsored orphans"
+                    :items="orphanSocialWorkerOptions"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    solo
+                    :rules="[rules.required]"
+                    persistent-hint
+                    placeholder="SocialWorker"
+                  >
+                  </v-select>
+                </v-col>
+              </v-row>
+            </v-form>
+            <v-card-actions class="justify-end">
+              <v-btn text class="red--text" @click="cancelAssignSocialWorker"
+                >Cancel</v-btn
+              >
+              <v-btn
+                text
+                class="primary--text"
+                @click="confirmAssignSocialWorker"
+                :disabled="!validAssignSocialWorkerForm"
+                >Confirm</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-card-actions class="justify-end">
           <v-btn text class="red--text" @click="cancelSetInitDateExchangeRate"
             >Cancel</v-btn
@@ -177,17 +221,19 @@ export default {
       },
       { text: "Donor", value: "donor.nameInitials" },
       { text: "Currency", value: "foreignCurrency" },
-      { text: "PeriodOfSupport", value: "supportPeriod" },
-      { text: "NumberOfOrphans", value: "orphans.length" },
-      { text: "AdminFee%", value: "protein" },
+      { text: "Period of Support", value: "supportPeriod" },
+      { text: "Number of Orphans", value: "orphans.length" },
+      { text: "Admin Fee%", value: "adminFeePercentage" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     rules: {
       required: (value) => !!value || "Required.",
     },
     showSetInitDateDialog: false,
+    showAssignSocialWorkerDialog: false,
     showEditDialog: false,
     validSetInitDateForm: false,
+    validAssignSocialWorkerForm: false,
     exchangeRate: "",
     initDateMenu: false,
     initDate: "",
@@ -208,6 +254,10 @@ export default {
     supportPlanDonor: "",
     supportPlanInitDate: null,
     supportPlanTermDate: null,
+    orphanSocialWorker: null,
+    orphanSocialWorkerOptions: [],
+    villageIds: [],
+    socialWorkers: [],
   }),
 
   computed: {},
@@ -244,6 +294,7 @@ export default {
                           supportPeriod
                           exchangeRate
                           individualFund_brr
+                          adminFeePercentage
                           adminFee_brr
                           netPayment_brr
                           initDate
@@ -276,6 +327,15 @@ export default {
                               middleName
                               lastName
                             }
+                            village {
+                              id
+                              socialWorker {
+                                id
+                                firstName
+                                middleName
+                                lastName
+                              }
+                            }
                           }
                           donor {
                             id
@@ -291,16 +351,131 @@ export default {
         })
         .then((res) => res.data.data.coordinator)
         .then((coordinator) => {
-          // coordinator.donors.forEach(element => {
-          //   element.supportPlans.length>0 && console.log(element);
-          // });
-
           // copies the support plans which are not null
           this.supportPlans = coordinator.donors
             .map((val) => val.supportPlans)
-            .reduce((acc, curVal) => curVal && acc.concat(curVal), []);
-          // console.log(this.supportPlans);
+            .reduce((accSupportPlan, supportPlan) => supportPlan && accSupportPlan.concat(supportPlan), []);
         })
+        .catch((err) => console.warn(err));
+    },
+
+    updateSupportPlan(
+      supportPlanId,
+      exchangeRate,
+      individualFund_brr,
+      adminFee_brr,
+      netPayment_brr,
+      initDate,
+      termDate
+    ) {
+      return axios
+        .post("/graphql", {
+          query: `mutation updateSupportPlan(
+                    $id: ID!
+                    $exchangeRate: Float
+                    $individualFund_brr: Float
+                    $adminFee_brr: Float
+                    $netPayment_brr: Float
+                    $initDate: DateTime
+                    $termDate: DateTime
+                  ) {
+                    updateSupportPlan(
+                      id: $id
+                      exchangeRate: $exchangeRate
+                      individualFund_brr: $individualFund_brr
+                      adminFee_brr: $adminFee_brr
+                      netPayment_brr: $netPayment_brr
+                      initDate: $initDate
+                      termDate: $termDate
+                    ) {
+                      id
+                      donor {
+                        nameInitials
+                      }
+                      initDate
+                      termDate
+                      orphans {
+                        id
+                        firstName
+                        father {
+                          firstName
+                          lastName
+                        }
+                        supportPlan {
+                          id
+                          created_at
+                          collectiveFund_fc
+                          individualFund_fc
+                          foreignCurrency
+                          supportPeriod
+                          exchangeRate
+                          individualFund_brr
+                          adminFee_brr
+                          netPayment_brr
+                          initDate
+                          termDate
+                        }
+                        accountNumber
+                        guardian {
+                          id
+                          firstName
+                          middleName
+                          lastName
+                        }
+                        village {
+                          id
+                          name
+                          socialWorker {
+                            id
+                          }
+                          district {
+                            name
+                            zone {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }`,
+          variables: {
+            id: parseInt(supportPlanId),
+            exchangeRate: parseFloat(exchangeRate),
+            individualFund_brr: parseFloat(individualFund_brr),
+            adminFee_brr: parseFloat(adminFee_brr),
+            netPayment_brr: parseFloat(netPayment_brr),
+            initDate: initDate,
+            termDate: termDate,
+          },
+        })
+        .then((res) => res.data.data.updateSupportPlan)
+        .catch((err) => console.warn(err));
+    },
+
+    createSponsorshipStatus(orphanId, status) {
+      return axios
+        .post("/graphql", {
+          query: `mutation createSponsorshipStatus(
+                  $status: sponsorshipStatus
+                  $date: DateTime!
+                  $orphanId: ID
+                ) {
+                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
+                    id
+                    status
+                    date
+                    orphan {
+                      id
+                    }
+                  }
+                }`,
+          variables: {
+            status: status,
+            date: new Date().toISOString(),
+            orphanId: orphanId,
+          },
+        })
+        .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
     },
 
@@ -406,9 +581,46 @@ export default {
 
     confirmSetInitDateExchangeRate() {
       if (this.$refs.setInitDateForm.validate()) {
-        // console.log(this.selectedSupportPlan);
-        // check the validity of the fund by like comparing the sum of individual with the collective fund in FC
+        for (const orphan of this.selectedSupportPlan.orphans) {
+          if (this.villageIds.length === 0) {
 
+            this.socialWorkers = [];
+            this.orphanSocialWorkerOptions = [];
+          }
+          if (this.villageIds.indexOf(orphan.village.id) === -1) {
+
+            this.villageIds.push(orphan.village.id);
+            this.socialWorkers.push(orphan.village.socialWorker);
+            this.orphanSocialWorkerOptions.push(
+              `${orphan.village.socialWorker.firstName} ${orphan.village.socialWorker.middleName} ${orphan.village.socialWorker.lastName}`
+            );
+          }
+        }
+        this.setInitDateClose();
+
+        this.showAssignSocialWorkerDialog = true;
+      } else {
+        // handle error and show some kind of notification
+      }
+    },
+
+    setInitDateClose() {
+      this.showSetInitDateDialog = false;
+    },
+
+    setInitDateReset() {
+      this.$refs.setInitDateForm.reset();
+    },
+
+    cancelAssignSocialWorker() {
+      this.setInitDateReset();
+      this.assignSocialWorkerClose();
+      this.assignSocialWorkerReset();
+    },
+
+    async confirmAssignSocialWorker() {
+      if (this.$refs.assignSocialWorkerForm.validate()) {
+        // check the validity of the fund by like comparing the sum of individual with the collective fund in FC
         const individualFund_brr =
           this.selectedSupportPlan.individualFund_fc * this.exchangeRate;
         const adminFee_brr = individualFund_brr * 0.05;
@@ -421,105 +633,87 @@ export default {
           )
         ).toISOString();
 
-        axios
-          .post("/graphql", {
-            query: `mutation updateSupportPlan(
-                    $id: ID!
-                    $exchangeRate: Float
-                    $individualFund_brr: Float
-                    $adminFee_brr: Float
-                    $netPayment_brr: Float
-                    $initDate: DateTime
-                    $termDate: DateTime
-                  ) {
-                    updateSupportPlan(
-                      id: $id
-                      exchangeRate: $exchangeRate
-                      individualFund_brr: $individualFund_brr
-                      adminFee_brr: $adminFee_brr
-                      netPayment_brr: $netPayment_brr
-                      initDate: $initDate
-                      termDate: $termDate
-                    ) {
-                      id
-                      donor {
-                        nameInitials
-                      }
-                      initDate
-                      termDate
-                      orphans {
-                        id
-                        firstName
-                        father {
-                          firstName
-                          lastName
-                        }
-                        supportPlan {
-                          id
-                          created_at
-                          collectiveFund_fc
-                          individualFund_fc
-                          foreignCurrency
-                          supportPeriod
-                          exchangeRate
-                          individualFund_brr
-                          adminFee_brr
-                          netPayment_brr
-                          initDate
-                          termDate
-                        }
-                        accountNumber
-                        guardian {
-                          id
-                          firstName
-                          middleName
-                          lastName
-                        }
-                        village {
-                          name
-                          district {
-                            name
-                            zone {
-                              name
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }`,
-            variables: {
-              id: parseInt(this.selectedSupportPlan.id),
-              exchangeRate: parseFloat(this.exchangeRate),
-              individualFund_brr: parseFloat(individualFund_brr),
-              adminFee_brr: parseFloat(adminFee_brr),
-              netPayment_brr: parseFloat(netPayment_brr),
-              initDate: initDate,
-              termDate: termDate,
-            },
-          })
-          .then((res) => res.data.data.updateSupportPlan)
-          .then((supportPlan) => {
-            this.supportPlanOrphans = supportPlan.orphans;
-            this.supportPlanDonor = supportPlan.donor.nameInitials;
-            this.supportPlanInitDate = supportPlan.initDate;
-            this.supportPlanTermDate = supportPlan.termDate;
-          })
-          .catch((err) => console.warn(err));
+        const updatedSupportPlan = await this.updateSupportPlan(
+          this.selectedSupportPlan.id,
+          this.exchangeRate,
+          individualFund_brr,
+          adminFee_brr,
+          netPayment_brr,
+          initDate,
+          termDate
+        );
 
+        this.supportPlanOrphans = updatedSupportPlan.orphans;
+        this.supportPlanDonor = updatedSupportPlan.donor.nameInitials;
+        this.supportPlanInitDate = updatedSupportPlan.initDate;
+        this.supportPlanTermDate = updatedSupportPlan.termDate;
+
+        for (const orphan of updatedSupportPlan.orphans) {
+          const sponsorshipStatus = await this.createSponsorshipStatus(
+            orphan.id,
+            "active"
+          );
+          console.log(`sponsorshipStatus`, sponsorshipStatus);
+
+          const socialWorker = this.socialWorkers.filter(
+            (socialWorker) =>
+              this.orphanSocialWorker ===
+              `${socialWorker.firstName} ${socialWorker.middleName} ${socialWorker.lastName}`
+          )[0];
+
+          const assignedSocialWorker = await this.updateOrphan(
+            orphan.id,
+            socialWorker.id
+          );
+          console.log(`assignedSocialWorker`, assignedSocialWorker.socialWorker);
+        }
         this.showSupportPlanOrphansDialog = true;
-        this.setInitDateClose();
+
         this.setInitDateReset();
-      } else {
-        // handle error and show some kind of notification
+        this.assignSocialWorkerClose();
+        this.assignSocialWorkerReset();
       }
     },
 
-    setInitDateClose() {
-      this.showSetInitDateDialog = false;
+    assignSocialWorkerClose() {
+      this.showAssignSocialWorkerDialog = false;
     },
 
-    setInitDateReset() {
-      this.$refs.setInitDateForm.reset();
+    assignSocialWorkerReset() {
+      this.$refs.assignSocialWorkerForm.reset();
+    },
+
+    updateOrphan(orphanId, socialWorkerId) {
+      let query = `mutation updateOrphan(
+        $id: ID!
+        $socialWorkerId: ID
+      ) {
+        updateOrphan(
+          id: $id
+          socialWorkerId: $socialWorkerId
+        ) {
+          id
+          socialWorker {
+            id
+            firstName
+            middleName
+            lastName
+          }
+        }
+      }`;
+
+      let variables = {
+        id: orphanId,
+        socialWorkerId: socialWorkerId,
+      };
+
+      return axios
+        .post("/graphql/", {
+          query: query,
+          variables: variables,
+        })
+        .then((res) => res.data.data.updateOrphan)
+        .catch((err) => console.warn(err));
     },
 
     orphanFullName(item) {

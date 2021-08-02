@@ -61,6 +61,8 @@
                   <educational-records-dialog
                     :open="educationalRecordsDialog"
                     :item="item"
+                    :isEditable="true"
+                    :isOrphanDetail="false"
                   />
                   <insert-images-dialog
                     :open="insertImagesDialog"

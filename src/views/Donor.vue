@@ -253,7 +253,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <OrphanDetail :details="item" />
+              <OrphanDetail :details="item" user="donor"/>
             </template>
           </v-data-table>
         </v-sheet>
@@ -372,7 +372,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <OrphanDetail :details="item" />
+              <OrphanDetail :details="item" user="donor"/>
             </template>
           </v-data-table>
         </v-sheet>
@@ -489,7 +489,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <OrphanDetail :details="item" />
+              <OrphanDetail :details="item" user="donor"/>
             </template>
           </v-data-table>
         </v-sheet>
@@ -606,7 +606,7 @@
             </template>
             <!-- Show Details icon -->
             <template v-slot:item.details="{ item }">
-              <OrphanDetail :details="item" />
+              <OrphanDetail :details="item" user="donor"/>
             </template>
           </v-data-table>
         </v-sheet>
@@ -634,7 +634,7 @@ export default {
       pendingSearch: "",
       activeSearch: "",
       graduatedSearch: "",
-      orphanTable: "",
+      orphanTable: "processing",
       singleProcessingSelect: false,
       singlePendingSelect: false,
       singleActiveSelect: false,

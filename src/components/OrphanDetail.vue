@@ -13,15 +13,21 @@
     </template>
     <template v-slot:default="dialog">
       <v-card max-width="">
-        <v-toolbar dense flat color="primary" dark>
-          <span class="mx-auto">
+        <v-toolbar dense flat>
+          <!-- <span class="mx-auto">
             {{ "Name's Detail" }}
-          </span>
+          </span> -->
+          <v-spacer></v-spacer>
+          <v-btn fab small dark color="red" class="mr-3 mt-2" @click="dialog.value = false">
+            <v-icon>
+              mdi-close
+            </v-icon>
+          </v-btn>
         </v-toolbar>
         <v-card-text>
-          <v-row class="mt-6">
+          <v-row class="mt-0">
             <!-- First Card -->
-            <v-col cols="4" class="">
+            <v-col cols="4" class="mt-3">
               <v-card elevation="3" class="pb-md-8">
                 <v-row>
                   <v-col cols="12" class="text-center">
@@ -80,7 +86,7 @@
                         </v-row>
                         <v-img
                           height="82vh"
-                          src="@/assets/1-crop.jpg"
+                          :src="photoLong"
                           contain
                           alt="long photo"
                         ></v-img>
@@ -89,6 +95,7 @@
                   </v-col>
                   <v-col cols="12" class="text-center">
                     <v-btn
+                      v-if="user === 'coordinator'"
                       @click="editProfile"
                       width="90%"
                       color="blue lighten-2"
@@ -819,12 +826,7 @@
                         </v-row>
                         <v-row>
                           <v-col cols="12">
-                            EDUCATIONAL RECORD WILL GO HERE
-                            <v-data-table
-                              :headers="educationalRecordHeaders"
-                              :items="educationalRecordItems"
-                              class="elevation-1"
-                            ></v-data-table>
+                            <educational-records-dialog :open="educationalRecordsDialog" :item="orphan" :isEditable="user !== 'donor'" :isOrphanDetail="true"/>
                           </v-col>
                         </v-row>
                       </v-card-text>
@@ -2762,8 +2764,8 @@
 
                             <v-col cols="12">
                               <v-card elevation="1">
+                                <!-- :bench="benchedPhotos" -->
                                 <v-virtual-scroll
-                                  :bench="benchedPhotos"
                                   :items="orphan.photos"
                                   item-height="350"
                                   max-height="350"
@@ -2771,23 +2773,15 @@
                                 > 
                                   <template v-slot:default="{ index, item }">
                                     <v-row>
+                                      <!-- Portrait Photo -->
                                       <v-col cols="6">
                                         <v-list-item :key="index">
-                                          <!-- <v-list-item-action>
-                                            <v-btn fab small depressed color="rgba(19,84,122,.5)" @click="test(index, item)">
-                                            </v-btn>
-                                          </v-list-item-action> -->
-
-                                          <!-- Portrait Photo -->
                                           <v-list-item-content v-if="item.photoPortraitUrl">
-                                            <!-- <v-list-item-title>
-                                              User Database Record
-                                            </v-list-item-title> -->
                                             <v-hover>
                                               <template v-slot:default="{ hover }">
                                                 <v-card height="350" width="250" elevation="4">
                                                   <v-img
-                                                    :src="imageGenerator(item.photoPortraitUrl)"
+                                                    :src="portraitImageGenerator(item)"
                                                     max-height="350px"
                                                   ></v-img>
                                                   <v-fade-transition>
@@ -2805,7 +2799,7 @@
                                                             v-if="notEditable"
                                                             fab
                                                             color="primary"
-                                                            @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                            @click="toggleOrphanPortraitPhotoDialog"
                                                           >
                                                             <v-icon> mdi-magnify-plus </v-icon>
                                                           </v-btn>
@@ -2848,14 +2842,14 @@
                                                 </v-card>
                                               </template>
                                             </v-hover>
-                                            <v-dialog v-model="orphanPortratAndLongPhotoDialog">
+                                            <v-dialog v-model="orphanPortraitPhotoDialog">
                                               <v-container>
                                                 <v-row>
                                                   <v-spacer></v-spacer>
                                                   <v-col class="pr-n12" sm="1">
                                                     <v-icon
                                                       dark
-                                                      @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                      @click="toggleOrphanPortraitPhotoDialog"
                                                     >
                                                       mdi-close
                                                     </v-icon>
@@ -2863,34 +2857,25 @@
                                                 </v-row>
                                                 <v-img
                                                   height="82vh"
-                                                  :src="imageGenerator(item.photoPortraitUrl)"
+                                                  :src="portraitImageGenerator(item)"
                                                   contain
                                                   alt="long photo"
                                                 ></v-img>
                                               </v-container>
                                             </v-dialog>
                                           </v-list-item-content>
-
-                                          <!-- <v-list-item-action>
-                                            <v-icon small> mdi-open-in-new </v-icon>
-                                          </v-list-item-action> -->
                                         </v-list-item>
                                       </v-col>
                                       
+                                      <!-- Long Photo -->
                                       <v-col cols="6">
                                         <v-list-item :key="index">
-                                          <!-- <v-list-item-action>
-                                            <v-btn fab small depressed color="rgba(19,84,122,.5)" @click="test(index, item)">
-                                            </v-btn>
-                                          </v-list-item-action> -->
-
-                                          <!-- Long Photo -->
                                           <v-list-item-content v-if="item.photoLongUrl">
                                             <v-hover class="mb-10">
                                               <template v-slot:default="{ hover }">
                                                 <v-card height="350" width="250" elevation="4">
                                                   <v-img
-                                                    :src="imageGenerator(item.photoLongUrl)"
+                                                    :src="longImageGenerator(item)"
                                                     max-height="350px"
                                                   ></v-img>
                                                   <v-fade-transition>
@@ -2908,7 +2893,7 @@
                                                             v-if="notEditable"
                                                             fab
                                                             color="primary"
-                                                            @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                            @click="toggleOrphanLongPhotoDialog"
                                                           >
                                                             <v-icon> mdi-magnify-plus </v-icon>
                                                           </v-btn>
@@ -2949,14 +2934,14 @@
                                                 </v-card>
                                               </template>
                                             </v-hover>
-                                            <v-dialog v-model="orphanPortratAndLongPhotoDialog">
+                                            <v-dialog v-model="orphanLongPhotoDialog">
                                               <v-container>
                                                 <v-row>
                                                   <v-spacer></v-spacer>
                                                   <v-col class="pr-n12" sm="1">
                                                     <v-icon
                                                       dark
-                                                      @click="toggleOrphanPortraitAndLongPhotoDialog"
+                                                      @click="toggleOrphanLongPhotoDialog"
                                                     >
                                                       mdi-close
                                                     </v-icon>
@@ -2964,17 +2949,13 @@
                                                 </v-row>
                                                 <v-img
                                                   height="82vh"
-                                                  :src="imageGenerator(item.photoLongUrl)"
+                                                  :src="longImageGenerator(item)"
                                                   contain
                                                   alt="long photo"
                                                 ></v-img>
                                               </v-container>
                                             </v-dialog>
                                           </v-list-item-content>
-
-                                          <!-- <v-list-item-action>
-                                            <v-icon small> mdi-open-in-new </v-icon>
-                                          </v-list-item-action> -->
                                         </v-list-item>
                                       </v-col>
                                       
@@ -3082,9 +3063,9 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions class="justify-end">
+        <!-- <v-card-actions class="justify-end">
           <v-btn text @click="dialog.value = false">Submit</v-btn>
-        </v-card-actions>
+        </v-card-actions> -->
       </v-card>
     </template>
   </v-dialog>
@@ -3096,6 +3077,7 @@
 
 <script>
 import axios from "axios";
+import EducationalRecordsDialog from '@/components/EducationalRecordsDialog.vue';
 
 // enums
 const gender = ["M", "F"];
@@ -3150,11 +3132,16 @@ const relationToOrphan = [
 ];
 
 export default {
+  components: { EducationalRecordsDialog },
   props: {
     details: {
       type: Object,
       required: true,
     },
+    user: {
+      type:String,
+      required: true,
+    }
   },
   data() {
     return {
@@ -3162,7 +3149,7 @@ export default {
       FATHER_AGE_LIMIT: 15,
       MOTHER_AGE_LIMIT: 14,
       GUARDIAN_AGE_LIMIT: 18,
-      benchedPhotos: 6,
+      // benchedPhotos: 1,
       skeleton: true,
       orphanSelectOptions: {
         genderOptions: gender,
@@ -3326,7 +3313,8 @@ export default {
       motherDateOfDeathMenu: false,
       guardianDateOfBirthMenu: false,
       longPhotoDialog: false,
-      orphanPortratAndLongPhotoDialog:false,
+      orphanPortraitPhotoDialog: false,
+      orphanLongPhotoDialog:false,
       orphanPassportDialog: false,
       orphanPassportFile: null,
       orphanBirthCertificateDialog: false,
@@ -3349,6 +3337,7 @@ export default {
       ],
       educationalRecordItems: [],
       photoPortrait: null,
+      photoLong: null,
       orphanPassport: null,
       orphanBirthCertificate: null,
       originalThankyouLetter: null,
@@ -3358,7 +3347,8 @@ export default {
       guardianIdCard: null,
       confirmationLetter: null,
       legalConfirmationLetter: null,
-      socialWorkers: null
+      socialWorkers: null,
+      educationalRecordsDialog: false,
     };
   },
   created() {
@@ -3438,6 +3428,14 @@ export default {
             this.orphan.photos[
               this.orphan.photos.length - 1
             ]?.photoPortraitUrl.indexOf("/")
+          )}`;
+
+          this.photoLong = `${axios.defaults.baseURL}${this.orphan.photos[
+            this.orphan.photos.length - 1
+          ]?.photoLongUrl.slice(
+            this.orphan.photos[
+              this.orphan.photos.length - 1
+            ]?.photoLongUrl.indexOf("/")
           )}`;
 
           this.orphanPassport = `${
@@ -3554,16 +3552,21 @@ export default {
       this.orphanSelectedOption.orphanMotherVitalStatus = this.orphan.mother?.vitalStatus;
       this.orphanSelectedOption.orphanEducationEnrollmentStatus = this.orphan.education?.enrollmentStatus;
 
-      this.orphanSelectEditableFields.orphanSocialWorker = `${this.orphan.socialWorker.firstName} ${this.orphan.socialWorker.middleName} ${this.orphan.socialWorker.lastName}`;
-      this.orphanSocialWorkerGender = this.orphan.socialWorker.gender;
-      this.orphanSocialWorkerDateOfBirth = this.orphan.socialWorker.dateOfBirth;
-      this.orphanSocialWorkerMobileNumber = this.orphan.socialWorker.mobileNumber;
+      if(this.orphan.socialWorker) {
+        this.orphanSelectEditableFields.orphanSocialWorker = `${this.orphan.socialWorker?.firstName} ${this.orphan.socialWorker?.middleName} ${this.orphan.socialWorker?.lastName}`;
+        this.orphanSocialWorkerGender = this.orphan.socialWorker?.gender;
+        this.orphanSocialWorkerDateOfBirth = this.orphan.socialWorker?.dateOfBirth;
+        this.orphanSocialWorkerMobileNumber = this.orphan.socialWorker?.mobileNumber;
+      }
     },
     toggleLongPhotoDialog() {
       this.longPhotoDialog = !this.longPhotoDialog;
     },
-    toggleOrphanPortraitAndLongPhotoDialog() {
-      this.orphanPortratAndLongPhotoDialog = !this.orphanPortratAndLongPhotoDialog;
+    toggleOrphanPortraitPhotoDialog() {
+      this.orphanPortraitPhotoDialog = !this.orphanPortraitPhotoDialog;
+    },
+    toggleOrphanLongPhotoDialog() {
+      this.orphanLongPhotoDialog = !this.orphanLongPhotoDialog;
     },
     async editProfile() {
       this.notEditable = !this.notEditable;
@@ -4356,20 +4359,33 @@ export default {
       return orphanId;
     },
     dateGenerator(date) {
-      return new Date(Date.parse(date.toString())).toDateString();
+        return date ? new Date(Date.parse(date.toString())).toDateString() : "";
     },
     genderGenerator(genderAbbr) {
-      return genderAbbr === "M" ? "Male" : "Femail";
+      return genderAbbr === "M" ? "Male" : genderAbbr === "F" ? "Female" : "";
     },
     ageGenerator(date) {
-      return new Date().getFullYear() - new Date(Date.parse(date.toString())).getFullYear();
+        return date ? new Date().getFullYear() - new Date(Date.parse(date.toString())).getFullYear() : "";
     },
-    imageGenerator(imageUrl) {
-      return `${
+    portraitImageGenerator(photo) {
+      // const image = this.orphan.photos.filter(val => val.id === id)[0];
+      // const image = this.orphan.photos[idx];
+
+      return photo ? `${
         axios.defaults.baseURL
-        }${imageUrl.slice(
-          imageUrl.indexOf("/")
-        )}`;
+        }${photo.photoPortraitUrl.slice(
+          photo.photoPortraitUrl.indexOf("/")
+        )}` : "";
+    },
+    longImageGenerator(photo) {
+      // const image = this.orphan.photos.filter(val => val.id === id)[0];
+      // const image = this.orphan.photos[idx];
+
+      return photo ? `${
+        axios.defaults.baseURL
+        }${photo.photoLongUrl.slice(
+          photo.photoLongUrl.indexOf("/")
+        )}` : "";
     },
     toggleOrphanPassportDialog() {
       this.orphanPassportDialog = !this.orphanPassportDialog;
