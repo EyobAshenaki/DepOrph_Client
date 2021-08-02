@@ -207,7 +207,7 @@
                   <v-col cols="12" sm="6" md="4" class="mt-n6">
                     <v-responsive max-width="" class="">
                       <v-select
-                        v-model="orphan.mother.vitalStatus"
+                        v-model="selectedOrphan.motherVitalStatus"
                         :items="motherVitalStatusOptions"
                         :menu-props="{
                           bottom: true,
@@ -219,11 +219,11 @@
                     </v-responsive>
                   </v-col>
                   <!-- Mother Martial Status field -->
-                  <template v-if="orphan.mother.vitalStatus === 'Alive'">
+                  <template v-if="selectedOrphan.motherVitalStatus === 'Alive'">
                     <v-col cols="12" sm="6" md="4" class="mt-n6">
                       <v-responsive max-width="" class="">
                         <v-select
-                          v-model="orphan.mother.maritalStatus"
+                          v-model="selectedOrphan.motherMaritalStatus"
                           :items="motherMaritalStatusOptions"
                           :menu-props="{
                             bottom: true,
@@ -236,7 +236,7 @@
                   </template>
                   <!-- Mother Date of Death field -->
                   <template
-                    v-else-if="orphan.mother.vitalStatus === 'Passed Away'"
+                    v-else-if="selectedOrphan.motherVitalStatus === 'Passed Away'"
                   >
                     <v-col cols="12" sm="6" md="4" class="mt-n6">
                       <v-responsive max-width="" class="">
@@ -250,7 +250,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="orphan.mother.dateOfDeath"
+                              v-model="motherDateOfDeath"
                               label="Date of Death"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -260,7 +260,7 @@
                           </template>
                           <v-date-picker
                             ref="motherDateOfDeathPicker"
-                            v-model="orphan.mother.dateOfDeath"
+                            v-model="motherDateOfDeath"
                             no-title
                             scrollable
                             :max="new Date().toISOString().substr(0, 10)"
@@ -418,6 +418,10 @@ export default {
           otherProperty: null,
         },
       },
+      selectedOrphan: {
+        motherVitalStatus: null,
+        motherMaritalStatus: null,
+      },
       rules: {
         required: (value) => !!value || "Required.",
         name: (value) => {
@@ -432,6 +436,7 @@ export default {
       fatherCauseOfDeath: null,
       motherDateOfBirthMenu: false,
       motherDateOfDeathMenu: false,
+      motherDateOfDeath: null,
       motherVitalStatusOptions: ["Alive", "Passed Away"],
       motherMaritalStatusOptions: ["Widow", "Married"],
       orphanHousingSituationOptions: [
@@ -538,19 +543,22 @@ export default {
         this.orphan.father.dateOfBirth = this.fatherDateOfBirth;
         this.orphan.father.dateOfDeath = this.fatherDateOfDeath;
 
-        this.orphan.mother.vitalStatus = this.orphan.mother.vitalStatus
+        this.orphan.mother.vitalStatus = this.selectedOrphan.motherVitalStatus
           .split(" ")[0]
           .toString()
           .toLowerCase();
-
-        if (this.orphan.mother.vitalStatus === "alive") {
+        console.log(this.orphan.mother.vitalStatus)
+        if (this.orphan.mother.vitalStatus === "passed") {
+          this.orphan.mother.dateOfDeath = this.motherDateOfDeath;
+          this.orphan.mother.maritalStatus = null;
+          this.orphan.mother.mobileNumber = null;
+          this.orphan.mother.monthlyExpense = null;
+        } else {
+          this.orphan.mother.maritalStatus = this.selectedOrphan.motherMaritalStatus?.toLowerCase();
           this.orphan.mother.dateOfDeath = null;
-        } else this.orphan.mother.maritalStatus = null;
-
-        this.orphan.mother.maritalStatus = this.orphan.mother.maritalStatus?.toLowerCase();
-
-        this.orphan.mother.mobileNumber = "0974671463";
-        this.orphan.mother.monthlyExpense = parseFloat(987.76);
+          this.orphan.mother.mobileNumber = "0974671463";
+          this.orphan.mother.monthlyExpense = parseFloat(987.76);
+        }
 
         this.$emit("familyDone", this.orphan);
         this.$emit("familyRefs", this.$refs.familyForm)
