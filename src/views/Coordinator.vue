@@ -51,6 +51,7 @@
         :newOrphanDialog="newOrphanDialog"
         :orphanVillageId="selectedOrphanVillage"
         @dialogClosed="newOrphanDialog = $event"
+        @registrationDone="addNewOrphan($event)"
       />
     </v-fab-transition>
     <!-- StatusChange select Dialog -->
@@ -595,7 +596,7 @@ export default {
       orphans: [],
       villages: [],
       showOrphans: false,
-      selectedOrphanIds: [],
+      selectedOrphanIds: {ids: []},
     };
   },
   created() {
@@ -749,9 +750,13 @@ export default {
     },
     goToOrphansTable(item) {
       this.showOrphans = true;
-      this.selectedOrphanIds = item.orphans.map((orphan) =>
+      this.selectedOrphanIds.ids = item.orphans.map((orphan) =>
         parseInt(orphan.id)
       );
+    },
+    addNewOrphan(newOrphanId) {
+      console.log(`adding new orhan`, newOrphanId);
+      this.selectedOrphanIds.ids.push(parseInt(newOrphanId));
     },
     // custom search function based on selected columns
     searchFilter(value, search, item) {
@@ -953,7 +958,7 @@ export default {
       }
       dialog.value = false;
     },
-    async createSponsorshipStatus(orphanId, status) {
+    createSponsorshipStatus(orphanId, status) {
       return axios
         .post("/graphql", {
           query: `mutation createSponsorshipStatus(
