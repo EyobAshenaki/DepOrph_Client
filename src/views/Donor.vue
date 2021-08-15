@@ -755,7 +755,11 @@ export default {
       graduatedOrphans: [],
     };
   },
+  beforeCreate() {
+    console.log(`beforeCreate: `, this.singleProcessingSelect);
+  },
   created() {
+    console.log(`afterCreate: `, this.singleProcessingSelect);
     this.initialize();
     this.percentGenerator();
   },
@@ -809,6 +813,8 @@ export default {
   },
   methods: {
     changeState(val) {
+      this.orphans = [];
+      this.initialize();
       this.orphanTable = val;
     },
     // ********************************
@@ -921,17 +927,15 @@ export default {
           this.orphans = [...donor.orphans];
           this.donor = Object.assign({}, donor);
           this.donorUser = Object.assign(this.donorUser, donor.user);
-          // this.donorUser = new Object(donor.user);
           for (const property in this.donorUser) {
             if (Object.hasOwnProperty.call(this.donor, property)) {
               this.donorUser[property] = donor[property];
             }
           }
-          console.log("donor", this.donor);
-          console.log("donorUser", this.donorUser);
+          // console.log("donor", this.donor);
+          // console.log("donorUser", this.donorUser);
         })
         .catch((err) => console.warn(err));
-      // console.log(this.orphans);
     },
     // custom search functions based on selected columns
     activeSearchFilter(value, search, item) {
@@ -1129,12 +1133,7 @@ export default {
         foreignCurrency = this.currency;
         supportPeriod = this.supportPeriod;
       }
-      // console.log("collectiveFund_fc", collectiveFund_fc);
-      // console.log("individualFund_fc", individualFund_fc);
-      // console.log("foreignCurrency", foreignCurrency);
-      // console.log("supportPeriod", supportPeriod);
-      // console.log("DonorId", this.donor.id);
-      // console.log("Orphans", orphanIds);
+
       axios
         .post("/graphql/", {
           query: `mutation createSupportPlan(
@@ -1186,6 +1185,9 @@ export default {
             this.createSponsorshipStatus(orphanId, "pending")
               .then((sponsorshipStatuse) => {
                 console.log("SponsoreStatus:", sponsorshipStatuse);
+                this.selectedProcessingOrphans = [];
+                this.orphans = [];
+                this.initialize();
               })
               .catch((err) => console.warn(err));
           }
