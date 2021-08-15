@@ -1250,7 +1250,7 @@ export default {
             )
             .then((res) => {
               axios.post(`/graphql/`, {
-                query: `mutation createPhotos(
+                query: `mutation createOrphanPhotos(
                       $photoPortraitUrl: String!
                       $orphanId: ID
                       ) {
@@ -1264,7 +1264,7 @@ export default {
                   orphanId: registeredOrphan.id,
                 },
               })
-              .then(res => res.data.data.createPhotos)
+              .then(res => res.data.data.createOrphanPhotos)
               .catch(err => console.warn(err));
             })
             .catch((err) => console.warn(err));
