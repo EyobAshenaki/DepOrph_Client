@@ -18,7 +18,14 @@
             {{ "Name's Detail" }}
           </span> -->
           <v-spacer></v-spacer>
-          <v-btn fab small dark color="red" class="mr-3 mt-2" @click="dialog.value = false">
+          <v-btn
+            fab
+            small
+            dark
+            color="red"
+            class="mr-3 mt-2"
+            @click="dialog.value = false"
+          >
             <v-icon>
               mdi-close
             </v-icon>
@@ -441,11 +448,8 @@
                             class="pt-2 pb-0"
                           >
                             <v-text-field
-                              v-model="
-                                orphanEditableFields.orphanAccountNumber
-                              "
+                              v-model="orphanEditableFields.orphanAccountNumber"
                               solo
-                              
                               :readonly="notEditable"
                             ></v-text-field>
                           </v-col>
@@ -826,7 +830,12 @@
                         </v-row>
                         <v-row>
                           <v-col cols="12">
-                            <educational-records-dialog :open="educationalRecordsDialog" :item="orphan" :isEditable="user !== 'donor'" :isOrphanDetail="true"/>
+                            <educational-records-dialog
+                              :open="educationalRecordsDialog"
+                              :item="orphan"
+                              :isEditable="user !== 'donor'"
+                              :isOrphanDetail="true"
+                            />
                           </v-col>
                         </v-row>
                       </v-card-text>
@@ -2685,9 +2694,7 @@
                                 "
                                 solo
                                 no-data-text="Select Status"
-                                v-model="
-                                  orphanSelectedSocialWorker
-                                "
+                                v-model="orphanSelectedSocialWorker"
                               ></v-select>
                               <v-text-field
                                 v-else
@@ -2706,15 +2713,15 @@
                               order-lg=""
                               class="pt-2 pb-0"
                             >
-                            <v-responsive>
-                              <v-text-field
-                                :value="
-                                  genderGenerator(orphanSocialWorkerGender)
-                                "
-                                solo
-                                :readonly="notEditable"
-                              ></v-text-field>
-                            </v-responsive>
+                              <v-responsive>
+                                <v-text-field
+                                  :value="
+                                    genderGenerator(orphanSocialWorkerGender)
+                                  "
+                                  solo
+                                  :readonly="notEditable"
+                                ></v-text-field>
+                              </v-responsive>
                             </v-col>
                             <!-- socialWorker age textfield -->
                             <v-col
@@ -2724,17 +2731,17 @@
                               order-lg=""
                               class="pt-2 pb-0"
                             >
-                            <v-responsive>
-                              <v-text-field
-                                :value="
-                                  ageGenerator(orphanSocialWorkerDateOfBirth)
-                                "
-                                solo
-                                :readonly="notEditable"
-                              ></v-text-field>
-                            </v-responsive>
+                              <v-responsive>
+                                <v-text-field
+                                  :value="
+                                    ageGenerator(orphanSocialWorkerDateOfBirth)
+                                  "
+                                  solo
+                                  :readonly="notEditable"
+                                ></v-text-field>
+                              </v-responsive>
                             </v-col>
-                             <!-- socialWorker mobile number textfield -->
+                            <!-- socialWorker mobile number textfield -->
                             <v-col
                               cols="12"
                               sm="6"
@@ -2742,15 +2749,13 @@
                               order-lg=""
                               class="pt-2 pb-0"
                             >
-                            <v-responsive>
-                              <v-text-field
-                                :value="
-                                  orphanSocialWorkerMobileNumber
-                                "
-                                solo
-                                :readonly="notEditable"
-                              ></v-text-field>
-                            </v-responsive>
+                              <v-responsive>
+                                <v-text-field
+                                  :value="orphanSocialWorkerMobileNumber"
+                                  solo
+                                  :readonly="notEditable"
+                                ></v-text-field>
+                              </v-responsive>
                             </v-col>
                           </template>
                           <v-col cols="12" class="pt-0">
@@ -2770,38 +2775,63 @@
                                   item-height="350"
                                   max-height="350"
                                   style="overflow-x: hidden; !important"
-                                > 
+                                >
                                   <template v-slot:default="{ index, item }">
                                     <v-row>
                                       <!-- Portrait Photo -->
                                       <v-col cols="6">
                                         <v-list-item :key="index">
-                                          <v-list-item-content v-if="item.photoPortraitUrl">
+                                          <v-list-item-content
+                                            v-if="item.photoPortraitUrl"
+                                          >
                                             <v-hover>
-                                              <template v-slot:default="{ hover }">
-                                                <v-card height="350" width="250" elevation="4">
+                                              <template
+                                                v-slot:default="{ hover }"
+                                              >
+                                                <v-card
+                                                  height="350"
+                                                  width="250"
+                                                  elevation="4"
+                                                >
                                                   <v-img
-                                                    :src="portraitImageGenerator(item)"
+                                                    :src="
+                                                      portraitImageGenerator(
+                                                        item
+                                                      )
+                                                    "
                                                     max-height="350px"
                                                   ></v-img>
                                                   <v-fade-transition>
-                                                    <v-overlay v-if="hover" absolute>
+                                                    <v-overlay
+                                                      v-if="hover"
+                                                      absolute
+                                                    >
                                                       <v-row class="pb-6">
-                                                        <v-col cols="12" class="text-center">
+                                                        <v-col
+                                                          cols="12"
+                                                          class="text-center"
+                                                        >
                                                           <span>{{
                                                             notEditable
                                                               ? "Passport"
                                                               : "Edit Passport"
                                                           }}</span>
                                                         </v-col>
-                                                        <v-col cols="12" class="text-center">
+                                                        <v-col
+                                                          cols="12"
+                                                          class="text-center"
+                                                        >
                                                           <v-btn
                                                             v-if="notEditable"
                                                             fab
                                                             color="primary"
-                                                            @click="toggleOrphanPortraitPhotoDialog"
+                                                            @click="
+                                                              toggleOrphanPortraitPhotoDialog
+                                                            "
                                                           >
-                                                            <v-icon> mdi-magnify-plus </v-icon>
+                                                            <v-icon>
+                                                              mdi-magnify-plus
+                                                            </v-icon>
                                                           </v-btn>
 
                                                           <!-- <template v-else>
@@ -2834,7 +2864,6 @@
                                                               </v-icon>
                                                             </v-btn>
                                                           </template> -->
-                                                        
                                                         </v-col>
                                                       </v-row>
                                                     </v-overlay>
@@ -2842,14 +2871,20 @@
                                                 </v-card>
                                               </template>
                                             </v-hover>
-                                            <v-dialog v-model="orphanPortraitPhotoDialog">
+                                            <v-dialog
+                                              v-model="
+                                                orphanPortraitPhotoDialog
+                                              "
+                                            >
                                               <v-container>
                                                 <v-row>
                                                   <v-spacer></v-spacer>
                                                   <v-col class="pr-n12" sm="1">
                                                     <v-icon
                                                       dark
-                                                      @click="toggleOrphanPortraitPhotoDialog"
+                                                      @click="
+                                                        toggleOrphanPortraitPhotoDialog
+                                                      "
                                                     >
                                                       mdi-close
                                                     </v-icon>
@@ -2857,7 +2892,9 @@
                                                 </v-row>
                                                 <v-img
                                                   height="82vh"
-                                                  :src="portraitImageGenerator(item)"
+                                                  :src="
+                                                    portraitImageGenerator(item)
+                                                  "
                                                   contain
                                                   alt="long photo"
                                                 ></v-img>
@@ -2866,36 +2903,59 @@
                                           </v-list-item-content>
                                         </v-list-item>
                                       </v-col>
-                                      
+
                                       <!-- Long Photo -->
                                       <v-col cols="6">
                                         <v-list-item :key="index">
-                                          <v-list-item-content v-if="item.photoLongUrl">
+                                          <v-list-item-content
+                                            v-if="item.photoLongUrl"
+                                          >
                                             <v-hover class="mb-10">
-                                              <template v-slot:default="{ hover }">
-                                                <v-card height="350" width="250" elevation="4">
+                                              <template
+                                                v-slot:default="{ hover }"
+                                              >
+                                                <v-card
+                                                  height="350"
+                                                  width="250"
+                                                  elevation="4"
+                                                >
                                                   <v-img
-                                                    :src="longImageGenerator(item)"
+                                                    :src="
+                                                      longImageGenerator(item)
+                                                    "
                                                     max-height="350px"
                                                   ></v-img>
                                                   <v-fade-transition>
-                                                    <v-overlay v-if="hover" absolute>
+                                                    <v-overlay
+                                                      v-if="hover"
+                                                      absolute
+                                                    >
                                                       <v-row class="pb-6">
-                                                        <v-col cols="12" class="text-center">
+                                                        <v-col
+                                                          cols="12"
+                                                          class="text-center"
+                                                        >
                                                           <span>{{
                                                             notEditable
                                                               ? "Passport"
                                                               : "Edit Passport"
                                                           }}</span>
                                                         </v-col>
-                                                        <v-col cols="12" class="text-center">
+                                                        <v-col
+                                                          cols="12"
+                                                          class="text-center"
+                                                        >
                                                           <v-btn
                                                             v-if="notEditable"
                                                             fab
                                                             color="primary"
-                                                            @click="toggleOrphanLongPhotoDialog"
+                                                            @click="
+                                                              toggleOrphanLongPhotoDialog
+                                                            "
                                                           >
-                                                            <v-icon> mdi-magnify-plus </v-icon>
+                                                            <v-icon>
+                                                              mdi-magnify-plus
+                                                            </v-icon>
                                                           </v-btn>
                                                           <!-- <template v-else>
                                                             <v-avatar color="primary">
@@ -2934,14 +2994,18 @@
                                                 </v-card>
                                               </template>
                                             </v-hover>
-                                            <v-dialog v-model="orphanLongPhotoDialog">
+                                            <v-dialog
+                                              v-model="orphanLongPhotoDialog"
+                                            >
                                               <v-container>
                                                 <v-row>
                                                   <v-spacer></v-spacer>
                                                   <v-col class="pr-n12" sm="1">
                                                     <v-icon
                                                       dark
-                                                      @click="toggleOrphanLongPhotoDialog"
+                                                      @click="
+                                                        toggleOrphanLongPhotoDialog
+                                                      "
                                                     >
                                                       mdi-close
                                                     </v-icon>
@@ -2949,7 +3013,9 @@
                                                 </v-row>
                                                 <v-img
                                                   height="82vh"
-                                                  :src="longImageGenerator(item)"
+                                                  :src="
+                                                    longImageGenerator(item)
+                                                  "
                                                   contain
                                                   alt="long photo"
                                                 ></v-img>
@@ -2958,13 +3024,11 @@
                                           </v-list-item-content>
                                         </v-list-item>
                                       </v-col>
-                                      
                                     </v-row>
                                   </template>
                                 </v-virtual-scroll>
                               </v-card>
                             </v-col>
-
 
                             <!-- <v-col cols="4">
                               <v-hover>
@@ -3052,7 +3116,6 @@
                                 </v-container>
                               </v-dialog>
                             </v-col> -->
-                          
                           </template>
                         </v-row>
                       </v-card-text>
@@ -3071,13 +3134,11 @@
   </v-dialog>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 
 <script>
 import axios from "axios";
-import EducationalRecordsDialog from '@/components/EducationalRecordsDialog.vue';
+import EducationalRecordsDialog from "@/components/EducationalRecordsDialog.vue";
 
 // enums
 const gender = ["M", "F"];
@@ -3139,9 +3200,9 @@ export default {
       required: true,
     },
     user: {
-      type:String,
+      type: String,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -3314,7 +3375,7 @@ export default {
       guardianDateOfBirthMenu: false,
       longPhotoDialog: false,
       orphanPortraitPhotoDialog: false,
-      orphanLongPhotoDialog:false,
+      orphanLongPhotoDialog: false,
       orphanPassportDialog: false,
       orphanPassportFile: null,
       orphanBirthCertificateDialog: false,
@@ -3360,31 +3421,63 @@ export default {
   computed: {
     guardianRelationToOrphan() {
       if (this.orphanSelectedOption.orphanGuardianGender === "M") {
-        return ["grandfather", "brother", "uncle", "cousin", "nephew", "legalGuardian"];
-
+        return [
+          "grandfather",
+          "brother",
+          "uncle",
+          "cousin",
+          "nephew",
+          "legalGuardian",
+        ];
       } else {
-        return ["mother", "grandmother", "sister", "aunt", "cousin", "niece", "legalGuardian"];
+        return [
+          "mother",
+          "grandmother",
+          "sister",
+          "aunt",
+          "cousin",
+          "niece",
+          "legalGuardian",
+        ];
       }
-    }
+    },
   },
   watch: {
     orphanDateOfBirthMenu(val) {
-      val && setTimeout(() => (this.$refs.orphanDateOfBirthPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.orphanDateOfBirthPicker.activePicker = "YEAR")
+        );
     },
     fatherDateOfBirthMenu(val) {
-      val && setTimeout(() => (this.$refs.fatherDateOfBirthPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.fatherDateOfBirthPicker.activePicker = "YEAR")
+        );
     },
     fatherDateOfDeathMenu(val) {
-      val && setTimeout(() => (this.$refs.fatherDateOfDeathPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.fatherDateOfDeathPicker.activePicker = "YEAR")
+        );
     },
     motherDateOfBirthMenu(val) {
-      val && setTimeout(() => (this.$refs.motherDateOfBirthPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.motherDateOfBirthPicker.activePicker = "YEAR")
+        );
     },
     motherDateOfDeathMenu(val) {
-      val && setTimeout(() => (this.$refs.motherDateOfDeathPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.motherDateOfDeathPicker.activePicker = "YEAR")
+        );
     },
     guardianDateOfBirthMenu(val) {
-      val && setTimeout(() => (this.$refs.guardianDateOfBirthPicker.activePicker = "YEAR"));
+      val &&
+        setTimeout(
+          () => (this.$refs.guardianDateOfBirthPicker.activePicker = "YEAR")
+        );
     },
   },
   methods: {
@@ -3492,8 +3585,9 @@ export default {
         })
         .catch((err) => console.warn(err));
 
-        // TODO: # this need to be custom for different users
-        this.orphanSelectOptions.orphanSocialWorkerOptions = await axios.post("/graphql/", {
+      // TODO: # this need to be custom for different users
+      this.orphanSelectOptions.orphanSocialWorkerOptions = await axios
+        .post("/graphql/", {
           query: `query {
                     allSocialWorkers {
                       id
@@ -3502,14 +3596,17 @@ export default {
                       lastName
                       mobileNumber
                     }
-                  }`
+                  }`,
         })
-        .then(res => res.data.data.allSocialWorkers)
-        .then(socialWorkers => {
+        .then((res) => res.data.data.allSocialWorkers)
+        .then((socialWorkers) => {
           this.socialWorkers = socialWorkers;
-          return socialWorkers.map(sociaWorker => `${sociaWorker.firstName} ${sociaWorker.middleName} ${sociaWorker.lastName}`)
+          return socialWorkers.map(
+            (sociaWorker) =>
+              `${sociaWorker.firstName} ${sociaWorker.middleName} ${sociaWorker.lastName}`
+          );
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     },
     populateFields() {
       this.orphanEditableFields.orphanFirstName = this.orphan.firstName;
@@ -3552,7 +3649,7 @@ export default {
       this.orphanSelectedOption.orphanMotherVitalStatus = this.orphan.mother?.vitalStatus;
       this.orphanSelectedOption.orphanEducationEnrollmentStatus = this.orphan.education?.enrollmentStatus;
 
-      if(this.orphan.socialWorker) {
+      if (this.orphan.socialWorker) {
         this.orphanSelectEditableFields.orphanSocialWorker = `${this.orphan.socialWorker?.firstName} ${this.orphan.socialWorker?.middleName} ${this.orphan.socialWorker?.lastName}`;
         this.orphanSocialWorkerGender = this.orphan.socialWorker?.gender;
         this.orphanSocialWorkerDateOfBirth = this.orphan.socialWorker?.dateOfBirth;
@@ -3585,51 +3682,65 @@ export default {
         this.orphanSelectedOption.orphanGuardianGender = this.orphan.guardian.gender;
         this.orphanSelectedOption.orphanGuardianRelationToOrphan = this.orphan.guardian.relationToOrphan;
         this.orphanSelectedOption.orphanGuardianNationality = this.orphan.guardian.nationality;
-        this.orphanSelectedDates.orphanDateOfBirth = this.dashDateFormatter(this.orphan.dateOfBirth);
-        this.orphanSelectedDates.orphanFatherDateOfBirth = this.dashDateFormatter(this.orphan.father.dateOfBirth);
-        this.orphanSelectedDates.orphanFatherDateOfDeath = this.dashDateFormatter(this.orphan.father.dateOfDeath);
-        this.orphanSelectedDates.orphanMotherDateOfBirth = this.dashDateFormatter(this.orphan.mother.dateOfBirth);
-        this.orphanSelectedDates.orphanMotherDateOfDeath = this.dashDateFormatter(this.orphan.mother.dateOfDeath);
-        this.orphanSelectedDates.orphanGuardianDateOfBirth = this.dashDateFormatter(this.orphan.guardian.dateOfBirth);
+        this.orphanSelectedDates.orphanDateOfBirth = this.dashDateFormatter(
+          this.orphan.dateOfBirth
+        );
+        this.orphanSelectedDates.orphanFatherDateOfBirth = this.dashDateFormatter(
+          this.orphan.father.dateOfBirth
+        );
+        this.orphanSelectedDates.orphanFatherDateOfDeath = this.dashDateFormatter(
+          this.orphan.father.dateOfDeath
+        );
+        this.orphanSelectedDates.orphanMotherDateOfBirth = this.dashDateFormatter(
+          this.orphan.mother.dateOfBirth
+        );
+        this.orphanSelectedDates.orphanMotherDateOfDeath = this.dashDateFormatter(
+          this.orphan.mother.dateOfDeath
+        );
+        this.orphanSelectedDates.orphanGuardianDateOfBirth = this.dashDateFormatter(
+          this.orphan.guardian.dateOfBirth
+        );
 
-        this.orphanSelectedSocialWorker = `${this.orphan.socialWorker.firstName} ${this.orphan.socialWorker.middleName} ${this.orphan.socialWorker.lastName}`;
+        this.orphanSelectedSocialWorker = `${this.orphan.socialWorker?.firstName} ${this.orphan.socialWorker?.middleName} ${this.orphan.socialWorker?.lastName}`;
       } else {
         this.copyToOrphan(this.orphan, this.orphanSelectedOption);
         this.copyToOrphan(this.orphan, this.orphanEditableFields);
 
         for (const key in this.orphanSelectedDates) {
           if (Object.hasOwnProperty.call(this.orphanSelectedDates, key)) {
-            this.orphanSelectedDates[key] = this.isoDateFormatter(this.orphanSelectedDates[key]);
+            this.orphanSelectedDates[key] = this.isoDateFormatter(
+              this.orphanSelectedDates[key]
+            );
           }
         }
 
         this.copyToOrphan(this.orphan, this.orphanSelectedDates);
 
         // if (this.orphan.education.level) {
-          if (this.orphan.education.level === "Religious Education") {
-            this.orphan.education.level = "religiousEducation";
-          } else if (this.orphan.education.level === "Preschool") {
-            this.orphan.education.level = "preSchool";
-          } else if (
-            this.orphan.education.level === "Primary/Elementary" ||
-            this.orphan.education.level === "Junior" ||
-            this.orphan.education.level === "Highschool"
-          ) {
-            this.orphan.education.level = "gradeSchool";
-          } else if (this.orphan.education.level === "Undergraduate") {
-            this.orphan.education.level = "underGraduate";
-          } else if (this.orphan.education.level === "Postgraduate") {
-            this.orphan.education.level = "postGraduate";
-          } else {
-            this.orphan.education.level = "N_A";
-          }
+        if (this.orphan.education.level === "Religious Education") {
+          this.orphan.education.level = "religiousEducation";
+        } else if (this.orphan.education.level === "Preschool") {
+          this.orphan.education.level = "preSchool";
+        } else if (this.orphan.education.level === "Primary/Elementary") {
+          this.orphan.education.level = "primary_elementary";
+        } else if (this.orphan.education.level === "Junior") {
+          this.orphan.education.level = "junior";
+        } else if (this.orphan.education.level === "Highschool") {
+          this.orphan.education.level = "highschool";
+        } else if (this.orphan.education.level === "Undergraduate") {
+          this.orphan.education.level = "underGraduate";
+        } else if (this.orphan.education.level === "Postgraduate") {
+          this.orphan.education.level = "postGraduate";
+        } else {
+          this.orphan.education.level = "N_A";
+        }
         // }
 
-        console.log("editedOrphan: ", this.orphan)
+        console.log("editedOrphan: ", this.orphan);
 
-        let fatherUrl = {}
+        let fatherUrl = {};
 
-        if(this.fatherDeathCertificateFile) {
+        if (this.fatherDeathCertificateFile) {
           const fatherDeathCertificateFormData = new FormData();
           fatherDeathCertificateFormData.append(
             "fatherDeathCertificate",
@@ -3638,12 +3749,12 @@ export default {
           );
 
           fatherUrl["deathCertificateUrl"] = await axios
-          .post(
-            `/public/images/fatherDeathCertificate/`,
-            fatherDeathCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+            .post(
+              `/public/images/fatherDeathCertificate/`,
+              fatherDeathCertificateFormData
+            )
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
         }
 
         this.orphan.father.dateOfDeath = this.isoDateFormatter(
@@ -3663,7 +3774,7 @@ export default {
           fatherUrl
         );
 
-        console.log(`updatedFather`, updatedFather)
+        console.log(`updatedFather`, updatedFather);
 
         const updatedEducation = await this.updateEducation(
           this.orphan.education.id,
@@ -3675,7 +3786,7 @@ export default {
           this.orphan.education.reason
         );
 
-        console.log(`updatedEducation`, updatedEducation)
+        console.log(`updatedEducation`, updatedEducation);
 
         this.orphan.mother.dateOfDeath = this.isoDateFormatter(
           this.orphan.mother.dateOfDeath
@@ -3697,7 +3808,7 @@ export default {
           this.orphan.mother.mobileNumber
         );
 
-        console.log(`updatedMother`, updatedMother)
+        console.log(`updatedMother`, updatedMother);
 
         const updatedHouseProperty = await this.updateHouseProperty(
           this.orphan.house_property.id,
@@ -3705,11 +3816,11 @@ export default {
           this.orphan.house_property.otherProperty
         );
 
-        console.log(`updatedHouseProperty`, updatedHouseProperty)
+        console.log(`updatedHouseProperty`, updatedHouseProperty);
 
         let guardianUrls = {};
 
-        if(this.confirmationLetterFile) {
+        if (this.confirmationLetterFile) {
           const guardianConfirmationLetterFormData = new FormData();
           guardianConfirmationLetterFormData.append(
             "guardianConfirmationLetter",
@@ -3718,15 +3829,15 @@ export default {
           );
 
           guardianUrls["confirmationLetterUrl"] = await axios
-          .post(
-            `/public/images/guardianConfirmationLetter/`,
-            guardianConfirmationLetterFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+            .post(
+              `/public/images/guardianConfirmationLetter/`,
+              guardianConfirmationLetterFormData
+            )
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
         }
 
-        if(this.legalConfirmationLetterFile) {
+        if (this.legalConfirmationLetterFile) {
           const guardianLegalConfirmationLetterFormData = new FormData();
           guardianLegalConfirmationLetterFormData.append(
             "guardianLegalConfirmationLetter",
@@ -3735,15 +3846,15 @@ export default {
           );
 
           guardianUrls["legalConfirmationLetterUrl"] = await axios
-          .post(
-            `/public/images/guardianLegalConfirmationLetter/`,
-            guardianLegalConfirmationLetterFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+            .post(
+              `/public/images/guardianLegalConfirmationLetter/`,
+              guardianLegalConfirmationLetterFormData
+            )
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
         }
 
-        if(this.guardianIdCardFile) {
+        if (this.guardianIdCardFile) {
           const guardianIdCardFormData = new FormData();
           guardianIdCardFormData.append(
             "guardianIDCard",
@@ -3752,9 +3863,9 @@ export default {
           );
 
           guardianUrls["iDCardUrl"] = await axios
-          .post(`/public/images/guardianIDCard/`, guardianIdCardFormData)
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+            .post(`/public/images/guardianIDCard/`, guardianIdCardFormData)
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
         }
 
         this.orphan.guardian.dateOfBirth = this.isoDateFormatter(
@@ -3776,13 +3887,17 @@ export default {
           guardianUrls
         );
 
-        const updatedSocialWorker = this.socialWorkers.filter(socialWorker => this.orphanSelectedSocialWorker === `${socialWorker.firstName} ${socialWorker.middleName} ${socialWorker.lastName}`)[0];  
+        const updatedSocialWorker = this.socialWorkers.filter(
+          (socialWorker) =>
+            this.orphanSelectedSocialWorker ===
+            `${socialWorker.firstName} ${socialWorker.middleName} ${socialWorker.lastName}`
+        )[0];
 
-        console.log(`updatedGuardian`, updatedGuardian)
+        console.log(`updatedGuardian`, updatedGuardian);
 
         let orphanUrls = {};
 
-        if(this.orphanBirthCertificateFile) {
+        if (this.orphanBirthCertificateFile) {
           const orphanBirthCertificateFormData = new FormData();
           orphanBirthCertificateFormData.append(
             "orphanBirthCertificate",
@@ -3791,15 +3906,15 @@ export default {
           );
 
           orphanUrls["birthCertificateUrl"] = await axios
-          .post(
-            `/public/images/orphanBirthCertificate/`,
-            orphanBirthCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+            .post(
+              `/public/images/orphanBirthCertificate/`,
+              orphanBirthCertificateFormData
+            )
+            .then((res) => res.data)
+            .catch((err) => console.warn(err));
         }
 
-        if(this.orphanIdCardFile) {
+        if (this.orphanIdCardFile) {
           const orphanIdCardFormData = new FormData();
           orphanIdCardFormData.append(
             "orphanIdCard",
@@ -3813,7 +3928,7 @@ export default {
             .catch((err) => console.warn(err));
         }
 
-        if(this.orphanPassportFile) {
+        if (this.orphanPassportFile) {
           const orphanPassportFormData = new FormData();
           orphanPassportFormData.append(
             "orphanPassport",
@@ -3827,7 +3942,7 @@ export default {
             .catch((err) => console.warn(err));
         }
 
-        if(this.originalThankyouLetterFile) {
+        if (this.originalThankyouLetterFile) {
           const originalThankyouLetterFormData = new FormData();
           originalThankyouLetterFormData.append(
             "orphanOriginalThankyouLetter",
@@ -3836,7 +3951,10 @@ export default {
           );
 
           orphanUrls["originalThankyouLetterUrl"] = await axios
-            .post(`/public/images/orphanOriginalThankyouLetter/`, originalThankyouLetterFormData)
+            .post(
+              `/public/images/orphanOriginalThankyouLetter/`,
+              originalThankyouLetterFormData
+            )
             .then((res) => res.data)
             .catch((err) => console.warn(err));
         }
@@ -3868,7 +3986,6 @@ export default {
         this.populateFields();
 
         console.log(`updatedOrphan`, updatedOrphan);
-
       }
       this.educationLevelFormatter();
     },
@@ -3882,9 +3999,9 @@ export default {
       fatherUrl
     ) {
       let queryParameterInjection = "",
-          query$ParameterInjection = "";
+        query$ParameterInjection = "";
       for (const url in fatherUrl) {
-        if(url !== "") {
+        if (url !== "") {
           query$ParameterInjection += ` $${url}: String`;
           queryParameterInjection += ` ${url}: $${url}`;
         }
@@ -3918,8 +4035,8 @@ export default {
         lastName: lastName,
         dateOfBirth: dateOfBirth,
         dateOfDeath: dateOfDeath,
-        causeOfDeath: causeOfDeath
-      }
+        causeOfDeath: causeOfDeath,
+      };
       variables = Object.assign(variables, fatherUrl);
 
       return axios
@@ -3992,9 +4109,9 @@ export default {
       guardianUrls
     ) {
       let queryParameterInjection = "",
-          query$ParameterInjection = "";
+        query$ParameterInjection = "";
       for (const url in guardianUrls) {
-        if(url !== "") {
+        if (url !== "") {
           query$ParameterInjection += ` $${url}: String`;
           queryParameterInjection += ` ${url}: $${url}`;
         }
@@ -4043,14 +4160,14 @@ export default {
         email: email,
         mobileNumber: mobileNumber,
         telephoneNumber: telephoneNumber,
-        nationality: nationality
-      }
+        nationality: nationality,
+      };
       variables = Object.assign(variables, guardianUrls);
 
       return axios
         .post("/graphql/", {
           query: query,
-          variables: variables
+          variables: variables,
         })
         .then((res) => res.data.data.updateGuardian)
         .catch((err) => console.warn(err));
@@ -4114,11 +4231,7 @@ export default {
         .catch((err) => console.warn(err));
     },
 
-    updateHouseProperty(
-      HousePropertyId,
-      housingSituation,
-      otherProperty
-    ) {
+    updateHouseProperty(HousePropertyId, housingSituation, otherProperty) {
       return axios
         .post("/graphql/", {
           query: `mutation updateHouse_property(
@@ -4169,9 +4282,9 @@ export default {
       orphanUrls
     ) {
       let queryParameterInjection = "",
-          query$ParameterInjection = "";
+        query$ParameterInjection = "";
       for (const url in orphanUrls) {
-        if(url !== "") {
+        if (url !== "") {
           query$ParameterInjection += ` $${url}: String`;
           queryParameterInjection += ` ${url}: $${url}`;
         }
@@ -4309,7 +4422,7 @@ export default {
             photoPortraitUrl
           }
         }
-      }`
+      }`;
 
       let variables = {
         id: orphanId,
@@ -4337,7 +4450,7 @@ export default {
       return axios
         .post("/graphql/", {
           query: query,
-          variables: variables
+          variables: variables,
         })
         .then((res) => res.data.data.updateOrphan)
         .catch((err) => console.warn(err));
@@ -4359,33 +4472,36 @@ export default {
       return orphanId;
     },
     dateGenerator(date) {
-        return date ? new Date(Date.parse(date.toString())).toDateString() : "";
+      return date ? new Date(Date.parse(date.toString())).toDateString() : "";
     },
     genderGenerator(genderAbbr) {
       return genderAbbr === "M" ? "Male" : genderAbbr === "F" ? "Female" : "";
     },
     ageGenerator(date) {
-        return date ? new Date().getFullYear() - new Date(Date.parse(date.toString())).getFullYear() : "";
+      return date
+        ? new Date().getFullYear() -
+            new Date(Date.parse(date.toString())).getFullYear()
+        : "";
     },
     portraitImageGenerator(photo) {
       // const image = this.orphan.photos.filter(val => val.id === id)[0];
       // const image = this.orphan.photos[idx];
 
-      return photo ? `${
-        axios.defaults.baseURL
-        }${photo.photoPortraitUrl.slice(
-          photo.photoPortraitUrl.indexOf("/")
-        )}` : "";
+      return photo
+        ? `${axios.defaults.baseURL}${photo.photoPortraitUrl.slice(
+            photo.photoPortraitUrl.indexOf("/")
+          )}`
+        : "";
     },
     longImageGenerator(photo) {
       // const image = this.orphan.photos.filter(val => val.id === id)[0];
       // const image = this.orphan.photos[idx];
 
-      return photo ? `${
-        axios.defaults.baseURL
-        }${photo.photoLongUrl.slice(
-          photo.photoLongUrl.indexOf("/")
-        )}` : "";
+      return photo
+        ? `${axios.defaults.baseURL}${photo.photoLongUrl.slice(
+            photo.photoLongUrl.indexOf("/")
+          )}`
+        : "";
     },
     toggleOrphanPassportDialog() {
       this.orphanPassportDialog = !this.orphanPassportDialog;
@@ -4474,15 +4590,13 @@ export default {
         }
       );
 
-      // removing gradeSchool and adding primary, junior and hightschool
+      // removing primary_elementary and adding Primary/Elementary
       this.orphanSelectOptions.orphanEducationLevelOptions.splice(
         this.orphanSelectOptions.orphanEducationLevelOptions.indexOf(
-          "gradeSchool"
+          "primary_elementary"
         ),
         1,
-        "Primary/Elementary",
-        "Junior",
-        "Highschool"
+        "Primary/Elementary"
       );
 
       this.orphanSelectOptions.orphanEducationLevelOptions = this.orphanSelectOptions.orphanEducationLevelOptions.map(
@@ -4494,12 +4608,7 @@ export default {
           const regex = /[A-Z]/g;
           let idx = val.search(regex);
           if (val === "N_A") obj.text = val;
-          else if (
-            val === "Primary/Elementary" ||
-            val === "Junior" ||
-            val === "Highschool"
-          )
-            obj.text = val;
+          else if (val === "Primary/Elementary") obj.text = val;
           else if (val === "preSchool")
             obj.text =
               val.slice(0, 1).toUpperCase() + val.slice(1).toLowerCase();
@@ -4532,34 +4641,22 @@ export default {
     // formats education level
     educationLevelFormatter() {
       if (this.orphan.education?.level === "religiousEducation") {
-        this.orphanSelectEditableFields.orphanEducationLevel = "Religious Education";
+        this.orphanSelectEditableFields.orphanEducationLevel =
+          "Religious Education";
         this.orphanSelectedOption.orphanEducationLevel = "Religious Education";
       } else if (this.orphan.education?.level === "preSchool") {
         this.orphanSelectEditableFields.orphanEducationLevel = "Preschool";
         this.orphanSelectedOption.orphanEducationLevel = "Preschool";
-      } else if (this.orphan.education?.level === "gradeSchool") {
-        if (
-          this.orphan.education?.year > 0 &&
-          this.orphan.education?.year < 7
-        ) {
-          this.orphanSelectEditableFields.orphanEducationLevel = "Primary/Elementary";
-          this.orphanSelectedOption.orphanEducationLevel = "Primary/Elementary";
-        } else if (
-          this.orphan.education?.year > 6 &&
-          this.orphan.education?.year < 9
-        ) {
-          this.orphanSelectEditableFields.orphanEducationLevel = "Junior";
-          this.orphanSelectedOption.orphanEducationLevel = "Junior";
-        } else if (
-          this.orphan.education?.year > 8 &&
-          this.orphan.education?.year < 13
-        ) {
-          this.orphanSelectEditableFields.orphanEducationLevel = "Highschool";
-          this.orphanSelectedOption.orphanEducationLevel = "Highschool";
-        } else {
-          this.orphanSelectEditableFields.orphanEducationLevel = "N_A";
-          this.orphanSelectedOption.orphanEducationLevel = "N_A";
-        }
+      } else if (this.orphan.education?.level === "primary_elementary") {
+        this.orphanSelectEditableFields.orphanEducationLevel =
+          "Primary/Elementary";
+        this.orphanSelectedOption.orphanEducationLevel = "Primary/Elementary";
+      } else if (this.orphan.education?.level === "junior") {
+        this.orphanSelectEditableFields.orphanEducationLevel = "Junior";
+        this.orphanSelectedOption.orphanEducationLevel = "Junior";
+      } else if (this.orphan.education?.level === "highschool") {
+        this.orphanSelectEditableFields.orphanEducationLevel = "Highschool";
+        this.orphanSelectedOption.orphanEducationLevel = "Highschool";
       } else if (this.orphan.education?.level === "underGraduate") {
         this.orphanSelectEditableFields.orphanEducationLevel = "Under Graduate";
         this.orphanSelectedOption.orphanEducationLevel = "Under Graduate";
@@ -4664,7 +4761,8 @@ export default {
 
     dashDateFormatter(dateString) {
       let dateFormat = new Date(dateString);
-      return `${dateFormat.getFullYear()}-0${dateFormat.getMonth() + 1}-${dateFormat.getDate()}`;
+      return `${dateFormat.getFullYear()}-0${dateFormat.getMonth() +
+        1}-${dateFormat.getDate()}`;
     },
   },
 };
