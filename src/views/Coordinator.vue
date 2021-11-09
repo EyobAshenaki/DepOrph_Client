@@ -328,130 +328,257 @@
 
     <template v-else>
       <v-row v-if="!showOrphans" justify="center" no-gutters>
-        <!-- Table Card -->
-        <!-- TODO: # add a details column -->
-        <!--       # impliment editable fullName * NEW FEATURE * -->
-        <!--       # impliment a custom pagination -->
-        <v-col cols="11" style="margin-top: 6rem">
-          <v-card elevation="3" min-height="50vh">
-            <v-sheet class="overflow-y-auto" max-height="83vh">
-              <v-data-table
-                :headers="headers"
-                :items="villages"
-                item-key="id"
-                :search="search"
-                append-icon="mdi-magnify"
-                :custom-filter="searchFilter"
-                multi-sort
-                class="elevation-1"
+        <!-- Project Creation dialog -->
+        <v-row justify="center">
+          <v-dialog v-model="createProjectDialog" persistent max-width="600px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-col
+                cols="12"
+                class="text-center"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                style="margin-top: 6rem"
               >
-                <template v-slot:top>
-                  <v-row style="margin: 0px">
-                    <!-- Filter/Search Selection -->
-                    <!-- TODO: # add close icon and function to remove from selection -->
-                    <!--       # add tooltip maybe -->
-                    <v-col cols="12" sm="7" class="ml-md-auto mx-sm-auto">
-                      <v-responsive
-                        min-width="300"
-                        max-width="300"
-                        class="mx-xs-auto ml-sm-auto mt-sm-2"
+                <v-btn fab dark color="indigo">
+                  <v-icon dark>
+                    mdi-plus
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </template>
+
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Create Project</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <!-- Project start date -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-menu
+                        ref="projectStartDateMenu"
+                        v-model="projectStartDateMenu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="auto"
                       >
-                        <v-select
-                          v-model="filterValue"
-                          hint="select field/s to filter explicity"
-                          :items="filterItems"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          solo
-                          flat
-                          outlined
-                          dense
-                          persistent-hint
-                          multiple
-                          placeholder="Filter By"
-                        >
-                          <template v-slot:selection="{ item, index }">
-                            <v-chip
-                              color="primary"
-                              dark
-                              label
-                              close
-                              close-icon="mdi-close-outline"
-                              @click:close="removeSelected(item)"
-                              v-if="index === 0"
-                            >
-                              <span>{{ item }}</span>
-                            </v-chip>
-                            <span v-if="index === 1" class="grey--text caption">
-                              (+{{ filterValue.length - 1 }} others)
-                            </span>
-                          </template>
-                        </v-select>
-                      </v-responsive>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="projectStartDate"
+                            label="Start date"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="projectStartDate"
+                          :active-picker.sync="projectStartDateActivePicker"
+                          :min="
+                            new Date(
+                              Date.now() -
+                                new Date().getTimezoneOffset() * 60000
+                            )
+                              .toISOString()
+                              .substr(0, 10)
+                          "
+                          max="2070-01-01"
+                          @change="projectStartDateSave"
+                        ></v-date-picker>
+                      </v-menu>
                     </v-col>
-                    <!-- Search Input -->
-                    <!-- TODO: # add search icon and close icon -->
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="5"
-                      offset-md="0"
-                      class="mx-sm-auto"
-                    >
-                      <v-responsive max-width="300" class="ml-sm-3 mt-sm-4">
-                        <v-text-field
-                          v-model="search"
-                          placeholder="Search"
-                          dense
-                          flat
-                          clearable
-                          append-icon="mdi-filter-minus"
-                        >
-                          <template v-slot:prepend> </template>
-                        </v-text-field>
-                      </v-responsive>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        label="Period*"
+                        type="number"
+                        required
+                        hint="duration of the project in years"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        label="Maximum beneficiaries*"
+                        type="number"
+                        persistent-hint
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        label="Total budget*"
+                        type="number"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <!-- Project proposal insertion -->
+                    <v-col cols="12">
+                      <v-file-input
+                        accept="image/*,.pdf,.doc"
+                        label="Project proposal"
+                      ></v-file-input>
                     </v-col>
                   </v-row>
-                </template>
-                <template v-slot:item.id="{ item }">
-                  {{ getVillageTableId(item) }}
-                </template>
-                <template v-slot:item.villageName="{ item }">
-                  {{ getVillageTableVillageName(item) }}
-                </template>
-                <template v-slot:item.district="{ item }">
-                  {{ getVillageTableDistrict(item) }}
-                </template>
-                <template v-slot:item.registrationDate="{ item }">
-                  {{ getVillageTableRegistrationDate(item) }}
-                </template>
-                <template v-slot:item.donor="{ item }">
-                  {{ getVillageTableDonor(item) }}
-                </template>
-                <template v-slot:item.socialWorker="{ item }">
-                  {{ getVillageTableSocialWorker(item) }}
-                </template>
-                <template v-slot:item.orphans="{ item }">
-                  <v-btn
-                    small
-                    color="primary darken-2"
-                    @click="goToOrphansTable(item)"
-                    >Show Orphan</v-btn
+                </v-container>
+                <small>*indicates required field</small>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="red darken-1"
+                  text
+                  @click="createProjectDialog = false"
+                >
+                  Close
+                </v-btn>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="createProjectDialog = false"
+                >
+                  Save
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-row>
+        <!-- Project Main card -->
+        <v-col cols="12">
+          <v-card
+            class="mx-auto mt-8"
+            min-width="500"
+            max-width="90%"
+            height="100%"
+          >
+            <v-card-text>
+              <v-col class="mx-auto" cols="12" sm="6">
+                <v-text-field
+                  v-model="searchProject"
+                  label="Search"
+                  outlined
+                  clearable
+                ></v-text-field>
+              </v-col>
+              <!-- Project Card lists -->
+              <v-row class="d-flex justify-space-around">
+                <!-- <v-col class="" cols=""> -->
+                <v-card
+                  v-for="(item, idx) in projects"
+                  :key="idx"
+                  class="mb-8"
+                  max-width="450"
+                >
+                  <v-img
+                    height="200px"
+                    src="../assets/brandi-redd-aJTiW00qqtI-unsplash.jpg"
                   >
-                </template>
-              </v-data-table>
-              <!-- becomes visble when full name is edited -->
-              <!-- TODO: # Impliment a loding functionality -->
-              <!--       # maybe server side validation also -->
-              <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-                {{ snackText }}
+                    <v-col cols="12" class="ma-0 mt-3 d-flex justify-end">
+                      <v-btn class="mr-1">
+                        <v-icon>mdi-text-box-multiple-outline</v-icon>
+                      </v-btn>
+                      <v-btn>
+                        <v-icon>mdi-calendar-month</v-icon>
+                        <!-- <v-icon>mdi-handshake-outline</v-icon> -->
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="12" class="d-flex mt-12">
+                      <v-card-title
+                        class="justify-start"
+                        style="font-size: 2em"
+                      >
+                        {{ `Project-${item.number}` }}
+                      </v-card-title>
+                    </v-col>
+                  </v-img>
+                  <!-- Middle part of the card -->
+                  <v-card-text
+                    class="text--primary ml-0"
+                    style="font-size: 1.3em"
+                  >
+                    <v-col cols="12">
+                      <v-row>
+                        <v-icon size="60" color="teal">mdi-calendar</v-icon>
+                        <v-col cols="">
+                          <v-card-subtitle class="pa-0">From:</v-card-subtitle>
+                          <p>{{ "Jan 18,2021" }}</p>
+                        </v-col>
 
-                <template v-slot:action="{ attrs }">
-                  <v-btn v-bind="attrs" text @click="snack = false">
-                    Close
-                  </v-btn>
-                </template>
-              </v-snackbar>
-            </v-sheet>
+                        <v-divider class="my-4 mr-8" vertical></v-divider>
+
+                        <v-col cols="">
+                          <v-card-subtitle class="pa-0">To:</v-card-subtitle>
+                          <p>{{ "Jan 18,2026" }}</p>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-row>
+                        <v-icon size="60" color="orange"
+                          >mdi-currency-usd</v-icon
+                        >
+                        <v-card-subtitle style="font-size: 1em"
+                          >Total Budget:</v-card-subtitle
+                        >
+                        <p class="mb-0 pa-4 pl-0">{{ item.totalBudget }}</p>
+                      </v-row>
+                    </v-col>
+                  </v-card-text>
+
+                  <v-divider class="mx-6"></v-divider>
+
+                  <!-- Footer Part of the card -->
+                  <v-card-text>
+                    <v-row class="ma-0">
+                      <v-col class="text-center">
+                        <v-icon size="40" color="orange"
+                          >mdi-account-group</v-icon
+                        >
+                        <v-card-title
+                          class="px-0 pt-2 pb-1 ml-2"
+                          style="font-size: 1.2em"
+                          >Beneficiaries</v-card-title
+                        >
+                        <p class="mb-0 pl-0">
+                          {{ item.maximumNumberOfBeneficiaries }}
+                        </p>
+                      </v-col>
+
+                      <v-divider class="my-4" vertical></v-divider>
+
+                      <v-col class="text-center">
+                        <v-icon size="40" color="orange"
+                          >mdi-check-circle</v-icon
+                        >
+                        <v-card-title
+                          class="ml-4 pt-2 pb-1"
+                          style="font-size: 1.2em"
+                          >Status</v-card-title
+                        >
+                        <p class="mb-0 pl-0 text-body-2">{{ item.status }}</p>
+                      </v-col>
+
+                      <v-divider class="my-4" vertical></v-divider>
+
+                      <v-col class="text-center">
+                        <v-icon size="40" color="orange">mdi-home-group</v-icon>
+                        <v-card-title
+                          class="ml-1 pt-2 pb-1"
+                          style="font-size: 1.2em"
+                          ># Villages</v-card-title
+                        >
+                        <p class="mb-0 pl-0">
+                          {{ item.villages ? item.villages.length : 0 }}
+                        </p>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+                <!-- </v-col> -->
+              </v-row>
+            </v-card-text>
           </v-card>
         </v-col>
       </v-row>
@@ -486,6 +613,7 @@ export default {
     return {
       search: "", // used for filter
       orphanSearch: "",
+      searchProject: "",
       singleOrphanSelect: false,
       selectedOrphans: [],
       selectSwitch: "Multiple Orphans",
@@ -512,34 +640,6 @@ export default {
       orphanFilterValue: [],
       // used for filter selection
       // table headers if that wasn't clear enough LOL
-      headers: [
-        { text: "Id", value: "id" },
-        {
-          text: "Village Name",
-          align: "Start",
-          value: "villageName",
-        },
-        {
-          text: "District",
-          value: "district",
-        },
-        {
-          text: "Registred on",
-          value: "registrationDate",
-        },
-        {
-          text: "Donor",
-          value: "donor",
-        },
-        {
-          text: "Social Worker",
-          value: "socialWorker",
-        },
-        {
-          text: "Orphans",
-          value: "orphans",
-        },
-      ],
       orphanHeaders: [
         { text: "Id", value: "id" },
         {
@@ -569,9 +669,14 @@ export default {
         email: "",
         role: "",
       },
+      projects: [],
       rules: {
         required: (value) => !!value || "Required.",
       },
+      createProjectDialog: false,
+      projectStartDateActivePicker: null,
+      projectStartDate: null,
+      projectStartDateMenu: false,
       newOrphanDialog: false,
       showVillagesSelectionDialog: false,
       selectedOrphanVillage: "",
@@ -596,11 +701,12 @@ export default {
       orphans: [],
       villages: [],
       showOrphans: false,
-      selectedOrphanIds: {ids: []},
+      selectedOrphanIds: { ids: [] },
     };
   },
   created() {
     this.initialize();
+    this.initializeProjects();
   },
   computed: {
     // temporary filter for the notification panel
@@ -639,6 +745,9 @@ export default {
       this.selectSwitch =
         this.singleOrphanSelect === true ? "Single Orphan" : "Multiple Orphans";
     },
+    projectStartDateMenu(val) {
+      val && setTimeout(() => (this.projectStartDateActivePicker = "YEAR"));
+    },
   },
   methods: {
     initialize() {
@@ -655,36 +764,10 @@ export default {
                       email
                       role
                     }
-                    villages {
+                    donors {
                       id
-                      name
-                      registrationDate
-                      district {
-                        name
-                        socialWorkers {
-                          firstName
-                          middleName
-                          lastName
-                        }
-                      }
-                      donor {
-                        nameInitials
-                      }
                       orphans {
                         id
-                        created_at
-                        firstName
-                        father {
-                          firstName
-                          lastName
-                        }
-                        dateOfBirth
-                        gender
-                        sponsorshipStatuses {
-                          id
-                          status
-                          date
-                        }
                       }
                     }
                   }
@@ -693,6 +776,7 @@ export default {
             id: this.$route.params.id,
           },
         })
+        // .then(res => console.log(res.data.data.coordinator))
         .then((res) => res.data.data.coordinator)
         .then((coordinator) => {
           this.coordinator = Object.assign({}, coordinator);
@@ -700,8 +784,13 @@ export default {
             this.coordinatorUser,
             coordinator.user
           );
-          this.villages.push(...this.coordinator.villages);
-          this.orphans = this.coordinator.villages.reduce((acc, village) => {
+
+          // #          // change this with the getVillagebyCoordinatorId
+
+          // this.villages.push(...this.coordinator.villages);
+
+          // amended
+          this.orphans = this.coordinator.donors.reduce((acc, village) => {
             return acc.concat(village.orphans);
           }, []);
           for (const property in this.coordinatorUser) {
@@ -713,6 +802,40 @@ export default {
         })
         .catch((err) => console.warn(err));
     },
+    initializeProjects() {
+      axios
+        .post("/graphql/", {
+          query: `query getProjectsByCoordinatorId ($coordinatorId: ID!) {
+                  getProjectsByCoordinatorId(coordinatorId: $coordinatorId) {
+                    id
+                    number
+                    startDate
+                    endDate
+                    status
+                    maximumNumberOfBeneficiaries
+                    durationInYears
+                    totalBudget
+                    administrativeCost
+                    supportPlans {
+                      id
+                      donor {
+                        id
+                        nameInitials
+                      }
+                    }
+                    villages {
+                      id
+                    }
+                  }
+                }`,
+          variables: {
+            coordinatorId: this.$route.params.id,
+          },
+        })
+        .then((res) => res.data.data.getProjectsByCoordinatorId)
+        .then((projects) => (this.projects = [...projects]))
+        .catch((err) => console.warn(err));
+    },
     toggleNewOrphanDialog(val) {
       this.showVillagesSelectionDialog = val;
     },
@@ -722,35 +845,10 @@ export default {
     toggleChangeStatus(val) {
       this.showStatusChangeSelectionDialog = val;
     },
-    getVillageTableId(item) {
-      return item.id;
-    },
-    getVillageTableVillageName(item) {
-      return item.name;
-    },
-    getVillageTableDistrict(item) {
-      if (item.district === null) return "";
-      return item.district.name;
-    },
-    getVillageTableRegistrationDate(item) {
-      return item.registrationDate;
-    },
-    getVillageTableDonor(item) {
-      if (item.donor === null) return "";
-      return item.donor.nameInitials;
-    },
-    getVillageTableSocialWorker(item) {
-      return (
-        item.district.socialWorkers[0].firstName +
-        " " +
-        item.district.socialWorkers[0].middleName +
-        " " +
-        item.district.socialWorkers[0].lastName
-      );
-    },
-    goToOrphansTable(item) {
+    // #
+    goToOrphansTable() {
       this.showOrphans = true;
-      this.selectedOrphanIds.ids = item.orphans.map((orphan) =>
+      this.selectedOrphanIds.ids = this.orphans.map((orphan) =>
         parseInt(orphan.id)
       );
     },
@@ -759,58 +857,6 @@ export default {
       this.selectedOrphanIds.ids.push(parseInt(newOrphanId));
     },
     // custom search function based on selected columns
-    searchFilter(value, search, item) {
-      // console.log(this.filterValue);
-      if (search.length > 0) {
-        if (this.filterValue.length > 0) {
-          for (const filterVal of this.filterValue) {
-            if (filterVal === this.headers[0].text) {
-              return item.id.indexOf(search) !== -1;
-            } else if (filterVal === this.headers[1].text) {
-              return (
-                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
-              );
-            } else if (filterVal === this.headers[2].text) {
-              return (
-                item.district.name
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
-            } else if (filterVal === this.headers[3].text) {
-              return (
-                item.registrationDate
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
-              // TODO # fix it to be visible as stacked avatars
-            } else if (filterVal === this.headers[4].text) {
-              return (
-                item.donor.nameInitials
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
-            } else if (filterVal === this.headers[5].text) {
-              let socialWorkerName = `${item.district.socialWorkers[0].firstName} ${item.district.socialWorkers[0].middleName} ${item.district.socialWorkers[0].lastName}`;
-              return (
-                socialWorkerName.toLowerCase().indexOf(search.toLowerCase()) !==
-                -1
-              );
-            } else if (filterVal === this.headers[6].text) {
-              return parseInt(item.orphans.length) === parseInt(search);
-            }
-          }
-        } else {
-          return (
-            item.name != null &&
-            typeof item.name === "string" &&
-            item.name
-              .toString()
-              .toLowerCase()
-              .indexOf(search) !== -1
-          );
-        }
-      }
-    },
     orphanSearchFilter(value, search, item) {
       if (search.length > 0) {
         if (this.orphanFilterValue.length > 0) {
@@ -988,6 +1034,10 @@ export default {
         .catch((err) => console.warn(err));
     },
 
+    projectStartDateSave(date) {
+      this.$refs.projectStartDateMenu.save(date);
+    },
+
     // -------------------------------------
     sendTest() {
       console.log(this.villages);
@@ -1017,10 +1067,6 @@ export default {
       // this comes at the very last of the process so:
       // notify the user weither the operation was successful or keep/write to the log functionality
       console.log("Dialog closed");
-    },
-    removeSelected(item) {
-      this.filterValue.splice(this.filterValue.indexOf(item), 1);
-      this.filterValue = [...this.filterValue];
     },
   },
 };

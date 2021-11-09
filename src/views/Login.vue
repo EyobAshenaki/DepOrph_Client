@@ -232,16 +232,16 @@ export default {
                           id
                           email
                           role
-                          coordinators {
+                          coordinator {
                             id
                           }
-                          heads {
+                          head {
                             id
                           }
-                          donors {
+                          donor {
                             id
                           }
-                          socialWorkers {
+                          socialWorker {
                             id
                             firstName
                           }
@@ -261,19 +261,19 @@ export default {
           if (user.role === "Head") {
             this.$router.push({
               name: "Head_v2",
-              params: { id: user.heads[0].id }
+              params: { id: user.head.id }
             });
           } else if (user.role === "Donor") {
-            this.$router.push({ name: "Donor", params: { id: user.donors[0].id } });
+            this.$router.push({ name: "Donor", params: { id: user.donor.id } });
           } else if (user.role === "Coordinator") {
             this.$router.push({
               name: "Coordinator",
-              params: { id: user.coordinators[0].id }
+              params: { id: user.coordinator.id }
             });
           } else if (user.role === "SocialWorker") {
             this.$router.push({
               name: "SocialWorker",
-              params: { id: user.socialWorkers[0].id, firstName: user.socialWorkers[0].firstName }
+              params: { id: user.socialWorker.id, firstName: user.socialWorker.firstName }
             });
           }
         })
