@@ -353,7 +353,11 @@
                 <span class="text-h5">Create Project</span>
               </v-card-title>
               <v-card-text>
-                <v-container>
+                <v-form
+                  ref="createProjectForm"
+                  v-model="validCreateProject"
+                  lazy-validation
+                >
                   <v-row>
                     <!-- Project start date -->
                     <v-col cols="12" md="6" sm="4">
@@ -371,6 +375,7 @@
                             label="Start date"
                             prepend-icon="mdi-calendar"
                             readonly
+                            :rules="[rules.required]"
                             v-bind="attrs"
                             v-on="on"
                           ></v-text-field>
@@ -393,36 +398,112 @@
                     </v-col>
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
+                        v-model="projectNumber"
+                        label="Number*"
+                        type="number"
+                        :rules="[rules.required]"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        v-model="projectDurationInYears"
                         label="Period*"
                         type="number"
-                        required
+                        :rules="[rules.required]"
                         hint="duration of the project in years"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
+                        v-model="projectMaxBeneficiaries"
                         label="Maximum beneficiaries*"
                         type="number"
-                        persistent-hint
-                        required
+                        :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
+                        v-model="projectTotalBudget"
                         label="Total budget*"
                         type="number"
-                        required
+                        :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        v-model="projectAdministrativeCost"
+                        label="Administrative cost*"
+                        type="number"
+                        :rules="[rules.required]"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="projectLocation"
+                        :items="allVillages"
+                        :item-text="villageText_Value"
+                        :item-value="villageText_Value"
+                        :menu-props="{
+                          top: true,
+                          offsetY: true,
+                        }"
+                        :rules="[rules.required]"
+                        label="Locations*"
+                      ></v-select>
+                    </v-col>
                     <!-- Project proposal insertion -->
-                    <v-col cols="12">
+                    <v-col cols="12" sm="6" md="4">
                       <v-file-input
-                        accept="image/*,.pdf,.doc"
+                        v-model="projectProposalFile"
+                        accept=".pdf,.doc"
                         label="Project proposal"
-                      ></v-file-input>
+                        :rules="[rules.required]"
+                        @change="toggleProjectProposalInput($event)"
+                      >
+                        <template v-slot:append>
+                          <v-tooltip top>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                class="ml-auto"
+                                v-bind="attrs"
+                                v-on="on"
+                                @click="toggleProjectProposalDialog"
+                              >
+                                mdi-file-eye-outline
+                              </v-icon>
+                            </template>
+                            <span>Preview</span>
+                          </v-tooltip>
+
+                          <!-- preview image popup -->
+                          <v-dialog v-model="projectProposalDialog">
+                            <v-container>
+                              <v-row>
+                                <!-- <v-col>what</v-col> -->
+                                <v-spacer></v-spacer>
+                                <v-col class="mr-n12" sm="1">
+                                  <v-icon
+                                    dark
+                                    @click="toggleProjectProposalDialog"
+                                  >
+                                    mdi-close
+                                  </v-icon>
+                                </v-col>
+                              </v-row>
+
+                              <v-img
+                                height="82vh"
+                                :src="projectProposalPreview"
+                                contain
+                                alt="Project Proposal Document"
+                              ></v-img>
+                            </v-container>
+                          </v-dialog>
+                        </template>
+                      </v-file-input>
                     </v-col>
                   </v-row>
-                </v-container>
+                </v-form>
                 <small>*indicates required field</small>
               </v-card-text>
               <v-card-actions>
@@ -437,7 +518,8 @@
                 <v-btn
                   color="blue darken-1"
                   text
-                  @click="createProjectDialog = false"
+                  :disabled="!validCreateProject"
+                  @click="createProjectSave"
                 >
                   Save
                 </v-btn>
@@ -445,6 +527,136 @@
             </v-card>
           </v-dialog>
         </v-row>
+        <!-- Create Support Plan dialog-->
+        <template>
+          <v-dialog
+            v-model="createSupportPlanDialog"
+            persistent
+            max-width="600px"
+          >
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Create SupportPlan</span>
+              </v-card-title>
+              <v-card-text>
+                <v-form
+                  ref="createSupportPlanForm"
+                  v-model="validCreateSupportPlan"
+                  lazy-validation
+                >
+                  <v-row>
+                    <!-- SupportPlan start date -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-menu
+                        ref="supportPlanStartDateMenu"
+                        v-model="supportPlanStartDateMenu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="supportPlanStartDate"
+                            label="Start date"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            :rules="[rules.required]"
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="supportPlanStartDate"
+                          :active-picker.sync="supportPlanStartDateActivePicker"
+                          :min="
+                            new Date(
+                              Date.now() -
+                                new Date().getTimezoneOffset() * 60000
+                            )
+                              .toISOString()
+                              .substr(0, 10)
+                          "
+                          max="2070-01-01"
+                          @change="supportPlanStartDateSave"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="12" md="6" sm="4">
+                      <v-text-field
+                        v-model="supportPlanPeriodInYears"
+                        label="Period*"
+                        type="number"
+                        :rules="[rules.required]"
+                        hint="duration of the support plan in years"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="supportPlanPaymentInterval"
+                        :items="paymentIntervals"
+                        :menu-props="{
+                          top: true,
+                          offsetY: true,
+                        }"
+                        label="Payment interval*"
+                        :rules="[rules.required]"
+                        hint="payment interval in months"
+                      ></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="supportPlanAdminFeePercent"
+                        :items="percent"
+                        :menu-props="{
+                          top: true,
+                          offsetY: true,
+                        }"
+                        label="Admin Fee %*"
+                        :rules="[rules.required]"
+                        hint="admin fee in percent"
+                      ></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="supportPlanDonor"
+                        :items="donors"
+                        :item-text="donorText_Value"
+                        :item-value="donorText_Value"
+                        :menu-props="{
+                          top: true,
+                          offsetY: true,
+                        }"
+                        :rules="[rules.required]"
+                        label="Villages*"
+                        multiple
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+                </v-form>
+                <small>*indicates required field</small>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="red darken-1"
+                  text
+                  @click="createSupportPlanDialog = false"
+                >
+                  Close
+                </v-btn>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  :disabled="!validCreateSupportPlan"
+                  @click="createSupportPlanSave"
+                >
+                  Save
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </template>
         <!-- Project Main card -->
         <v-col cols="12">
           <v-card
@@ -479,7 +691,8 @@
                       <v-btn class="mr-1">
                         <v-icon>mdi-text-box-multiple-outline</v-icon>
                       </v-btn>
-                      <v-btn>
+
+                      <v-btn @click="openCreateSupportPlanDialog(item)">
                         <v-icon>mdi-calendar-month</v-icon>
                         <!-- <v-icon>mdi-handshake-outline</v-icon> -->
                       </v-btn>
@@ -609,104 +822,129 @@ export default {
     SupportPlanTable,
   },
 
-  data() {
-    return {
-      search: "", // used for filter
-      orphanSearch: "",
-      searchProject: "",
-      singleOrphanSelect: false,
-      selectedOrphans: [],
-      selectSwitch: "Multiple Orphans",
-      drawer: false, // constroles the sidebar
-      // test fields *****************
-      test: "",
-      benched: 0,
-      snack: false,
-      snackColor: "",
-      snackText: "",
-      max25chars: (v) => v.length <= 25 || "Input too long!",
-      // *****************************
-      // used in filter selection items
-      filterItems: [
-        "Id",
-        "Village Name",
-        "District",
-        "Registred on",
-        "Donor",
-        "Social Worker",
-      ],
-      orphanFilterItems: [],
-      filterValue: [],
-      orphanFilterValue: [],
-      // used for filter selection
-      // table headers if that wasn't clear enough LOL
-      orphanHeaders: [
-        { text: "Id", value: "id" },
-        {
-          text: "Full Name",
-          align: "start",
-          value: "fullName",
-        },
-        {
-          text: "Age",
-          value: "age",
-        },
-        {
-          text: "Gender",
-          value: "gender",
-        },
-        {
-          text: "Sponsorship Status",
-          value: "sponsorshipStatus",
-        },
-        { text: "Sponsored Date", value: "sponsoredDate" },
-      ],
-      coordinator: {},
-      coordinatorUser: {
-        firstName: "",
-        middleName: "",
-        lastName: "",
-        email: "",
-        role: "",
+  data: () => ({
+    search: "", // used for filter
+    orphanSearch: "",
+    searchProject: "",
+    singleOrphanSelect: false,
+    selectedOrphans: [],
+    selectSwitch: "Multiple Orphans",
+    drawer: false, // constroles the sidebar
+    // test fields *****************
+    test: "",
+    benched: 0,
+    snack: false,
+    snackColor: "",
+    snackText: "",
+    max25chars: (v) => v.length <= 25 || "Input too long!",
+    // *****************************
+    // used in filter selection items
+    filterItems: [
+      "Id",
+      "Village Name",
+      "District",
+      "Registred on",
+      "Donor",
+      "Social Worker",
+    ],
+    orphanFilterItems: [],
+    filterValue: [],
+    orphanFilterValue: [],
+    // used for filter selection
+    // table headers if that wasn't clear enough LOL
+    orphanHeaders: [
+      { text: "Id", value: "id" },
+      {
+        text: "Full Name",
+        align: "start",
+        value: "fullName",
       },
-      projects: [],
-      rules: {
-        required: (value) => !!value || "Required.",
+      {
+        text: "Age",
+        value: "age",
       },
-      createProjectDialog: false,
-      projectStartDateActivePicker: null,
-      projectStartDate: null,
-      projectStartDateMenu: false,
-      newOrphanDialog: false,
-      showVillagesSelectionDialog: false,
-      selectedOrphanVillage: "",
-      selectedOrphanVillageOptions: [],
-      validVillageChoice: false,
-      showSupportPlanTable: false,
-      showStatusChangeSelectionDialog: false,
-      validStatusSelect: false,
-      currentStatus: "",
-      currentStatusOptions: [
-        { text: "New", value: "new" },
-        { text: "Active", value: "active" },
-      ],
-      changedStatus: "",
-      changedStatusOptions: [
-        { text: "Processing", value: "processing" },
-        { text: "Graduated", value: "graduated" },
-      ],
-      changeStatusOrphanDialog: false,
-      statusChangeReason: "",
-      // table rows/items
-      orphans: [],
-      villages: [],
-      showOrphans: false,
-      selectedOrphanIds: { ids: [] },
-    };
-  },
+      {
+        text: "Gender",
+        value: "gender",
+      },
+      {
+        text: "Sponsorship Status",
+        value: "sponsorshipStatus",
+      },
+      { text: "Sponsored Date", value: "sponsoredDate" },
+    ],
+    coordinator: {},
+    donors: [],
+    coordinatorUser: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      email: "",
+      role: "",
+    },
+    projects: [],
+    rules: {
+      required: (value) => !!value || "Required.",
+    },
+    createProjectDialog: false,
+    validCreateProject: false,
+    projectStartDateActivePicker: null,
+    projectStartDate: null,
+    projectStartDateMenu: false,
+    projectNumber: null,
+    projectDurationInYears: null,
+    projectMaxBeneficiaries: null,
+    projectTotalBudget: null,
+    projectAdministrativeCost: null,
+    projectProposalDialog: false,
+    projectLocation: null,
+    projectProposalFile: null,
+    projectProposalPreview: null,
+    selectedProjectId: null,
+    createSupportPlanDialog: false,
+    validCreateSupportPlan: false,
+    supportPlanStartDateActivePicker: null,
+    supportPlanStartDate: null,
+    supportPlanStartDateMenu: false,
+    percent: [],
+    paymentIntervals: [],
+    supportPlanPeriodInYears: null,
+    supportPlanPaymentInterval: null,
+    supportPlanAdminFeePercent: null,
+    supportPlanDonor: null,
+    newOrphanDialog: false,
+    showVillagesSelectionDialog: false,
+    selectedOrphanVillage: "",
+    selectedOrphanVillageOptions: [],
+    validVillageChoice: false,
+    showSupportPlanTable: false,
+    showStatusChangeSelectionDialog: false,
+    validStatusSelect: false,
+    currentStatus: "",
+    currentStatusOptions: [
+      { text: "New", value: "new" },
+      { text: "Active", value: "active" },
+    ],
+    changedStatus: "",
+    changedStatusOptions: [
+      { text: "Processing", value: "processing" },
+      { text: "Graduated", value: "graduated" },
+    ],
+    changeStatusOrphanDialog: false,
+    statusChangeReason: "",
+    // table rows/items
+    orphans: [],
+    villages: [],
+    allVillages: [],
+    showOrphans: false,
+    selectedOrphanIds: { ids: [] },
+  }),
   created() {
     this.initialize();
     this.initializeProjects();
+    this.initializeAllVillages();
+    this.percentGenerator();
+    this.paymentIntervalGenerator();
   },
   computed: {
     // temporary filter for the notification panel
@@ -748,7 +986,10 @@ export default {
     projectStartDateMenu(val) {
       val && setTimeout(() => (this.projectStartDateActivePicker = "YEAR"));
     },
-  },
+    supportPlanStartDateMenu(val) {
+      val && setTimeout(() => (this.supportPlanStartDateActivePicker = "YEAR"));
+    },
+  },  
   methods: {
     initialize() {
       // console.log("routerCoordinatorId: ", this.$route.params.id);
@@ -756,6 +997,7 @@ export default {
         .post("/graphql/", {
           query: `query coordinator($id: ID!) {
                   coordinator(id: $id) {
+                    id
                     firstName
                     middleName
                     lastName
@@ -766,6 +1008,7 @@ export default {
                     }
                     donors {
                       id
+                      nameInitials
                       orphans {
                         id
                       }
@@ -784,6 +1027,7 @@ export default {
             this.coordinatorUser,
             coordinator.user
           );
+          this.donors = [...this.coordinator.donors];
 
           // #          // change this with the getVillagebyCoordinatorId
 
@@ -823,7 +1067,7 @@ export default {
                         nameInitials
                       }
                     }
-                    villages {
+                    location {
                       id
                     }
                   }
@@ -836,6 +1080,20 @@ export default {
         .then((projects) => (this.projects = [...projects]))
         .catch((err) => console.warn(err));
     },
+    initializeAllVillages() {
+      return axios
+        .post("/graphql/", {
+          query: `query {
+                  allVillages {
+                    id
+                    name
+                  }
+                }`,
+        })
+        .then((res) => res.data.data.allVillages)
+        .then((allVillages) => (this.allVillages = [...allVillages]))
+        .catch((err) => console.warn(err));
+    },
     toggleNewOrphanDialog(val) {
       this.showVillagesSelectionDialog = val;
     },
@@ -844,6 +1102,17 @@ export default {
     },
     toggleChangeStatus(val) {
       this.showStatusChangeSelectionDialog = val;
+    },
+    toggleProjectProposalInput() {
+      if (this.projectProposalFile) {
+        this.projectProposalPreview = URL.createObjectURL(
+          this.projectProposalFile
+        );
+        console.log("Preview", this.projectProposalPreview);
+      }
+    },
+    toggleProjectProposalDialog() {
+      this.projectProposalDialog = !this.projectProposalDialog;
     },
     // #
     goToOrphansTable() {
@@ -1033,9 +1302,271 @@ export default {
         .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
     },
+    createSupportPlan(
+      name,
+      adminFeePercentage,
+      paymentInterval,
+      startDate,
+      endDate,
+      donorId,
+      projectId
+    ) {
+      return (
+        axios
+          .post("/graphql/", {
+            query: `mutation createSupportPlan (
+                  $name: String!
+                  $adminFeePercentage: Float!
+                  $paymentInterval: String!
+                  $startDate: DateTime
+                  $endDate: DateTime
+                  $donorId: ID
+                  $projectId: ID
+                  ) {
+                  createSupportPlan (
+                    name: $name
+                    adminFeePercentage: $adminFeePercentage
+                    paymentInterval: $paymentInterval
+                    startDate: $startDate
+                    endDate: $endDate
+                    donorId: $donorId
+                    projectId: $projectId
+                  ) {
+                    id
+                  }
+                }`,
+            variables: {
+              name: name,
+              adminFeePercentage: adminFeePercentage,
+              paymentInterval: paymentInterval,
+              startDate: startDate,
+              endDate: endDate,
+              donorId: donorId,
+              projectId: projectId,
+            },
+          })
+          // .then((res) => res.data.data.createSupportPlan)
+          .then((res) => console.log(res.data))
+          .catch((err) => console.warn(err))
+      );
+    },
+    createProject(
+      number,
+      startDate,
+      endDate,
+      maximumNumberOfBeneficiaries,
+      durationInYears,
+      location,
+      totalBudget,
+      administrativeCost,
+      coordinators
+    ) {
+      return axios
+        .post("/graphql/", {
+          query: `mutation createProject (
+                  $number: String!
+                  $startDate: DateTime
+                  $endDate: DateTime
+                  $maximumNumberOfBeneficiaries: Int!
+                  $durationInYears: Int!
+                  $location: [ID]!
+                  $totalBudget: Float!
+                  $administrativeCost: Float!
+                  $coordinators: [ID]
+                ) {
+                  createProject (
+                    number: $number
+                    startDate: $startDate
+                    endDate: $endDate
+                    maximumNumberOfBeneficiaries: $maximumNumberOfBeneficiaries
+                    durationInYears: $durationInYears
+                    location: $location
+                    totalBudget: $totalBudget
+                    administrativeCost: $administrativeCost
+                    coordinators: $coordinators
+                  ) {
+                    id
+                  }
+                }`,
+          variables: {
+            number: number,
+            startDate: startDate,
+            endDate: endDate,
+            maximumNumberOfBeneficiaries: maximumNumberOfBeneficiaries,
+            durationInYears: durationInYears,
+            location: location,
+            totalBudget: totalBudget,
+            administrativeCost: administrativeCost,
+            coordinators: coordinators
+          },
+        })
+        .then((res) => res.data.data.createProject)
+        .catch((err) => console.warn(err));
+    },
+
+    async createSupportPlanSave() {
+      if (this.$refs.createSupportPlanForm.validate()) {
+        const project = this.projects.filter(
+          (project) => project.id !== this.selectedProjectId
+        )[0];
+
+        const donor = this.donors.filter(
+          (donor) => donor.nameInitials === this.supportPlanDonor
+        )[0];
+
+        const name = `${donor.nameInitials}-${project.number}`;
+        const startDate = new Date(this.supportPlanStartDate).toISOString();
+
+        let tempDate = new Date(startDate);
+        const endDate = new Date(
+          tempDate.setFullYear(
+            tempDate.getFullYear() + parseInt(this.supportPlanPeriodInYears)
+          )
+        ).toISOString();
+
+        const supportPlan = await this.createSupportPlan(
+          name,
+          parseFloat(this.supportPlanAdminFeePercent),
+          String(this.supportPlanPaymentInterval),
+          startDate,
+          endDate,
+          donor.id,
+          project.id
+        );
+
+        console.log(supportPlan);
+
+        this.$refs.createSupportPlanForm.reset();
+        this.createSupportPlanDialog = false;
+      }
+    },
+
+    openCreateSupportPlanDialog(project) {
+      this.selectedProjectId = project.id;
+      this.createSupportPlanDialog = true;
+    },
+    async createProjectDocuments(
+      documentUrl,
+      documentType,
+      projectId
+    ) {
+      return axios.post("/graphql/", {
+        query: `mutation createProjectDocument (
+                  $documentUrl: String!
+                  $documentType: projectDocumentType!
+                  $projectId: ID!
+                ) {
+                  createProjectDocument (
+                    documentUrl: $documentUrl
+                    documentType: $documentType
+                    projectId: $projectId
+                  ) {
+                    id
+                    documentType
+                  }
+                }`,
+        variables: {
+          documentUrl: documentUrl,
+          documentType: documentType,
+          projectId: projectId
+        }
+      })
+      .then(res => res.data.data.createProjectDocuments)
+      .catch(err => console.warn(err));
+    },
+    async createProjectSave() {
+      if (this.$refs.createProjectForm.validate()) {
+
+        const startDate = new Date(this.projectStartDate).toISOString();
+
+        let tempDate = new Date(startDate);
+        const endDate = new Date(
+          tempDate.setFullYear(
+            tempDate.getFullYear() + parseInt(this.projectDurationInYears)
+          )
+        ).toISOString();
+
+        // check if the entered number is dublicate by using allProjects
+        // even better make it auto increment automatically
+        // projectNumber
+
+        const locations = this.allVillages.filter(village => {
+          return village.name === this.projectLocation;
+        }).map(village => village.id);
+
+        const coordinators = [this.coordinator.id];
+        const projectProposalUrl = "qwertyuiop";
+
+        // const projectProposalFormData = new FormData();
+        // projectProposalFormData.append(
+        //   "ProjectProposal",
+        //   this.projectProposalFile,
+        //   this.projectProposalFile.name
+        // );
+
+        // const projectProposalUrl = await axios
+        //   .post(
+        //     `/public/images/orphanProjectProposal/`,
+        //     projectProposalFormData
+        //   )
+        //   .then((res) => res.data)
+        //   .catch((err) => console.warn(err));
+
+        const project = await this.createProject(
+          this.projectNumber,
+          startDate,
+          endDate,
+          parseInt(this.projectMaxBeneficiaries),
+          parseInt(this.projectDurationInYears),
+          locations,
+          parseFloat(this.projectTotalBudget),
+          parseFloat(this.projectAdministrativeCost),
+          coordinators,
+        );
+        
+        const projectDocument = await this.createProjectDocuments(
+          projectProposalUrl,
+          "proposal",
+          project.id
+        );
+
+        console.log(projectDocument)
+
+        this.$refs.createProjectForm.reset();
+        this.createProjectDialog = false;
+      }
+    },
+
+    cancelSupportPlan() {
+      this.$refs.supportPlanForm.reset();
+      this.createSupportPlanDialog = false;
+    },
 
     projectStartDateSave(date) {
       this.$refs.projectStartDateMenu.save(date);
+    },
+
+    supportPlanStartDateSave(date) {
+      // Why does this.$refs.supportPlanStartDateMenu give an array??!
+      this.$refs.supportPlanStartDateMenu.save(date);
+    },
+
+    percentGenerator() {
+      for (let i = 1; i <= 30; i++) {
+        this.percent.push(i);
+      }
+    },
+    paymentIntervalGenerator() {
+      for (let i = 1; i <= 12; i++) {
+        this.paymentIntervals.push(i);
+      }
+    },
+
+    donorText_Value(item) {
+      return item.nameInitials;
+    },
+    villageText_Value(item) {
+      return item.name;
     },
 
     // -------------------------------------
