@@ -396,35 +396,6 @@
                         ></v-select>
                       </v-responsive>
                     </v-col>
-                    <!-- District Donors -->
-                    <v-col cols="12">
-                      <v-responsive max-width="" class="mx-10 mt-n7">
-                        <v-select
-                          v-model="districtDonors"
-                          multiple
-                          :items="donorOptions"
-                          :item-text="donorText_Value"
-                          :item-value="donorText_Value"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
-                          label="Donors"
-                        ></v-select>
-                      </v-responsive>
-                    </v-col>
-                    <!-- District Coordinator -->
-                    <v-col cols="12">
-                      <v-responsive max-width="" class="mx-10 mt-n7">
-                        <v-select
-                          v-model="districtCoordinator"
-                          :items="coordinatorsOptions"
-                          :item-text="coordinatorText_Value"
-                          :item-value="coordinatorText_Value"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
-                          label="Coordinators"
-                        ></v-select>
-                      </v-responsive>
-                    </v-col>
                     <v-col align="right" class="mb-5">
                       <v-btn class="mr-5" @click="districtCancel">Cancel</v-btn>
                       <v-btn
@@ -491,36 +462,8 @@
                           :item-text="districtText_Value"
                           :item-value="districtText_Value"
                           :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
                           label="District"
-                        ></v-select>
-                      </v-responsive>
-                    </v-col>
-                    <!-- Peasant Association Donor -->
-                    <v-col cols="12">
-                      <v-responsive max-width="" class="mx-10 mt-n7">
-                        <v-select
-                          v-model="villageDonor"
-                          :items="donorOptions"
-                          :item-text="donorText_Value"
-                          :item-value="donorText_Value"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
-                          label="Donor"
-                        ></v-select>
-                      </v-responsive>
-                    </v-col>
-                    <!-- Peasant Association Coordinator -->
-                    <v-col cols="12">
-                      <v-responsive max-width="" class="mx-10 mt-n7">
-                        <v-select
-                          v-model="villageCoordinator"
-                          :items="coordinatorsOptions"
-                          :item-text="coordinatorText_Value"
-                          :item-value="coordinatorText_Value"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
-                          label="Coordinator"
+                          clearable
                         ></v-select>
                       </v-responsive>
                     </v-col>
@@ -643,17 +586,6 @@
                         </v-text-field>
                       </v-responsive>
                     </v-col>
-                    <!-- Social Worker Password -->
-                    <!-- <v-col cols="12">
-                    <v-responsive max-width="" class="mx-10 mb-n7">
-                      <v-text-field
-                        v-model="socialWorkerPassword"
-                        label="Password"
-                        type="password"
-                      >
-                      </v-text-field>
-                    </v-responsive>
-                  </v-col> -->
                     <!-- Social Worker Phone Number -->
                     <v-col cols="12">
                       <v-responsive max-width="" class="mx-10 mb-n7">
@@ -674,22 +606,9 @@
                           :item-text="districtText_Value"
                           :item-value="districtText_Value"
                           :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
                           label="District"
-                        ></v-select>
-                      </v-responsive>
-                    </v-col>
-                    <!-- Social Worker Coordinator -->
-                    <v-col cols="12">
-                      <v-responsive max-width="430px" class="mx-10 mb-n7">
-                        <v-select
-                          v-model="socialWorkerCoordinator"
-                          :items="socialWorkerCoordinators"
-                          :item-text="coordinatorText_Value"
-                          :item-value="coordinatorText_Value"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          :rules="requiredRule"
-                          label="Coordinator"
+                          clearable
+                          :disabled="socialWorkerDistrictDisabled"
                         ></v-select>
                       </v-responsive>
                     </v-col>
@@ -704,6 +623,8 @@
                           :item-value="villageText_Value"
                           :menu-props="{ bottom: true, offsetY: true }"
                           label="Peasant Associations"
+                          clearable
+                          :disabled="socialWorkerVillageDisabled"
                         ></v-select>
                       </v-responsive>
                     </v-col>
@@ -953,9 +874,6 @@
                   </template>
                   <template v-slot:[`item.numberOfSocialWorkers`]="{ item }">
                     {{ getDistrictTableNumberOfSocialWorkers(item) }}
-                  </template>
-                  <template v-slot:[`item.coordinator`]="{ item }">
-                    {{ getDistrictTableCoordinator(item) }}
                   </template>
                 </v-data-table>
               </v-sheet>
@@ -1290,14 +1208,8 @@
                   <template v-slot:[`item.district`]="{ item }">
                     {{ getVillageTableDistrict(item) }}
                   </template>
-                  <template v-slot:[`item.registrationDate`]="{ item }">
-                    {{ getVillageTableRegistrationDate(item) }}
-                  </template>
-                  <template v-slot:[`item.donor`]="{ item }">
-                    {{ getVillageTableDonor(item) }}
-                  </template>
-                  <template v-slot:[`item.coordinator`]="{ item }">
-                    {{ getVillageTableCoordinator(item) }}
+                  <template v-slot:[`item.socialWorker`]="{ item }">
+                    {{ getVillageTableSocialWorker(item) }}
                   </template>
                   <template v-slot:[`item.numberOfOrphans`]="{ item }">
                     {{ getVillageTableNumberOfOrphans(item) }}
@@ -1384,19 +1296,8 @@
                       Coordinators:
                     </v-col>
                     <v-col cols="6">{{
-                      selectedDonor.coordinator.firstName
+                      selectedDonor.coordinators.length
                     }}</v-col>
-                    <v-col class="text-right" tag="strong" cols="6">
-                      Number of Villages:
-                    </v-col>
-                    <v-col cols="6">
-                      <a href="#" target="_blank">{{
-                        selectedDonor.villages.length
-                      }}</a>
-                      <!-- <a :href="`//${selectedDonor.website}`" target="_blank">{{
-                      selectedDonor.website
-                    }}</a> -->
-                    </v-col>
                     <v-col class="text-right" tag="strong" cols="6">
                       Number of Support Plans:
                     </v-col>
@@ -1485,23 +1386,6 @@
                   </v-card-text>
                   <v-divider></v-divider>
                   <v-row class="text-left" tag="v-card-text">
-                    <template v-if="selectedCoordinator.districts.length > 0">
-                      <v-col class="text-right" tag="strong" cols="6">
-                        Districts:
-                      </v-col>
-                      <v-col cols="6">{{
-                        selectedCoordinator.districts[0].name
-                      }}</v-col>
-                    </template>
-
-                    <v-col class="text-right" tag="strong" cols="6">
-                      Number of Villages:
-                    </v-col>
-                    <v-col cols="6">
-                      <a href="#" target="_blank">{{
-                        selectedCoordinator.villages.length
-                      }}</a>
-                    </v-col>
                     <v-col class="text-right" tag="strong" cols="6">
                       Number of Donors:
                     </v-col>
@@ -1612,12 +1496,20 @@
                     <v-col cols="6">{{
                       selectedSocialWorker.mobileNumber
                     }}</v-col>
-                    <template v-if="selectedSocialWorker.district != null">
+                    <template v-if="selectedSocialWorker.districts != null">
                       <v-col class="text-right" tag="strong" cols="6">
                         Districts:
                       </v-col>
                       <v-col cols="6">{{
-                        selectedSocialWorker.district.name
+                        selectedSocialWorker.districts.length
+                      }}</v-col>
+                    </template>
+                    <template v-if="selectedSocialWorker.villages != null">
+                      <v-col class="text-right" tag="strong" cols="6">
+                        Districts:
+                      </v-col>
+                      <v-col cols="6">{{
+                        selectedSocialWorker.villages.length
                       }}</v-col>
                     </template>
                     <template v-if="selectedSocialWorker.orphans != null">
@@ -1973,12 +1865,9 @@ export default {
     districtCoordinator: "",
     districtCoordinatorsOptions: [],
     districtDonors: [],
-    donorOptions: [],
     villageName: "",
     villageDistrict: "",
     districts: [],
-    villageDonor: "",
-    villageCoordinator: "",
     coordinators: [
       "Adem Mohammed Ali",
       "Frost Abdela Belachew",
@@ -1988,16 +1877,15 @@ export default {
     socialWorkerGender: "",
     genderOptions: ["Male", "Female"],
     socialWorkerEmail: "",
-    socialWorkerPassword: "",
     socialWorkerBirthDate: "",
     socialWorkerBirthDateMenu: false,
     socialWorkerPhoneNumber: "",
     socialWorkerDistrict: "",
     socialWorkerDistricts: [],
-    socialWorkerCoordinator: "",
-    socialWorkerCoordinators: [],
     socialWorkerVillages: [],
     socialWorkerVillageOptions: [],
+    socialWorkerDistrictDisabled: false,
+    socialWorkerVillageDisabled: false,
     villages: [],
     showDonorTree: false,
     showCoordinatorTree: false,
@@ -2041,17 +1929,14 @@ export default {
       "Region",
       "Zone",
       "Number of PAs",
-      "Number of Social Workers",
-      "Coordinator"
+      "Number of Social Workers"
     ],
     districtTableFilterValue: [],
     villageTableFilterItems: [
       "Id",
       "Village Name",
       "District",
-      "Registred on",
-      "Donor",
-      "Coordinator",
+      "SocialWorker",
       "Number of Orphans"
     ],
     villageTableFilterValue: [],
@@ -2079,10 +1964,6 @@ export default {
       {
         text: "Number of Social Workers",
         value: "numberOfSocialWorkers"
-      },
-      {
-        text: "Coordinator",
-        value: "coordinator"
       }
     ],
     regionHeaders: [
@@ -2129,16 +2010,8 @@ export default {
         value: "district"
       },
       {
-        text: "Registred on",
-        value: "registrationDate"
-      },
-      {
-        text: "Donor",
-        value: "donor"
-      },
-      {
-        text: "Coordinator",
-        value: "coordinator"
+        text: "SocialWorker",
+        value: "socialWorker"
       },
       {
         text: "Number of Orphans",
@@ -2173,11 +2046,10 @@ export default {
     // this.initializeDistrictTable();
     // this.initializeRegionTable();
     // this.initializeZoneTable();
-    // this.initializeVillageTable();
+    this.initializeVillageTable();
     this.initializeCoordinatorSelect();
     this.initializeRegionSelect();
     this.initializeZoneSelect();
-    this.initializeDonorSelect();
     this.initializeDistrictSelect();
     this.initializeVillageSelect();
   },
@@ -2258,33 +2130,51 @@ export default {
     },
     // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently
     districtRegion(val) {
-      const region = this.regionOptions.filter(region => region.name === val);
-      const regionId = parseInt(region[0].id);
-      console.log("regionId", regionId);
-      console.log("zoneOptions", this.zoneOptions);
-      this.zoneOptions = this.zoneOptions.filter(zone => {
-        if (zone.region !== null) {
-          return parseInt(zone.region.id) === regionId;
-        }
-      });
+      if (val) {
+        const region = this.regionOptions.filter(region => region.name === val);
+        const regionId = parseInt(region[0].id);
+        console.log("regionId", regionId);
+        console.log("zoneOptions", this.zoneOptions);
+        this.zoneOptions = this.zoneOptions.filter(zone => {
+          if (zone.region !== null) {
+            return parseInt(zone.region.id) === regionId;
+          }
+        });
+      }
     },
     socialWorkerDistrict(val) {
-      this.socialWorkerCoordinators.length = 0;
       this.socialWorkerVillageOptions.length = 0;
 
       if (val !== null) {
+        this.socialWorkerVillageDisabled = true;
+        this.socialWorkerDistrictDisabled = false;
+
         const district = this.districts.filter(
           district => district.name === val
         );
 
         if (district !== undefined) {
-          if (district[0].coordinator !== null) {
-            this.socialWorkerCoordinators.push(district[0].coordinator);
-          }
-          if (district[0].villages.length !== null) {
-            this.socialWorkerVillageOptions = [...district[0].villages];
-          }
+          // make this thing happen when the menu is triggered
+          this.socialWorkerVillageOptions = this.villageTable.filter(village => {
+            // remove one negative to make it village without districts
+            return !!(village.district);
+            // return !!village; 
+          })
         }
+      } else {
+        // this.socialWorkerDistrictDisabled = true;
+        this.socialWorkerVillageDisabled = false;
+      }
+    },
+    socialWorkerVillages(val) {
+      console.log("villages", val)
+      if (val.length !== 0){
+        this.socialWorkerDistrictDisabled = true;
+        this.socialWorkerVillageDisabled = false;
+      }
+      else {
+        // this.socialWorkerVillageDisabled = true;
+        this.socialWorkerDistrictDisabled = false;
       }
     }
   },
@@ -2580,21 +2470,6 @@ export default {
         .then(res => this.zoneOptions.push(...res))
         .catch(err => console.warn(err));
     },
-    initializeDonorSelect() {
-      axios
-        .post("/graphql/", {
-          query: `query {
-                  allDonors {
-                    id
-                    nameInitials
-                    companyName
-                  }
-                }`
-        })
-        .then(res => res.data.data.allDonors)
-        .then(res => this.donorOptions.push(...res))
-        .catch(err => console.warn(err));
-    },
     initializeDistrictSelect() {
       axios
         .post("/graphql/", {
@@ -2602,12 +2477,6 @@ export default {
                   allDistricts {
                     id
                     name
-                    coordinator {
-                      id 
-                      firstName
-                      middleName
-                      lastName
-                    }
                     villages {
                       id
                       name
@@ -2714,7 +2583,7 @@ export default {
           }
         })
         .then(res => res.data.data.createCoordinator)
-        // .then((res) => console.log(res.data.data.createCoordinator.firstName))
+        .then((res) => console.log(res))
         .catch(err => console.log(err));
     },
     async createDonor(companyName, nameInitials, userId, coordinatorId) {
@@ -2724,13 +2593,13 @@ export default {
                   $companyName: String!, 
                   $nameInitials: String!, 
                   $userId: ID!, 
-                  $coordinatorId: ID
+                  $coordinators: [ID]
                   ) {
                   createDonor(
                     companyName: $companyName
                     nameInitials: $nameInitials
                     userId: $userId
-                    coordinatorId: $coordinatorId
+                    coordinators: $coordinators
                   ) {
                     id
                     companyName
@@ -2746,7 +2615,7 @@ export default {
             companyName: companyName,
             nameInitials: nameInitials,
             userId: userId,
-            coordinatorId: coordinatorId
+            coordinators: coordinatorId
           }
         })
         .then(res => res.data.data.createDonor)
@@ -2773,7 +2642,7 @@ export default {
     async createZone(zoneName, regionId) {
       return await axios
         .post("/graphql/", {
-          query: `mutation createZone($zoneName: String!, $regionId: ID) {
+          query: `mutation createZone($zoneName: String!, $regionId: ID!) {
                   createZone(name: $zoneName, regionId: $regionId) {
                     id
                     name
@@ -2790,17 +2659,15 @@ export default {
         .then(res => res.data.data.createZone)
         .catch(err => console.warn(err));
     },
-    async createDistrict(districtName, coordinatorId, zoneId) {
+    async createDistrict(districtName, zoneId) {
       return await axios
         .post("/graphql/", {
           query: `mutation createDistrict(
                     $districtName: String!
-                    $coordinatorId: ID
-                    $zoneId: ID
+                    $zoneId: ID!
                   ) {
                     createDistrict(
                       name: $districtName
-                      coordinatorId: $coordinatorId
                       zoneId: $zoneId
                     ) {
                       id
@@ -2814,7 +2681,6 @@ export default {
                   }`,
           variables: {
             districtName: districtName,
-            coordinatorId: coordinatorId,
             zoneId: zoneId
           }
         })
@@ -2822,50 +2688,38 @@ export default {
         .catch(err => console.warn(err));
     },
     async createVillage(
-      registrationDate,
       villageName,
-      coordinatorId,
-      districtId,
-      donorId
+      districtId
     ) {
+      let variables = null;
+
+      if (districtId === undefined) {
+        variables = {
+          villageName
+        }
+      } else {
+        variables = {
+          villageName,
+          districtId
+        }
+      }
       return await axios
         .post("/graphql/", {
           query: `mutation createVillage(
-                    $registrationDate: DateTime!
                     $villageName: String
-                    $coordinatorId: ID
                     $districtId: ID
-                    $donorId: ID
                   ) {
                     createVillage(
-                      registrationDate: $registrationDate
                       name: $villageName
-                      coordinatorId: $coordinatorId
                       districtId: $districtId
-                      donorId: $donorId
                     ) {
                       id
                       name
-                      registrationDate
-                      coordinator {
-                        id
-                      }
-                      district {
-                        id
-                      }
-                      donor {
-                        id
-                      }
                     }
                   }`,
-          variables: {
-            registrationDate: registrationDate,
-            villageName: villageName,
-            coordinatorId: coordinatorId,
-            districtId: districtId,
-            donorId: donorId
-          }
+          variables: variables
         })
+        // .then(res => console.log(res.data))
         .then(res => res.data.data.createVillage)
         .catch(err => console.warn(err));
     },
@@ -2876,7 +2730,7 @@ export default {
       gender,
       dateOfBirth,
       mobileNumber,
-      initDate,
+      startDate,
       userId,
       districtIds,
       villageIds
@@ -2890,7 +2744,7 @@ export default {
                     $gender: socialWorkerGender
                     $dateOfBirth: DateTime
                     $mobileNumber: String!
-                    $initDate: DateTime
+                    $startDate: DateTime
                     $userId: ID!
                     $districts: [ID]
                     $villages: [ID]
@@ -2902,7 +2756,7 @@ export default {
                       gender: $gender
                       dateOfBirth: $dateOfBirth
                       mobileNumber: $mobileNumber
-                      initDate: $initDate
+                      startDate: $startDate
                       userId: $userId
                       districts: $districts
                       villages: $villages
@@ -2917,12 +2771,6 @@ export default {
                       }
                       districts {
                         id
-                        coordinator {
-                          id
-                          firstName
-                          middleName
-                          lastName
-                        }
                       }
                     }
                   }`,
@@ -2933,7 +2781,7 @@ export default {
             gender: String(gender),
             dateOfBirth: String(dateOfBirth),
             mobileNumber: String(mobileNumber),
-            initDate: String(initDate),
+            startDate: String(startDate),
             userId: userId,
             districts: districtIds,
             villages: villageIds
@@ -2957,7 +2805,8 @@ export default {
           password
         );
         const userId = parseInt(user.id);
-        await this.createCoordinator(firstName, middleName, lastName, userId);
+        const coordinator = await this.createCoordinator(firstName, middleName, lastName, userId);
+        console.log("coordinator", coordinator)
         this.infoDialogOwner = "Coordinator";
         this.infoDialogOwnerName = `${firstName} ${middleName} ${lastName}`;
         this.infoDialogOwnerEmail = this.coordinatorEmail;
@@ -3047,17 +2896,6 @@ export default {
     },
     async districtSave() {
       if (this.$refs.districtForm.validate()) {
-        const coordinator = this.coordinatorsOptions.filter(coordinator => {
-          return (
-            coordinator.firstName +
-              " " +
-              coordinator.middleName +
-              " " +
-              coordinator.lastName ===
-            this.districtCoordinator
-          );
-        });
-        const coordinatorId = parseInt(coordinator[0].id);
 
         const zone = this.zoneOptions.filter(
           zone => zone.name === this.districtZone
@@ -3066,7 +2904,6 @@ export default {
 
         const district = await this.createDistrict(
           this.districtName,
-          coordinatorId,
           zoneId
         );
         this.$refs.districtForm.reset();
@@ -3079,34 +2916,17 @@ export default {
     },
     async villageSave() {
       if (this.$refs.villageForm.validate()) {
-        const district = this.districts.filter(
-          district => district.name === this.villageDistrict
-        );
-        const districtId = district[0].id;
-
-        const donor = this.donorOptions.filter(
-          donor => donor.nameInitials === this.villageDonor
-        );
-        const donorId = donor[0].id;
-
-        const coordinator = this.coordinatorsOptions.filter(coordinator => {
-          return (
-            coordinator.firstName +
-              " " +
-              coordinator.middleName +
-              " " +
-              coordinator.lastName ===
-            this.villageCoordinator
+        let districtId = undefined;
+        if (this.villageDistrict) {
+          const district = this.districts.filter(
+            district => district.name === this.villageDistrict
           );
-        });
-        const coordinatorId = parseInt(coordinator[0].id);
-        const registrationDate = new Date().toISOString();
-        const village = this.createVillage(
-          registrationDate,
+          districtId = district[0].id;
+        }
+        
+        const village = await this.createVillage(
           this.villageName,
-          coordinatorId,
-          districtId,
-          donorId
+          districtId
         );
         this.$refs.villageForm.reset();
         console.log(`Village ${village.name} created!`);
@@ -3133,23 +2953,12 @@ export default {
         const socialWorkerBirthDate = new Date(
           Date.parse(this.socialWorkerBirthDate)
         ).toISOString();
-        const socialWorkerInitialDate = new Date().toISOString();
+        const socialWorkerStartDate = new Date().toISOString();
 
         const district = this.districts.filter(
           district => district.name === this.socialWorkerDistrict
         );
         const districtIds = district.map(val => parseInt(val.id));
-        // const coordinator = this.coordinatorsOptions.filter((coordinator) => {
-        //   return (
-        //     coordinator.firstName +
-        //       " " +
-        //       coordinator.middleName +
-        //       " " +
-        //       coordinator.lastName ===
-        //     this.donorCoordinator
-        //   );
-        // });
-        // const coordinatorId = parseInt(coordinator[0].id);
 
         const villages = this.socialWorkerVillageOptions.filter(village => {
           for (const vlg of this.socialWorkerVillages) {
@@ -3167,7 +2976,7 @@ export default {
           gender,
           socialWorkerBirthDate,
           this.socialWorkerPhoneNumber,
-          socialWorkerInitialDate,
+          socialWorkerStartDate,
           userId,
           districtIds,
           villageIds
@@ -3199,11 +3008,6 @@ export default {
                         region{
                           name
                         }
-                      }
-                      coordinator {
-                        firstName
-                        middleName
-                        lastName
                       }
                       villages {
                         name
@@ -3277,17 +3081,14 @@ export default {
                   allVillages {
                     id
                     name
-                    registrationDate
-                    coordinator {
-                      firstName
-                      middleName
-                      lastName
-                    }
                     district {
                       name
                     }
-                    donor {
-                      nameInitials
+                    socialWorker{
+                      id
+                      firstName
+                      middleName
+                      lastName
                     }
                     orphans {
                       id
@@ -3295,6 +3096,7 @@ export default {
                   }
                 }`
         })
+        // .then(res => console.log("villages", res))
         .then(res => res.data.data.allVillages)
         .then(res => this.villageTable.push(...res))
         .catch(err => console.warn(err));
@@ -3318,16 +3120,6 @@ export default {
     },
     getDistrictTableNumberOfSocialWorkers(item) {
       return item.socialWorkers.length;
-    },
-    getDistrictTableCoordinator(item) {
-      if (item.coordinator === null) return "";
-      return (
-        item.coordinator.firstName +
-        " " +
-        item.coordinator.middleName +
-        " " +
-        item.coordinator.lastName
-      );
     },
     // region table
     getRegionTableId(item) {
@@ -3371,20 +3163,14 @@ export default {
       if (item.district === null) return "";
       return item.district.name;
     },
-    getVillageTableRegistrationDate(item) {
-      return item.registrationDate;
-    },
-    getVillageTableDonor(item) {
-      if (item.donor === null) return "";
-      return item.donor.nameInitials;
-    },
-    getVillageTableCoordinator(item) {
+    getVillageTableSocialWorker(item) {
+      if (item.socialWorker === null) return "N/A";
       return (
-        item.coordinator.firstName +
+        item.socialWorker.firstName +
         " " +
-        item.coordinator.middleName +
+        item.socialWorker.middleName +
         " " +
-        item.coordinator.lastName
+        item.socialWorker.lastName
       );
     },
     getVillageTableNumberOfOrphans(item) {
@@ -3484,13 +3270,14 @@ export default {
               return parseInt(item.villages.length) === parseInt(search);
             } else if (filterVal === this.districtHeaders[5].text) {
               return parseInt(item.socialWorkers.length) === parseInt(search);
-            } else if (filterVal === this.districtHeaders[6].text) {
-              let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
-              return (
-                coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
-                -1
-              );
-            }
+            } 
+            // else if (filterVal === this.districtHeaders[6].text) {
+            //   let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
+            //   return (
+            //     coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
+            //     -1
+            //   );
+            // }
           }
         } else {
           return (
@@ -3522,23 +3309,12 @@ export default {
                   .toLowerCase()
                   .indexOf(search.toLowerCase()) !== -1
               );
-            } else if (filterVal === this.villageHeaders[3].text) {
-              return (
-                item.registrationDate
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
+            } 
               // TODO # fix it to be visible as stacked avatars
-            } else if (filterVal === this.villageHeaders[4].text) {
+            else if (filterVal === this.villageHeaders[5].text) {
+              let socialWorkerName = `${item.socialWorker.firstName} ${item.socialWorker.middleName} ${item.socialWorker.lastName}`;
               return (
-                item.donor.nameInitials
-                  .toLowerCase()
-                  .indexOf(search.toLowerCase()) !== -1
-              );
-            } else if (filterVal === this.villageHeaders[5].text) {
-              let coordinatorName = `${item.coordinator.firstName} ${item.coordinator.middleName} ${item.coordinator.lastName}`;
-              return (
-                coordinatorName.toLowerCase().indexOf(search.toLowerCase()) !==
+                socialWorkerName.toLowerCase().indexOf(search.toLowerCase()) !==
                 -1
               );
             } else if (filterVal === this.villageHeaders[6].text) {
@@ -3660,7 +3436,7 @@ export default {
                   id
                   companyName
                   nameInitials
-                  coordinator {
+                  coordinators {
                     firstName
                     middleName
                     lastName
@@ -3674,13 +3450,9 @@ export default {
                     id
                     firstName
                   }
-                  villages {
-                    name
-                  }
                   supportPlans {
                     id
-                    supportPeriod
-                    initDate
+                    startDate
                   }
                 }
               }`
@@ -3700,14 +3472,6 @@ export default {
                     lastName
                     user {
                       email
-                    }
-                    districts {
-                      id
-                      name
-                    }
-                    villages {
-                      id
-                      name
                     }
                     donors {
                       id
@@ -3732,8 +3496,8 @@ export default {
                     gender
                     dateOfBirth
                     mobileNumber
-                    initDate
-                    termDate
+                    startDate
+                    endDate
                     user {
                       email
                     }

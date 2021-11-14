@@ -11,6 +11,7 @@
       <v-tooltip top>
         <template #activator="{ on:tooltip }">
           <v-icon
+            v-if="!isOrphanDetail"
             class="mr-2"
             color="teal darken-2"
             v-bind="attrs"
@@ -19,6 +20,15 @@
           >
             mdi-file-plus
           </v-icon>
+          <v-btn
+            v-else
+            color="teal lighten-4"
+            v-bind="attrs"
+            v-on="{ ...tooltip, ...dialog }"
+            @click="populateEducationalRecordsTable(item)"
+          >
+            Educational Records
+          </v-btn>
         </template>
 
         <span>Educational Records</span>
@@ -168,7 +178,7 @@ import InsertEducationalRecordDialog from "./InsertEducationalRecordDialog.vue";
 import CustomImage from "./CustomImage.vue";
 export default {
   components: { InsertEducationalRecordDialog, CustomImage },
-  props: ["open", "item"],
+  props: ["open", "item", "isEditable", "isOrphanDetail"],
   data() {
     return {
       isOpen: false,

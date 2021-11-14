@@ -146,12 +146,14 @@ export default {
     familyRefsHandler(familyForm) {
       this.familyForm = familyForm;
     },
-    registrationDone(documentForm) {
+    registrationDone(documentFormObj) {
       this.personalForm.reset();
       this.educationForm.reset();
       this.guardianForm.reset();
       this.familyForm.reset();
-      documentForm.reset();
+      documentFormObj.documentForm.reset();
+      this.$emit("registrationDone", documentFormObj.newOrphanId);
+      console.log("registrationDone", documentFormObj.newOrphanId)
     },
     displayOrphan() {
       // console.log("personalModel", this.$refs.personalModel);

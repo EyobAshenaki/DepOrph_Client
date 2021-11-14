@@ -247,7 +247,7 @@ export default {
       isNewOrphan: false,
       isSupportPlan: false,
       isChangeStatus: false,
-      isProcessing: false,
+      isProcessing: true,
       isPending: false,
       isSponsored: false,
       isGraduated: false

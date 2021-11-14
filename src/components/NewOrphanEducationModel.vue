@@ -85,7 +85,7 @@
                     <v-col cols="12" sm="6" md="2">
                       <v-responsive max-width="" class="">
                         <v-select
-                          v-model="orphan.education.typeOfSchool"
+                          v-model="selectedOrphanTypeOfSchool"
                           :items="orphanSchoolTypeOptions"
                           :menu-props="{
                             bottom: true,
@@ -229,6 +229,7 @@ export default {
           reason: null,
         },
       },
+      selectedOrphanTypeOfSchool: null,
       rules: {
         required: (value) => !!value || "Required.",
         name: (value) => {
@@ -516,12 +517,15 @@ export default {
               this.orphan.education.year = 4;
             else this.orphan.education.year = null;
           } else if (
-            this.orphanEducationLevel === "Primary/Elementary" ||
-            this.orphanEducationLevel === "Junior" ||
-            this.orphanEducationLevel === "Highschool"
-          ) {
+            this.orphanEducationLevel === "Primary/Elementary") {
             this.orphan.education.year = this.orphanEducationYear;
-            this.orphan.education.level = "gradeSchool";
+            this.orphan.education.level = "primary_elementary";
+          } else if (this.orphanEducationLevel === "Junior") {
+            this.orphan.education.year = this.orphanEducationYear;
+            this.orphan.education.level = "junior";
+          } else if (this.orphanEducationLevel === "Highschool") {
+            this.orphan.education.year = this.orphanEducationYear;
+            this.orphan.education.level = "highschool";
           } else if (this.orphanEducationLevel === "Undergraduate") {
             this.orphan.education.year = this.orphanEducationYear;
             this.orphan.education.level = "underGraduate";
@@ -533,7 +537,7 @@ export default {
           }
         }
 
-        this.orphan.education.typeOfSchool = this.orphan.education.typeOfSchool?.toLowerCase();
+        this.orphan.education.typeOfSchool = this.selectedOrphanTypeOfSchool?.toLowerCase();
 
         this.$emit("educationDone", this.orphan);
         this.$emit("educationRefs", this.$refs.educationForm)

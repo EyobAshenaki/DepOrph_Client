@@ -948,57 +948,6 @@ export default {
                       villageId: $villageId
                     ) {
                       id
-                      firstName
-                      gender
-                      placeOfBirth
-                      dateOfBirth
-                      spokenLanguages
-                      hobbies
-                      religion
-                      healthDescription
-                      psychologicalStatus
-                      father {
-                        id
-                        firstName
-                        lastName
-                        dateOfBirth
-                        dateOfDeath
-                        causeOfDeath
-                      }
-                      mother {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                        vitalStatus
-                        dateOfBirth
-                      }
-                      education {
-                        enrollmentStatus
-                        schoolName
-                        typeOfSchool
-                        level
-                        year
-                      }
-                      guardian {
-                        firstName
-                        middleName
-                        lastName
-                        gender
-                        dateOfBirth
-                        relationToOrphan
-                        email
-                        nationality
-                        mobileNumber
-                        telephoneNumber
-                      }
-                      house_property {
-                        housingSituation
-                        otherProperty
-                      }
-                      village{
-                        id
-                      }
                     }
                   }`,
           variables: {
@@ -1301,7 +1250,7 @@ export default {
             )
             .then((res) => {
               axios.post(`/graphql/`, {
-                query: `mutation createPhotos(
+                query: `mutation createOrphanPhotos(
                       $photoPortraitUrl: String!
                       $orphanId: ID
                       ) {
@@ -1315,13 +1264,16 @@ export default {
                   orphanId: registeredOrphan.id,
                 },
               })
-              .then(res => console.log(res.data))
+              .then(res => res.data.data.createOrphanPhotos)
               .catch(err => console.warn(err));
             })
             .catch((err) => console.warn(err));
         }
 
-        this.$emit("registrationDone", this.$refs.documentForm);
+        this.$emit("registrationDone", {
+          documentForm: this.$refs.documentForm,
+          newOrphanId: registeredOrphan.id
+        });
         this.documentDialogClose();
       } else {
         this.formHasErrors = true;

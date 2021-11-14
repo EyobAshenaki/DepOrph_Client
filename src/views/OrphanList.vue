@@ -69,7 +69,7 @@
             <v-expansion-panels popout v-model="orphanPanel">
               <!-- New -->
               <v-expansion-panel>
-                <v-expansion-panel-header>
+                <v-expansion-panel-header @click="updateOrphanList">
                   <template v-slot:default="{ open }">
                     <v-row no-gutters>
                       <v-col cols="4"> New </v-col>
@@ -198,7 +198,7 @@
                           {{ displayOrphanRegistrationDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator"/>
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -357,7 +357,7 @@
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -567,7 +567,7 @@
                           {{ displaySponsoringOrphanDonor(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -768,7 +768,7 @@
                           {{ calcSponsoredDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -976,7 +976,7 @@
                           {{ calcGraduatedDate(item) }}
                         </template>
                         <template v-slot:item.details="{ item }">
-                          <orphan-detail :details="item" />
+                          <orphan-detail :details="item" user="coordinator" />
                         </template>
                       </v-data-table>
                       <!-- becomes visble when full name is edited -->
@@ -1024,10 +1024,10 @@ export default {
   // name: "OrphanList",
   props: {
     orphanIds: {
-      type: Array,
+      type: Object,
       required: false,
       default: () => [],
-    },
+    }
   },
   components: {
     // NewOrphanRegistrationModel,
@@ -1311,7 +1311,7 @@ export default {
   methods: {
     initialize() {
       if (this.orphanIds !== null) {
-        for (const id of this.orphanIds) {
+        for (const id of this.orphanIds.ids) {
           axios
             .post("/graphql/", {
               query: `query orphan($id: ID!) {
@@ -1333,6 +1333,8 @@ export default {
                           placeOfBirth
                           religion
                           spokenLanguages
+                          accountNumber
+                          gradeAgeMismatchReason
                           psychologicalStatus
                           healthDescription
                           education {
@@ -1406,6 +1408,15 @@ export default {
                             id
                             name
                           }
+                          socialWorker {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                            gender
+                            dateOfBirth
+                            mobileNumber
+                          }
                         }
                       }`,
               variables: {
@@ -1416,6 +1427,10 @@ export default {
             .catch((err) => console.warn(err));
         }
       }
+    },
+    updateOrphanList() {
+      this.orphans = [];
+      this.initialize();
     },
     // custom search function based on selected columns
     activeSearchFilter(value, search, item) {
@@ -1572,7 +1587,7 @@ export default {
     donorChoiceReset() {
       this.$refs.donorSelect.reset();
     },
-    async createSponsorshipStatus(orphanId, status) {
+    createSponsorshipStatus(orphanId, status) {
       return axios
         .post("/graphql", {
           query: `mutation createSponsorshipStatus(

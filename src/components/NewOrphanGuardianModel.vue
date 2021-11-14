@@ -99,7 +99,7 @@
                 <v-col cols="12" sm="6" md="2">
                   <v-responsive max-width="" class="">
                     <v-select
-                      v-model="orphan.guardian.gender"
+                      v-model="selectedOrphan.gender"
                       :items="guardianGenderOptions"
                       :menu-props="{ bottom: true, offsetY: true }"
                       label="Gender*"
@@ -112,7 +112,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-responsive max-width="" class="">
                     <v-select
-                      v-model="orphan.guardian.relationToOrphan"
+                      v-model="selectedOrphan.relationToOrphan"
                       :items="guardianRelationToOrphanOptions"
                       :menu-props="{ bottom: true, offsetY: true }"
                       label="Relation to Orphan*"
@@ -250,6 +250,10 @@ export default {
           email: null,
         },
       },
+      selectedOrphan: {
+        gender: null,
+        relationToOrphan: null,
+      },
       rules: {
         required: (value) => !!value || "Required.",
         name: (value) => {
@@ -349,13 +353,13 @@ export default {
       if (this.$refs.guardianForm.validate()) {
         // console.log(this.orphan);
 
-        this.orphan.guardian.gender = this.orphan.guardian.gender.slice(0, 1);
+        this.orphan.guardian.gender = this.selectedOrphan.gender.slice(0, 1);
 
         this.orphan.guardian.relationToOrphan =
-          this.orphan.guardian.relationToOrphan.slice(0, 1).toLowerCase() +
-          this.orphan.guardian.relationToOrphan.slice(1);
-        if (this.orphan.guardian.relationToOrphan.includes(" ")) {
-          this.orphan.guardian.relationToOrphan = this.orphan.guardian.relationToOrphan
+          this.selectedOrphan.relationToOrphan.slice(0, 1).toLowerCase() +
+          this.selectedOrphan.relationToOrphan.slice(1);
+        if (this.selectedOrphan.relationToOrphan.includes(" ")) {
+          this.orphan.guardian.relationToOrphan = this.selectedOrphan.relationToOrphan
             .split(" ")
             .join("");
         }

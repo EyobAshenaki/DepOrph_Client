@@ -49,7 +49,7 @@
                 <!-- Gender -->
                 <v-col cols="12" sm="6" md="2">
                   <v-select
-                    v-model="orphan.gender"
+                    v-model="selectedOrphan.gender"
                     :items="genderOptions"
                     :menu-props="{ bottom: true, offsetY: true }"
                     label="Gender*"
@@ -209,7 +209,7 @@
                 <!-- Psychological Status -->
                 <v-col cols="12" sm="6" md="3">
                   <v-select
-                    v-model="orphan.psychologicalStatus"
+                    v-model="selectedOrphan.psychologicalStatus"
                     :items="orphanPsychologicalStatusOptions"
                     :menu-props="{ bottom: true, offsetY: true }"
                     label="Psychological Status*"
@@ -285,9 +285,9 @@ export default {
       formHasErrors: false,
       orphan: {
         firstName: null,
-        gender: null,
         dateOfBirth: null,
         placeOfBirth: null,
+        gender: null,
         spokenLanguages: null,
         religion: null,
         psychologicalStatus: null,
@@ -296,6 +296,11 @@ export default {
           firstName: null,
           lastName: null,
         },
+      },
+      selectedOrphan: {
+        gender: null,
+        psychologicalStatus: null,
+
       },
       rules: {
         required: (value) => !!value || "Required.",
@@ -405,7 +410,8 @@ export default {
          */
         // console.log(this.orphan);
 
-        this.orphan.gender = this.orphan.gender.slice(0, 1).toUpperCase();
+        this.orphan.gender = this.selectedOrphan.gender.slice(0, 1).toUpperCase();
+        this.orphan.psychologicalStatus = this.selectedOrphan.psychologicalStatus;
         if (this.orphan.psychologicalStatus) {
           const words = this.orphan.psychologicalStatus.split(" ");
           this.orphan.psychologicalStatus = "";
