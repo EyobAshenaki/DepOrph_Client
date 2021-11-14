@@ -23,19 +23,32 @@
         <span>Financial Records</span>
       </v-tooltip>
     </template>
+    <v-snackbar v-model="snackBar" top right :color="snackBarColor" outlined>
+      <v-row>
+        <div class="ml-2">{{ snackBarText }}</div>
+        <v-spacer></v-spacer>
+        <v-icon color="gray" @click="snackBar = false" right>
+          mdi-close</v-icon
+        ></v-row
+      >
+    </v-snackbar>
     <v-card>
       <v-card-title
         >Financial Records <v-spacer></v-spacer>
         <insert-financial-record-dialog
           :orphanId="item.id"
-          @newRecordSaved="populateFinancialRecordsTable(item)"
+          @newRecordSaved="
+            snackBar = true;
+            snackBarColor = 'success';
+            snackBarText = 'Successfully added record!';
+            populateFinancialRecordsTable(item);
+          "
       /></v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
           <v-col cols="12">
-            <v-data-table :headers="headers" :items="items" hide-default-footer>
-            </v-data-table
+            <v-data-table :headers="headers" :items="items"> </v-data-table
           ></v-col>
         </v-row>
       </v-card-text>
@@ -58,6 +71,9 @@ export default {
     InsertFinancialRecordDialog
   },
   data: () => ({
+    snackBar: false,
+    snackBarText: "",
+    snackBarColor: "success",
     isOpen: false,
     headers: [
       {

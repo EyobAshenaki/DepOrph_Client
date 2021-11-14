@@ -11,7 +11,7 @@
       <v-btn color="primary" v-bind="attrs" v-on="on">New Record</v-btn>
     </template>
     <v-card>
-      <v-card-title>New Record</v-card-title>
+      <v-card-title>New Educational Record</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <v-form ref="educationalRecordForm" v-model="validForm" lazy-validation>
@@ -195,7 +195,7 @@
 <script>
 import axios from "axios";
 export default {
-  props: ["educationId"],
+  props: ["orphanId"],
   data() {
     return {
       isOpen: false,
@@ -340,11 +340,13 @@ export default {
     saveInsertEducatioanlRedordDialog() {
       if (this.$refs.educationalRecordForm.validate()) {
         const reportCardFormData = new FormData();
-        reportCardFormData.append(
-          "educationalRecordReportCard",
-          this.reportCard,
-          this.reportCard.name
-        );
+        if (this.reportCard) {
+          reportCardFormData.append(
+            "educationalRecordReportCard",
+            this.reportCard,
+            this.reportCard.name
+          );
+        }
         (async () => {
           try {
             const reportCardRes = await axios.post(
@@ -372,7 +374,7 @@ export default {
                     $reportCardUrl: String
                     $semesterGPA: Float
                     $cumulativeGPA: Float
-                    $educationId: ID
+                    $orphanId: ID!
                   ) {
                       createEducationalRecord(
                         enrollmentStatus: $enrollmentStatus
@@ -391,7 +393,7 @@ export default {
                         reportCardUrl: $reportCardUrl
                         semesterGPA: $semesterGPA
                         cumulativeGPA: $cumulativeGPA
-                        educationId: $educationId
+                        orphanId: $orphanId
                       ) {
                           id
                           created_at
@@ -417,18 +419,13 @@ export default {
                     reportCardUrl: reportCardRes.data,
                     semesterGPA: parseFloat(this.semesterGPA),
                     cumulativeGPA: parseFloat(this.cumulativeGPA),
-                    educationId: parseInt(this.educationId)
+                    orphanId: parseInt(this.orphanId)
                   }
                 };
-                const createEducationalRecordRes = await axios.post(
-                  `/graphql/`,
-                  queryOptions
-                );
-                // console.log(
-                //   createEducationalRecordRes.data |
-                //     createEducationalRecordRes.errors[0].message
-                // );
-                console.log(createEducationalRecordRes);
+                await axios.post(`/graphql/`, queryOptions);
+                this.isOpen = false;
+                this.$refs.educationalRecordForm.reset();
+                this.$emit("addedSuccessfully");
               } catch (error) {
                 console.error(error);
               }

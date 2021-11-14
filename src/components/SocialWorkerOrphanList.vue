@@ -58,6 +58,10 @@
                 :custom-filter="searchFilter"
               >
                 <template #[`item.actions`]="{ item }">
+                  <financialRecordsDialog
+                    :open="financialRecordsDialog"
+                    :item="item"
+                  />
                   <educational-records-dialog
                     :open="educationalRecordsDialog"
                     :item="item"
@@ -86,12 +90,14 @@ import { capitalize, calculateAge } from "@/utils/utils";
 import InsertImagesDialog from "./InsertImagesDialog.vue";
 import EducationalRecordsDialog from "./EducationalRecordsDialog.vue";
 import MiscellaneousSocialWorkerTasksDialog from "./MiscellaneousSocialWorkerTasksDialog.vue";
+import FinancialRecordsDialog from "./FinancialRecordsDialog.vue";
 export default {
   props: ["socialWorerkId"],
   components: {
     InsertImagesDialog,
     EducationalRecordsDialog,
-    MiscellaneousSocialWorkerTasksDialog
+    MiscellaneousSocialWorkerTasksDialog,
+    FinancialRecordsDialog
   },
   data() {
     return {
@@ -140,24 +146,11 @@ export default {
           text: "Account Number",
           value: "accountNumber"
         },
-        // { text: "Sponsored Date", value: "sponsoredDate" },
-        // {
-        //   text: "District",
-        //   value: "district"
-        // },
         {
           text: "Village",
           align: "Start",
           value: "village"
         },
-        // {
-        //   text: "Registred on",
-        //   value: "registrationDate",
-        // },
-        // {
-        //   text: "Donor",
-        //   value: "donor"
-        // },
         {
           text: "Actions",
           value: "actions"
@@ -166,7 +159,8 @@ export default {
       itemsPerPage: 20,
       insertImagesDialog: false,
       educationalRecordsDialog: false,
-      miscellaneousSocialWorkerTasksDialog: false
+      miscellaneousSocialWorkerTasksDialog: false,
+      financialRecordsDialog: false
     };
   },
   computed: {},
@@ -293,16 +287,12 @@ export default {
                             name
                           }
                         }
-                        donor {
-                          id
-                          nameInitials
-                        }
                       }
                     }
                   }`;
           const requestOptions = { query, variables: { id } };
           const res = await axios.post("/graphql", requestOptions);
-          if (res.data.errors) {
+          if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message);
           } else {
             const { socialWorker } = res.data.data;
@@ -323,8 +313,7 @@ export default {
                 guardianMobileNumber: item.guardian.mobileNumber,
                 accountNumber: item.accountNumber,
                 district: item.village.district.name,
-                village: item.village.name,
-                donor: item.donor.nameInitials
+                village: item.village.name
               };
             });
 

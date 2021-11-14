@@ -162,10 +162,10 @@ export default {
         };
         (async () => {
           await axios.post("/graphql", queryOptions);
+          this.$emit("newRecordSaved");
+          this.isOpen = false;
+          this.$refs.newFinancialRecordForm.reset();
         })();
-        this.isOpen = false;
-        this.$refs.newFinancialRecordForm.reset();
-        this.$emit("newRecordSaved");
       }
     }
   }

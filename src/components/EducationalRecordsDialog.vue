@@ -26,8 +26,11 @@
     </template>
     <v-card>
       <v-card-title
-        ><span> Educational Records</span> <v-spacer></v-spacer>
-        <insert-educational-record-dialog :educationId="educationId" />
+        ><span>Educational Records</span> <v-spacer></v-spacer>
+        <insert-educational-record-dialog
+          :orphanId="orphanId"
+          @addedSuccessfully="populateEducationalRecordsTable(item)"
+        />
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
@@ -173,7 +176,7 @@ export default {
       educationalRecordsDialog: false,
       educationalRecordsTableItems: [],
       itemsPerPage: 5,
-      educationId: null,
+      orphanId: null,
       educationalRecordsTableHeaders: [
         {
           text: "Date",
@@ -248,36 +251,34 @@ export default {
           const query = `
               query educationalRecordsByOrphanId($orphanId: ID!){
                   orphan(id:$orphanId){
-                    education{
+                    id
+                    educationalRecords{
                       id
-                      educationalRecords{
-                        id
-                        created_at
-                        enrollmentStatus
-                        schoolName
-                        typeOfSchool
-                        year
-                        level
-                        reason
-                        yearDivision
-                        quarter
-                        semester
-                        totalMark
-                        numberOfSubjects
-                        average
-                        rank
-                        reportCardUrl
-                        semesterGPA
-                        cumulativeGPA
-                      }
+                      created_at
+                      enrollmentStatus
+                      schoolName
+                      typeOfSchool
+                      year
+                      level
+                      reason
+                      yearDivision
+                      quarter
+                      semester
+                      totalMark
+                      numberOfSubjects
+                      average
+                      rank
+                      reportCardUrl
+                      semesterGPA
+                      cumulativeGPA
                     }
                   }
                 }
               `;
           const requestOptions = { query, variables: { orphanId: item.id } };
           const ERRes = await axios.post(`/graphql/`, requestOptions);
-          this.educationId = ERRes.data.data.orphan.education.id;
-          let tempRecords = ERRes.data.data.orphan.education.educationalRecords.map(
+          this.orphanId = ERRes.data.data.orphan.id;
+          let tempRecords = ERRes.data.data.orphan.educationalRecords.map(
             item => {
               let returnItem = { ...item };
               returnItem.status = item.enrollmentStatus;
