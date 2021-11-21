@@ -1,7 +1,7 @@
 <template>
   <div style="margin-top: 6.5rem">
     <AppNavBar :user="headUser" />
-    <!-- the value property make it not behave difrently than the showSidebar property -->
+    <!-- the value property make it not behave diffrently than the showSidebar property -->
     <v-navigation-drawer
       v-model="showSidebar"
       :value="showSidebar"
@@ -1287,7 +1287,41 @@
                     {{ selectedDonor.nameInitials }}
                   </div> -->
                     <div class="blue--text subheading font-weight-bold">
-                      {{ selectedDonor.user.email }}
+                      <span>{{ selectedDonor.user.email }}</span>
+                      <v-dialog max-width="400px">
+                        <template v-slot:activator="{ on, attrs }"
+                          ><v-btn
+                            small
+                            text
+                            class="ml-3"
+                            color="error"
+                            v-on="on"
+                            v-bind="attrs"
+                            >Reset password</v-btn
+                          ></template
+                        >
+                        <v-card>
+                          <v-card-title primary-title>
+                            Confirmation
+                          </v-card-title>
+                          <v-card-text>
+                            Are you sure you want to reset password the account
+                            <span
+                              class="blue--text subheading font-weight-bold"
+                              >{{ selectedDonor.user.email }}</span
+                            >?
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="error"
+                              @click="resetPassword(selectedDonor)"
+                              >RESET</v-btn
+                            >
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
                     </div>
                   </v-card-text>
                   <v-divider></v-divider>
@@ -1381,7 +1415,41 @@
                       }}
                     </h3>
                     <div class="blue--text subheading font-weight-bold">
-                      {{ selectedCoordinator.user.email }}
+                      <span>{{ selectedCoordinator.user.email }}</span>
+                      <v-dialog max-width="400px">
+                        <template v-slot:activator="{ on, attrs }"
+                          ><v-btn
+                            small
+                            text
+                            class="ml-3"
+                            color="error"
+                            v-on="on"
+                            v-bind="attrs"
+                            >Reset password</v-btn
+                          ></template
+                        >
+                        <v-card>
+                          <v-card-title primary-title>
+                            Confirmation
+                          </v-card-title>
+                          <v-card-text>
+                            Are you sure you want to reset password the account
+                            <span
+                              class="blue--text subheading font-weight-bold"
+                              >{{ selectedCoordinator.user.email }}</span
+                            >?
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="error"
+                              @click="resetPassword(selectedCoordinator)"
+                              >RESET</v-btn
+                            >
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
                     </div>
                   </v-card-text>
                   <v-divider></v-divider>
@@ -1473,7 +1541,41 @@
                       v-if="selectedSocialWorker.user != null"
                       class="blue--text subheading font-weight-bold"
                     >
-                      {{ selectedSocialWorker.user.email }}
+                      <span>{{ selectedSocialWorker.user.email }}</span>
+                      <v-dialog max-width="400px">
+                        <template v-slot:activator="{ on, attrs }"
+                          ><v-btn
+                            small
+                            text
+                            class="ml-3"
+                            color="error"
+                            v-on="on"
+                            v-bind="attrs"
+                            >Reset password</v-btn
+                          ></template
+                        >
+                        <v-card>
+                          <v-card-title primary-title>
+                            Confirmation
+                          </v-card-title>
+                          <v-card-text>
+                            Are you sure you want to reset password the account
+                            <span
+                              class="blue--text subheading font-weight-bold"
+                              >{{ selectedSocialWorker.user.email }}</span
+                            >?
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="error"
+                              @click="resetPassword(selectedSocialWorker)"
+                              >RESET</v-btn
+                            >
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
                     </div>
                   </v-card-text>
                   <v-divider></v-divider>
@@ -1488,7 +1590,7 @@
                       Age:
                     </v-col>
                     <v-col cols="6">{{
-                      selectedSocialWorker.dateOfBirth
+                      calculateAge(selectedSocialWorker.dateOfBirth)
                     }}</v-col>
                     <v-col class="text-right" tag="strong" cols="6">
                       Mobile Number:
@@ -1541,15 +1643,15 @@
         "
       >
         <v-card
-          style="margin-left: 15rem;"
+          style="margin-left: 10rem;"
           elevation="0"
-          min-height="85vh"
-          max-height="85vh"
+          min-height="81vh"
+          max-height="81vh"
           color="grey lighten-2"
         >
           <v-row class="px-3">
             <v-col cols="8">
-              <v-card cols="6" max-height="80vh" min-height="82vh">
+              <v-card cols="6" max-height="77vh" min-height="77vh">
                 <v-card-title primary-title>
                   Pending Requests
                 </v-card-title>
@@ -1561,7 +1663,7 @@
                         Registration
                       </v-card-title>
                       <v-divider></v-divider>
-                      <v-list max-height="66vh" style="overflow-y: auto">
+                      <v-list max-height="54vh" style="overflow-y: auto">
                         <v-list-item
                           v-for="(item, index) in filteredAccountMaintainences(
                             'register',
@@ -1607,7 +1709,7 @@
                         Password Recovery
                       </v-card-title>
                       <v-divider></v-divider>
-                      <v-list max-height="66vh" style="overflow-y: auto">
+                      <v-list max-height="54vh" style="overflow-y: auto">
                         <v-list-item
                           v-for="(item, index) in filteredAccountMaintainences(
                             'passwordRecovery',
@@ -1654,14 +1756,14 @@
               <v-card
                 cols="6"
                 elevation="2"
-                max-height="80vh"
-                min-height="82vh"
+                max-height="77vh"
+                min-height="77vh"
               >
                 <v-card-title primary-title>
-                  Aproved / Rejected Requests
+                  Approved / Rejected Requests
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-list max-height="74vh" style="overflow-y: auto">
+                <v-list max-height="64vh" style="overflow-y: auto">
                   <v-list-item
                     v-for="(item, index) in filteredAccountMaintainences(
                       'er',
@@ -1794,6 +1896,7 @@
 <script>
 import axios from "axios";
 import AppNavBar from "@/components/AppNavBar";
+import { calculateAge } from "@/utils/utils";
 
 export default {
   components: {
@@ -2208,10 +2311,39 @@ export default {
               this.headUser[property] = head[property];
             }
           }
-          console.log("head", this.head);
-          console.log("headUser", this.headUser);
+          console.log(`headUser`, this.headUser);
         })
         .catch(err => console.warn(err));
+    },
+    calculateAge,
+    resetPassword(item) {
+      console.log(item, item.user.id);
+      console.log(
+        `new password = ${item.lastName}${item.user.email.split("@")[0]}`
+      );
+      (async () => {
+        const query = `
+          mutation ($id: ID! $password: String){
+            updateUser(id: $id password: $password){
+              id
+              password
+            }
+          }
+        `;
+        const queryOptions = {
+          query,
+          variables: {
+            id: item.user.id,
+            password:
+              item.user.role === "Donor"
+                ? `${item.companyName}${item.user.email.split("@")[0]}`
+                : `${item.lastName}${item.user.email.split("@")[0]}`
+          }
+        };
+
+        const resetPassword = await axios.post("/graphql", queryOptions);
+        console.log(resetPassword.data);
+      })();
     },
     filteredAccountMaintainences(type, status) {
       return this.allAccountMaintainences.filter(
@@ -2545,7 +2677,6 @@ export default {
             password: String(pwd)
           }
         })
-        // .then((res) => console.log(res))
         .then(res => res.data.data.register.user)
         .catch(err => console.warn(err));
     },
@@ -2804,6 +2935,7 @@ export default {
           this.coordinatorEmail,
           password
         );
+        console.log(user);
         const userId = parseInt(user.id);
         const coordinator = await this.createCoordinator(firstName, middleName, lastName, userId);
         console.log("coordinator", coordinator)
@@ -3471,6 +3603,7 @@ export default {
                     middleName
                     lastName
                     user {
+                      id
                       email
                     }
                     donors {
@@ -3499,6 +3632,7 @@ export default {
                     startDate
                     endDate
                     user {
+                      id
                       email
                     }
                     districts {
@@ -3512,7 +3646,6 @@ export default {
         })
         .then(res => res.data.data.allSocialWorkers)
         .then(res => item.children.push(...res))
-        .then(res => console.log(res))
         .catch(err => console.warn(err));
     },
     removeSelectedRegion(item) {
