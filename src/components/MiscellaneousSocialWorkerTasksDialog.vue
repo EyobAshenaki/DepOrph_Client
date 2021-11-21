@@ -244,6 +244,7 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from "vuex";
 export default {
   props: ["open", "item"],
   data() {
@@ -273,6 +274,11 @@ export default {
     };
   },
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     openThankyouLetterPreviewDialog() {
       if (this.$refs.thankyouLetterForm.validate()) {
         this.thankyouLetterPreview = URL.createObjectURL(this.thankyouLetter);
@@ -309,11 +315,28 @@ export default {
                 accountNumber: this.accountNumber
               }
             };
-            await axios.post("/graphql", queryOptions);
+            const saveAccountNumberResponse = await axios.post(
+              "/graphql",
+              queryOptions
+            );
 
+            if (saveAccountNumberResponse.data.errors?.length) {
+              throw new Error(
+                saveAccountNumberResponse.data.errors[0].message.message
+              );
+            }
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("success");
+            this.SET_SNACKBAR_TEXT("Succesfully added account number.");
+            this.$emit("addedSuccessfully");
             this.accountNumberDialog = false;
             this.$refs.accountNumberForm.reset();
           } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
             console.error(error);
           }
         })();
@@ -355,16 +378,38 @@ export default {
                   }
                 };
 
-                // const updateThankyouLetterRes =
-                await axios.post("/graphql/", queryOptions);
+                const createThankyouLetterResponse = await axios.post(
+                  "/graphql/",
+                  queryOptions
+                );
 
+                if (createThankyouLetterResponse.data.errors?.length) {
+                  throw new Error(
+                    createThankyouLetterResponse.data.errors[0].message.message
+                  );
+                }
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("success");
+                this.SET_SNACKBAR_TEXT(
+                  "Succesfully uploaded thank you letter."
+                );
                 this.thankyouLetterDialog = false;
                 this.$refs.thankyouLetterForm.reset();
               } catch (err) {
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("error");
+                this.SET_SNACKBAR_TEXT(
+                  "Server error. Reload the page and try again."
+                );
                 console.error(err);
               }
             })();
           } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
             console.error(error);
           }
         })();
@@ -407,16 +452,36 @@ export default {
                   }
                 };
 
-                // const updateThankyouLetterRes =
-                await axios.post("/graphql/", queryOptions);
+                const createHealthRecordResponse = await axios.post(
+                  "/graphql/",
+                  queryOptions
+                );
 
+                if (createHealthRecordResponse.data.errors?.length) {
+                  throw new Error(
+                    createHealthRecordResponse.data.errors[0].message.message
+                  );
+                }
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("success");
+                this.SET_SNACKBAR_TEXT("Succesfully uploaded health record.");
                 this.healthRecordDialog = false;
                 this.$refs.healthRecordForm.reset();
               } catch (err) {
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("error");
+                this.SET_SNACKBAR_TEXT(
+                  "Server error. Reload the page and try again."
+                );
                 console.error(err);
               }
             })();
           } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
             console.error(error);
           }
         })();

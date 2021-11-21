@@ -82,6 +82,7 @@
 <script>
 import moment from "moment";
 import axios from "axios";
+import { mapMutations } from "vuex";
 export default {
   props: ["open", "orphanId"],
   data: () => ({
@@ -116,6 +117,11 @@ export default {
     specialCaseReason: ""
   }),
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     closeInsertFinancialRecordDialog() {
       this.isOpen = false;
     },
@@ -161,10 +167,27 @@ export default {
           }
         };
         (async () => {
-          await axios.post("/graphql", queryOptions);
-          this.$emit("newRecordSaved");
-          this.isOpen = false;
-          this.$refs.newFinancialRecordForm.reset();
+          try {
+            const insertFinnacialRecordResponse = await axios.post(
+              "/graphql",
+              queryOptions
+            );
+            if (insertFinnacialRecordResponse.data.errors?.length) {
+              throw new Error(
+                insertFinnacialRecordResponse.data.errors[0].message.message
+              );
+            }
+            this.$emit("newRecordSaved");
+            this.isOpen = false;
+            this.$refs.newFinancialRecordForm.reset();
+          } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
+            console.error(error);
+          }
         })();
       }
     }

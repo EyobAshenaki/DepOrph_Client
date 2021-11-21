@@ -194,6 +194,7 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from "vuex";
 export default {
   props: ["orphanId"],
   data() {
@@ -334,6 +335,11 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     closeInsertEducationalRecordDialog() {
       this.isOpen = false;
     },
@@ -422,15 +428,36 @@ export default {
                     orphanId: parseInt(this.orphanId)
                   }
                 };
-                await axios.post(`/graphql/`, queryOptions);
+                const insertEducationalRecordResponse = await axios.post(
+                  `/graphql/`,
+                  queryOptions
+                );
+                if (insertEducationalRecordResponse.data.errors?.length) {
+                  throw new Error(
+                    insertEducationalRecordResponse.data.errors[0].message.message
+                  );
+                }
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("success");
+                this.SET_SNACKBAR_TEXT("Record added successfully");
                 this.isOpen = false;
                 this.$refs.educationalRecordForm.reset();
                 this.$emit("addedSuccessfully");
               } catch (error) {
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("error");
+                this.SET_SNACKBAR_TEXT(
+                  "Server error. Reload the page and try again."
+                );
                 console.error(error);
               }
             })();
           } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
             console.error(error);
           }
         })();

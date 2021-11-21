@@ -75,6 +75,7 @@
                   <miscellaneous-social-worker-tasks-dialog
                     :open="miscellaneousSocialWorkerTasksDialog"
                     :item="item"
+                    @addedSuccessfully="initialize()"
                   />
                 </template>
               </v-data-table>
@@ -93,6 +94,7 @@ import InsertImagesDialog from "./InsertImagesDialog.vue";
 import EducationalRecordsDialog from "./EducationalRecordsDialog.vue";
 import MiscellaneousSocialWorkerTasksDialog from "./MiscellaneousSocialWorkerTasksDialog.vue";
 import FinancialRecordsDialog from "./FinancialRecordsDialog.vue";
+import { mapMutations } from "vuex";
 export default {
   props: ["socialWorerkId"],
   components: {
@@ -167,6 +169,11 @@ export default {
   },
   computed: {},
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     // custom search function based on selected columns
     searchFilter(value, search, item) {
       if (search.length > 0) {
@@ -247,17 +254,6 @@ export default {
       return item.id;
     },
     initialize() {
-      //   snackbar stuff
-      /*
-      this.snackText = `Login Successful! Welcome ${String(
-        this.$route.params.firstName
-      )
-        .charAt(0)
-        .toUpperCase()}${String(this.$route.params.firstName).substring(1)} `;
-      this.snackColor = `green`;
-      this.snack = true;
-    */
-
       let { id } = this.$route.params;
 
       (async () => {
@@ -324,16 +320,12 @@ export default {
             this.orphans = formattedOrphans;
           }
         } catch (error) {
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_TEXT(
+            "Server error. Reload the page and try again."
+          );
           console.error(error);
-          if (
-            error.message ===
-            "Cannot return null for non-nullable field Query.socialWorker."
-          ) {
-            error.message = `Social worker  with id: ${id} doesn't exist.`;
-          }
-          this.snackText = error.message;
-          this.snackColor = `red`;
-          this.snack = true;
         }
       })();
     }

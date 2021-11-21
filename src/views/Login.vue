@@ -11,21 +11,6 @@
         </v-avatar>
       </v-row> -->
 
-        <v-snackbar
-          v-model="snackBar"
-          top
-          right
-          :color="snackBarColor"
-          outlined
-        >
-          <v-row>
-            <div class="ml-2">{{ snackbarText }}</div>
-            <v-spacer></v-spacer>
-            <v-icon color="gray" @click="snackBar = false" right>
-              mdi-close</v-icon
-            ></v-row
-          >
-        </v-snackbar>
         <h2 class="text-h3 text-center pt-3">Login</h2>
         <v-form>
           <p class="my-1 ml-1 error--text">{{ loginError }}</p>
@@ -190,13 +175,10 @@
 
 <script>
 import axios from "axios";
-
+import { mapMutations } from "vuex";
 export default {
   data() {
     return {
-      snackBar: false,
-      snackbarText: "",
-      snackBarColor: "success",
       reveal: false,
       createAccount: false,
       selected: false,
@@ -239,6 +221,11 @@ export default {
     };
   },
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     async login() {
       let loginResponse;
       try {
@@ -280,6 +267,9 @@ export default {
           const { user } = loginResponse.data.data.login;
           sessionStorage.setItem("loggedIn", true);
           sessionStorage.setItem("loggedInAs", user.role);
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("success");
+          this.SET_SNACKBAR_TEXT("Logged in successfully.");
           if (user.role === "Head") {
             this.$router.push({
               name: "Head_v2",
@@ -308,22 +298,17 @@ export default {
         } else if (String(error).includes("No such user found for email:")) {
           this.loginError = "Insert the correct email";
         } else {
-          this.snackBar = true;
-          this.snackBarColor = "error";
-          this.snackbarText = error;
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_TEXT(
+            "Server error. Reload the page and try again."
+          );
         }
-        console.warn(error);
+        console.error(error);
       }
     },
     sendRequest() {
       if (this.$refs.accountForm.validate()) {
-        console.log(
-          this.accountFullName.trim(),
-          this.accountRole,
-          this.accountEmail.trim(),
-          this.accountMobileNumber.trim(),
-          this.createAccount
-        );
         (async () => {
           const query = `
                 mutation (
@@ -362,9 +347,26 @@ export default {
             }
           };
 
-          const accountRes = await axios.post("/graphql", queryOptions);
+          try {
+            const accountRes = await axios.post("/graphql", queryOptions);
 
-          console.log(accountRes);
+            if (accountRes.data.errors?.length) {
+              throw new Error();
+            } else {
+              this.SET_SNACKBAR(true);
+              this.SET_SNACKBAR_COLOR("success");
+              this.SET_SNACKBAR_TEXT(
+                "Request submitted successfully. Please wait until the department Head reviews your request."
+              );
+            }
+          } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
+            console.error(error);
+          }
         })();
         this.reveal = false;
         this.$refs.accountForm.reset();
