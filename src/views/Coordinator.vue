@@ -320,9 +320,11 @@
       </v-card>
     </v-dialog>
 
+    <orphan-registration-stepper />
+
     <template v-if="showSupportPlanTable">
       <v-fab-transition>
-        <support-plan-table />
+        <support-plan-table :projectId="selectedProjectId" @closeSupportPlanTable="showSupportPlanTable = $event"/>
       </v-fab-transition>
     </template>
 
@@ -407,7 +409,7 @@
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectDurationInYears"
-                        label="Period*"
+                        label="Duration*"
                         type="number"
                         :rules="[rules.required]"
                         hint="duration of the project in years"
@@ -437,7 +439,7 @@
                         :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" md="6" sm="6">
                       <v-select
                         v-model="projectLocation"
                         :items="allVillages"
@@ -452,7 +454,7 @@
                       ></v-select>
                     </v-col>
                     <!-- Project proposal insertion -->
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" md="6" sm="6">
                       <v-file-input
                         v-model="projectProposalFile"
                         accept=".pdf,.doc"
@@ -532,7 +534,7 @@
           <v-dialog
             v-model="createSupportPlanDialog"
             persistent
-            max-width="600px"
+            max-width="60%"
           >
             <v-card>
               <v-card-title>
@@ -545,8 +547,8 @@
                   lazy-validation
                 >
                   <v-row>
-                    <!-- SupportPlan start date -->
-                    <v-col cols="12" md="6" sm="4">
+                    <!-- start date -->
+                    <v-col class="" cols="12" sm="6" md="6" lg="2">
                       <v-menu
                         ref="supportPlanStartDateMenu"
                         v-model="supportPlanStartDateMenu"
@@ -582,7 +584,8 @@
                         ></v-date-picker>
                       </v-menu>
                     </v-col>
-                    <v-col cols="12" md="6" sm="4">
+                    <!-- period in months -->
+                    <v-col class="" cols="12" sm="6" md="6" lg="2">
                       <v-text-field
                         v-model="supportPlanPeriodInYears"
                         label="Period*"
@@ -591,7 +594,8 @@
                         hint="duration of the support plan in years"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- payment interval -->
+                    <v-col class="" cols="12" sm="6" md="4" lg="3">
                       <v-select
                         v-model="supportPlanPaymentInterval"
                         :items="paymentIntervals"
@@ -604,7 +608,8 @@
                         hint="payment interval in months"
                       ></v-select>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- admin fee percentage -->
+                    <v-col class="" cols="12" sm="6" md="4" lg="2">
                       <v-select
                         v-model="supportPlanAdminFeePercent"
                         :items="percent"
@@ -617,7 +622,8 @@
                         hint="admin fee in percent"
                       ></v-select>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- donors -->
+                    <v-col class="" cols="12" sm="6" md="4" lg="2">
                       <v-select
                         v-model="supportPlanDonor"
                         :items="donors"
@@ -628,13 +634,37 @@
                           offsetY: true,
                         }"
                         :rules="[rules.required]"
-                        label="Villages*"
-                        multiple
+                        label="Donors*"
                       ></v-select>
                     </v-col>
                   </v-row>
                 </v-form>
                 <small>*indicates required field</small>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-data-table
+                  v-model="selectedVillageOrphans"
+                  :headers="villageOrphanHeaders"
+                  :items="villageOrphans"
+                  item-key="id"
+                  :single-select="villageOrphanSingleSelect"
+                  show-select
+                >
+                  <template v-slot:top>
+                    <v-switch
+                      v-model="villageOrphanSingleSelect"
+                      label="Single select"
+                      class="pt-3 "
+                    ></v-switch>
+                  </template>
+                  <template v-slot:item.fullName="{ item }">
+                    {{ fullName(item) }}
+                  </template>
+                  <template v-slot:item.age="{ item }">
+                    {{ calcAge(item) }}
+                  </template>
+                </v-data-table>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -692,7 +722,7 @@
                         <v-icon>mdi-text-box-multiple-outline</v-icon>
                       </v-btn>
 
-                      <v-btn @click="openCreateSupportPlanDialog(item)">
+                      <v-btn @click="openSupportPlanDialog(item)">
                         <v-icon>mdi-calendar-month</v-icon>
                         <!-- <v-icon>mdi-handshake-outline</v-icon> -->
                       </v-btn>
@@ -716,14 +746,30 @@
                         <v-icon size="60" color="teal">mdi-calendar</v-icon>
                         <v-col cols="">
                           <v-card-subtitle class="pa-0">From:</v-card-subtitle>
-                          <p>{{ "Jan 18,2021" }}</p>
+                          <p>
+                            {{
+                              new Date(item.startDate)
+                                .toDateString()
+                                .slice(
+                                  new Date(item.startDate)
+                                    .toDateString()
+                                    .indexOf(" ")
+                                )
+                            }}
+                          </p>
                         </v-col>
 
                         <v-divider class="my-4 mr-8" vertical></v-divider>
 
                         <v-col cols="">
                           <v-card-subtitle class="pa-0">To:</v-card-subtitle>
-                          <p>{{ "Jan 18,2026" }}</p>
+                          <p>{{ new Date(item.endDate)
+                                .toDateString()
+                                .slice(
+                                  new Date(item.endDate)
+                                    .toDateString()
+                                    .indexOf(" ")
+                                ) }}</p>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -735,7 +781,7 @@
                         <v-card-subtitle style="font-size: 1em"
                           >Total Budget:</v-card-subtitle
                         >
-                        <p class="mb-0 pa-4 pl-0">{{ item.totalBudget }}</p>
+                        <p class="mb-0 pa-4 pl-0">{{ item.grandTotalBudget }}</p>
                       </v-row>
                     </v-col>
                   </v-card-text>
@@ -783,7 +829,7 @@
                           ># Villages</v-card-title
                         >
                         <p class="mb-0 pl-0">
-                          {{ item.villages ? item.villages.length : 0 }}
+                          {{ item.location ? item.location.length : 0 }}
                         </p>
                       </v-col>
                     </v-row>
@@ -813,6 +859,7 @@ import OrphanList from "@/views/OrphanList.vue";
 import AppNavBar from "@/components/AppNavBar";
 import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
 import SupportPlanTable from "../components/SupportPlanTable.vue";
+import OrphanRegistrationStepper from "../components/OrphanRegistrationStepper.vue"
 
 export default {
   components: {
@@ -820,6 +867,7 @@ export default {
     AppNavBar,
     NewOrphanRegistrationModel,
     SupportPlanTable,
+    OrphanRegistrationStepper
   },
 
   data: () => ({
@@ -912,6 +960,16 @@ export default {
     supportPlanPaymentInterval: null,
     supportPlanAdminFeePercent: null,
     supportPlanDonor: null,
+    villageOrphans: [],
+    villageOrphanHeaders: [
+      { text: "Id", align: "start", value: "id" },
+      { text: "Orphan Name", value: "fullName" },
+      { text: "Age", value: "age" },
+      { text: "Gender", value: "gender" },
+      { text: "Account No", value: "accountNumber" },
+    ],
+    selectedVillageOrphans: [],
+    villageOrphanSingleSelect: false,
     newOrphanDialog: false,
     showVillagesSelectionDialog: false,
     selectedOrphanVillage: "",
@@ -957,9 +1015,26 @@ export default {
     // used in new orphan dialog
   },
   watch: {
-    showVillagesSelectionDialog(val) {
+    async showVillagesSelectionDialog(val) {
       if (val === true) {
-        this.selectedOrphanVillageOptions = [...this.coordinator.villages];
+        this.selectedOrphanVillageOptions = [];
+
+        const villages = await axios
+          .post("/graphql", {
+            query: `query getVillagesByCoordinatorId ($coordinatorId: ID!) {
+                      getVillagesByCoordinatorId (coordinatorId: $coordinatorId) {
+                        idid
+                        name
+                      }
+                    }`,
+            variables: {
+              coordinatorId: this.$route.params.id,
+            },
+          })
+          .then((res) => res.data.data.getVillagesByCoordinatorId)
+          .catch((err) => console.warn(err));
+
+        this.selectedOrphanVillageOptions = [...villages];
       }
     },
     currentStatus(val) {
@@ -989,7 +1064,7 @@ export default {
     supportPlanStartDateMenu(val) {
       val && setTimeout(() => (this.supportPlanStartDateActivePicker = "YEAR"));
     },
-  },  
+  },
   methods: {
     initialize() {
       // console.log("routerCoordinatorId: ", this.$route.params.id);
@@ -1058,7 +1133,7 @@ export default {
                     status
                     maximumNumberOfBeneficiaries
                     durationInYears
-                    totalBudget
+                    grandTotalBudget
                     administrativeCost
                     supportPlans {
                       id
@@ -1069,6 +1144,18 @@ export default {
                     }
                     location {
                       id
+                      name
+                      orphans {
+                        id
+                        firstName
+                        father {
+                          firstName
+                          lastName
+                        }
+                        dateOfBirth
+                        gender
+                        accountNumber
+                      }
                     }
                   }
                 }`,
@@ -1098,7 +1185,8 @@ export default {
       this.showVillagesSelectionDialog = val;
     },
     toggleSupportPlanTable(val) {
-      this.showSupportPlanTable = val;
+      console.log(val)
+      // this.showSupportPlanTable = val;
     },
     toggleChangeStatus(val) {
       this.showStatusChangeSelectionDialog = val;
@@ -1289,6 +1377,14 @@ export default {
                     date
                     orphan {
                       id
+                      firstName
+                      father {
+                        firstName
+                        lastName
+                      }
+                      dateOfBirth
+                      gender
+                      accountNumber
                     }
                   }
                 }`,
@@ -1309,12 +1405,12 @@ export default {
       startDate,
       endDate,
       donorId,
-      projectId
+      projectId,
+      orphans
     ) {
-      return (
-        axios
-          .post("/graphql/", {
-            query: `mutation createSupportPlan (
+      return axios
+        .post("/graphql/", {
+          query: `mutation createSupportPlan (
                   $name: String!
                   $adminFeePercentage: Float!
                   $paymentInterval: String!
@@ -1322,6 +1418,7 @@ export default {
                   $endDate: DateTime
                   $donorId: ID
                   $projectId: ID
+                  $orphans: [ID]
                   ) {
                   createSupportPlan (
                     name: $name
@@ -1331,24 +1428,24 @@ export default {
                     endDate: $endDate
                     donorId: $donorId
                     projectId: $projectId
+                    orphans: $orphans
                   ) {
                     id
                   }
                 }`,
-            variables: {
-              name: name,
-              adminFeePercentage: adminFeePercentage,
-              paymentInterval: paymentInterval,
-              startDate: startDate,
-              endDate: endDate,
-              donorId: donorId,
-              projectId: projectId,
-            },
-          })
-          // .then((res) => res.data.data.createSupportPlan)
-          .then((res) => console.log(res.data))
-          .catch((err) => console.warn(err))
-      );
+          variables: {
+            name,
+            adminFeePercentage,
+            paymentInterval,
+            startDate,
+            endDate,
+            donorId,
+            projectId,
+            orphans,
+          },
+        })
+        .then((res) => res.data.data.createSupportPlan)
+        .catch((err) => console.warn(err));
     },
     createProject(
       number,
@@ -1357,7 +1454,7 @@ export default {
       maximumNumberOfBeneficiaries,
       durationInYears,
       location,
-      totalBudget,
+      grandTotalBudget,
       administrativeCost,
       coordinators
     ) {
@@ -1370,7 +1467,7 @@ export default {
                   $maximumNumberOfBeneficiaries: Int!
                   $durationInYears: Int!
                   $location: [ID]!
-                  $totalBudget: Float!
+                  $grandTotalBudget: Float!
                   $administrativeCost: Float!
                   $coordinators: [ID]
                 ) {
@@ -1381,7 +1478,7 @@ export default {
                     maximumNumberOfBeneficiaries: $maximumNumberOfBeneficiaries
                     durationInYears: $durationInYears
                     location: $location
-                    totalBudget: $totalBudget
+                    grandTotalBudget: $grandTotalBudget
                     administrativeCost: $administrativeCost
                     coordinators: $coordinators
                   ) {
@@ -1395,9 +1492,9 @@ export default {
             maximumNumberOfBeneficiaries: maximumNumberOfBeneficiaries,
             durationInYears: durationInYears,
             location: location,
-            totalBudget: totalBudget,
+            grandTotalBudget: grandTotalBudget,
             administrativeCost: administrativeCost,
-            coordinators: coordinators
+            coordinators: coordinators,
           },
         })
         .then((res) => res.data.data.createProject)
@@ -1424,6 +1521,10 @@ export default {
           )
         ).toISOString();
 
+        const orphanIds = this.selectedVillageOrphans.map(
+          (orphan) => orphan.id
+        );
+
         const supportPlan = await this.createSupportPlan(
           name,
           parseFloat(this.supportPlanAdminFeePercent),
@@ -1431,27 +1532,31 @@ export default {
           startDate,
           endDate,
           donor.id,
-          project.id
+          // project.id,
+          this.selectedProjectId,
+          orphanIds
         );
 
         console.log(supportPlan);
 
         this.$refs.createSupportPlanForm.reset();
-        this.createSupportPlanDialog = false;
+        // this.createSupportPlanDialog = false;
+        this.showSupportPlanTable = false;
       }
     },
 
-    openCreateSupportPlanDialog(project) {
+    openSupportPlanDialog(project) {
       this.selectedProjectId = project.id;
-      this.createSupportPlanDialog = true;
+      this.villageOrphans = project.location.reduce((acc, cur) => {
+        return acc.concat(...cur.orphans);
+      }, []);
+
+      this.showSupportPlanTable = true;
     },
-    async createProjectDocuments(
-      documentUrl,
-      documentType,
-      projectId
-    ) {
-      return axios.post("/graphql/", {
-        query: `mutation createProjectDocument (
+    async createProjectDocuments(documentUrl, documentType, projectId) {
+      return axios
+        .post("/graphql/", {
+          query: `mutation createProjectDocument (
                   $documentUrl: String!
                   $documentType: projectDocumentType!
                   $projectId: ID!
@@ -1465,18 +1570,17 @@ export default {
                     documentType
                   }
                 }`,
-        variables: {
-          documentUrl: documentUrl,
-          documentType: documentType,
-          projectId: projectId
-        }
-      })
-      .then(res => res.data.data.createProjectDocuments)
-      .catch(err => console.warn(err));
+          variables: {
+            documentUrl: documentUrl,
+            documentType: documentType,
+            projectId: projectId,
+          },
+        })
+        .then((res) => res.data.data.createProjectDocuments)
+        .catch((err) => console.warn(err));
     },
     async createProjectSave() {
       if (this.$refs.createProjectForm.validate()) {
-
         const startDate = new Date(this.projectStartDate).toISOString();
 
         let tempDate = new Date(startDate);
@@ -1490,9 +1594,11 @@ export default {
         // even better make it auto increment automatically
         // projectNumber
 
-        const locations = this.allVillages.filter(village => {
-          return village.name === this.projectLocation;
-        }).map(village => village.id);
+        const locations = this.allVillages
+          .filter((village) => {
+            return village.name === this.projectLocation;
+          })
+          .map((village) => village.id);
 
         const coordinators = [this.coordinator.id];
         const projectProposalUrl = "qwertyuiop";
@@ -1521,16 +1627,18 @@ export default {
           locations,
           parseFloat(this.projectTotalBudget),
           parseFloat(this.projectAdministrativeCost),
-          coordinators,
+          coordinators
         );
-        
+
         const projectDocument = await this.createProjectDocuments(
           projectProposalUrl,
           "proposal",
           project.id
         );
 
-        console.log(projectDocument)
+        this.projects.push(project);
+
+        console.log(projectDocument);
 
         this.$refs.createProjectForm.reset();
         this.createProjectDialog = false;
