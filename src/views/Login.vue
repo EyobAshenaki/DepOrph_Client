@@ -11,26 +11,41 @@
         </v-avatar>
       </v-row> -->
 
-
+        <v-snackbar
+          v-model="snackBar"
+          top
+          right
+          :color="snackBarColor"
+          outlined
+        >
+          <v-row>
+            <div class="ml-2">{{ snackbarText }}</div>
+            <v-spacer></v-spacer>
+            <v-icon color="gray" @click="snackBar = false" right>
+              mdi-close</v-icon
+            ></v-row
+          >
+        </v-snackbar>
         <h2 class="text-h3 text-center pt-3">Login</h2>
         <v-form>
-        <v-text-field
-          v-model="loginEmail"
-          class="mt-7"
-          label="Email"
-          dense
-          type="email"
-          outlined
-          color="#FF9983"
-        ></v-text-field>
-        <v-text-field
-          v-model="loginPassword"
-          label="Password"
-          dense
-          type="password"
-          outlined
-          color="#FF9983"
-        ></v-text-field>
+          <p class="my-1 ml-1 error--text">{{ loginError }}</p>
+          <v-text-field
+            v-model="loginEmail"
+            class="mt-4"
+            label="Email"
+            dense
+            type="email"
+            outlined
+            color="#FF9983"
+          ></v-text-field>
+          <v-text-field
+            v-model="loginPassword"
+            label="Password"
+            dense
+            type="password"
+            outlined
+            color="#FF9983"
+          ></v-text-field>
         </v-form>
         <v-row justify="space-between" class="mb-1">
           <!-- <v-checkbox
@@ -84,11 +99,8 @@
         </v-row>
       </v-card-actions>
       <!-- signup -->
-      <v-expand-transition>
-        <v-card
-          v-if="reveal"
-          class="transition-fast-in-fast-out v-card--reveal"
-        >
+      <v-expand-transition v-if="reveal">
+        <v-card class="transition-fast-in-fast-out v-card--reveal">
           <v-card-text class="pb-0">
             <h2 class="text-h3 text-center pt-3 mb-7">
               {{ createAccount ? "Signup Request" : "Reset Password" }}
@@ -182,11 +194,15 @@ import axios from "axios";
 export default {
   data() {
     return {
+      snackBar: false,
+      snackbarText: "",
+      snackBarColor: "success",
       reveal: false,
       createAccount: false,
       selected: false,
       loginEmail: "",
       loginPassword: "",
+      loginError: "",
       role: "",
       accountFullName: null,
       accountRole: null,
@@ -206,7 +222,7 @@ export default {
         personalName: [
           v => !!v || "Name is required",
           v =>
-            /^[A-z]([A-z/]+) ([A-z/]+) ([A-z/]+)$/gi.test(v.trim()) ||
+            /^[A-z]([A-z/]+) ([A-z/]+) ([A-z/]+)$/gi.test(v) ||
             "Name must include father and grandfather name"
         ],
         email: [
@@ -217,15 +233,16 @@ export default {
         ],
         mobileNumber: [
           v => !!v || "Phone Number is required",
-          v => /^09[0-9]{8}$/.test(v.trim()) || "Phone Number must be in 0-9"
+          v => /^09[0-9]{8}$/.test(v) || "Phone Number must be in 0-9"
         ]
       }
     };
   },
   methods: {
-    login() {
-      axios
-        .post("/graphql", {
+    async login() {
+      let loginResponse;
+      try {
+        loginResponse = await axios.post("/graphql", {
           query: `mutation login($email: String!, $password: String!) {
                       login(email: $email, password: $password) {
                         user {
@@ -252,10 +269,15 @@ export default {
             email: this.loginEmail,
             password: this.loginPassword
           }
-        })
-        .then(res => res.data.data.login.user)
-        
-        .then(user => {
+        });
+
+        if (
+          loginResponse.data.errors?.length &&
+          loginResponse.data.data === null
+        )
+          throw new Error(String(loginResponse.data.errors[0].message.message));
+        else {
+          const { user } = loginResponse.data.data.login;
           sessionStorage.setItem("loggedIn", true);
           sessionStorage.setItem("loggedInAs", user.role);
           if (user.role === "Head") {
@@ -273,11 +295,25 @@ export default {
           } else if (user.role === "SocialWorker") {
             this.$router.push({
               name: "SocialWorker",
-              params: { id: user.socialWorker.id, firstName: user.socialWorker.firstName }
+              params: {
+                id: user.socialWorker.id,
+                firstName: user.socialWorker.firstName
+              }
             });
           }
-        })
-        .catch(err => console.warn(err));
+        }
+      } catch (error) {
+        if (String(error).includes("Invalid password")) {
+          this.loginError = "Insert the correct password";
+        } else if (String(error).includes("No such user found for email:")) {
+          this.loginError = "Insert the correct email";
+        } else {
+          this.snackBar = true;
+          this.snackBarColor = "error";
+          this.snackbarText = error;
+        }
+        console.warn(error);
+      }
     },
     sendRequest() {
       if (this.$refs.accountForm.validate()) {
@@ -291,7 +327,7 @@ export default {
         (async () => {
           const query = `
                 mutation (
-                  $type: accountMaintainenceType!, 
+                  $type: accountMaintainenceType!,
                   $role: userRoles!
                   $firstName: String!
                   $middleName: String!

@@ -160,10 +160,6 @@ export default {
       this.isOpen = false;
     },
     saveImageInsertDialog(item) {
-      this.snackText = "Uploading Images...";
-      this.snackColor = "sky-blue";
-      this.snack = true;
-      console.log(this.snackText);
       if (this.$refs.imagesForm.validate()) {
         // (1) SEND IMAGES TO SERVER,
         // (2) GET IMAGES URLS,
@@ -198,12 +194,12 @@ export default {
             (async () => {
               try {
                 const query = `
-                  mutation createPhotos(
+                  mutation createPhoto(
                     $photoPortraitUrl: String!
                     $photoLongUrl: String
-                    $orphanId: ID
+                    $orphanId: ID!
                     ) {
-                      createOrphanPhotos(
+                      createOrphanPhoto(
                         photoPortraitUrl: $photoPortraitUrl
                         photoLongUrl: $photoLongUrl
                         orphanId: $orphanId
@@ -218,13 +214,11 @@ export default {
                     orphanId: item.id
                   }
                 };
-                const createPhotosRes = await axios.post(
-                  `/graphql/`,
-                  queryOptions
-                );
+                // const createPhotosRes =
+                await axios.post(`/graphql/`, queryOptions);
                 // ! log create result, // TODO finc a better way to perform feedback
-                console.log(createPhotosRes.data);
                 this.insertImageDialog = false;
+                this.$refs.imagesForm.reset();
               } catch (err) {
                 console.error(err);
               }
@@ -234,6 +228,9 @@ export default {
           }
         })();
         this.isOpen = false;
+        this.snackBarText = "Uploading Images...";
+        this.snackBarColor = "sky-blue";
+        this.snackBar = true;
       }
     }
   }

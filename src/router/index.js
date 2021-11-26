@@ -66,10 +66,7 @@ router.beforeEach((to, from, next) => {
   // ! really messy route guarding
   if (isAuthenticated) {
     // for all logged in staff
-    console.log("logged in as: ", sessionStorage.getItem("loggedInAs"));
-    console.log("going to: ", to);
     if (to.name === "login") {
-      console.log("logged out insider");
       next();
     }
     // trying to relogin ==> allow
@@ -77,8 +74,7 @@ router.beforeEach((to, from, next) => {
       to.name.startsWith(sessionStorage.getItem("loggedInAs")) &&
       (from.name === "login" || from.name === null)
     ) {
-      // trying to go to designeted route ==> allow
-      console.log("legitimate insider");
+      // trying to go to designated route ==> allow
       next();
     } else {
       // trying to visit an undesignated route
@@ -92,10 +88,8 @@ router.beforeEach((to, from, next) => {
     // if not logged in
     // trying to login ==> allow
     if (to.name === "login") {
-      console.log("new login");
       next();
     } else {
-      console.log("malicious outsider");
       next({ path: "/" });
     }
   }

@@ -59,7 +59,7 @@
                       v-model="accountNumber"
                       label="Account Number"
                       prepend-icon="mdi-book-open"
-                      :rules="[rules.required, rules.accountNumber]"
+                      :rules="[rules.required /*, rules.accountNumber]*/]"
                     >
                     </v-text-field>
                   </v-col>
@@ -250,9 +250,10 @@ export default {
     return {
       isOpen: false,
       rules: {
-        required: value => !!value || "Required.",
-        accountNumber: value =>
-          isFinite(value) || "Account number must be a number."
+        required: value => !!value || "Required."
+        //   accountNumber: value =>{
+        //     console.log(value);
+        //     return value.length > 4 || "Account number must be at least a 4-digits long."}
       },
       accountNumberDialog: false,
       validAccountNumberForm: false,
@@ -335,12 +336,12 @@ export default {
             (async () => {
               try {
                 const query = `
-                mutation updateThankyouLetter(
-                  $id: ID!,
+                mutation createOrphanLetter(
+                  $orphanId: ID!,
                   $originalThankyouLetterUrl: String!
                   ) {
-                    updateOrphan(
-                      id: $id,
+                    createOrphanLetter(
+                      orphanId: $orphanId,
                       originalThankyouLetterUrl: $originalThankyouLetterUrl
                       ) {
                         originalThankyouLetterUrl
@@ -349,14 +350,13 @@ export default {
                 const queryOptions = {
                   query,
                   variables: {
-                    id: item.id,
+                    orphanId: item.id,
                     originalThankyouLetterUrl: thankyouLetterRes.data
                   }
                 };
 
                 // const updateThankyouLetterRes =
                 await axios.post("/graphql/", queryOptions);
-                // console.log(updateThankyouLetterRes.data);
 
                 this.thankyouLetterDialog = false;
                 this.$refs.thankyouLetterForm.reset();
@@ -388,27 +388,27 @@ export default {
               try {
                 const query = `
                 mutation createHealthRecord(
-                  $medicalCertificateUrl: String
+                  $documentUrl: String!
                   $orphanId: ID!
                   ) {
-                    createHealthRecord(
-                      medicalCertificateUrl: $medicalCertificateUrl
+                    createOrphanDocument(
+                      documentUrl: $documentUrl
+                      documentType: medicalCertificate
                       orphanId: $orphanId
                       ) {
-                        created_at
+                        __typename
                       }
                   }`;
                 const queryOptions = {
                   query,
                   variables: {
-                    medicalCertificateUrl: healthRecordRes.data,
+                    documentUrl: healthRecordRes.data,
                     orphanId: item.id
                   }
                 };
 
                 // const updateThankyouLetterRes =
                 await axios.post("/graphql/", queryOptions);
-                // console.log(updateThankyouLetterRes.data);
 
                 this.healthRecordDialog = false;
                 this.$refs.healthRecordForm.reset();
