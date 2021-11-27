@@ -16,7 +16,7 @@
           <v-spacer></v-spacer>
           <v-hover v-slot="{ hover }">
             <v-icon
-              :color="hover ? 'error' : 'gray lighten-3'"
+              :color="hover ? 'red lighten-3' : 'gray lighten-3'"
               @click="SET_SNACKBAR(false)"
               right
             >
