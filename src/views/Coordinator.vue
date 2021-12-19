@@ -47,11 +47,16 @@
     </v-dialog>
 
     <v-fab-transition>
-      <NewOrphanRegistrationModel
+      <!-- <NewOrphanRegistrationModel
         :newOrphanDialog="newOrphanDialog"
         :orphanVillageId="selectedOrphanVillage"
         @dialogClosed="newOrphanDialog = $event"
         @registrationDone="addNewOrphan($event)"
+      /> -->
+      <orphan-registration-stepper 
+        :newOrphanDialog="newOrphanDialog"
+        :villageId="selectedOrphanVillage"
+        @dialogClosed="newOrphanDialog = $event"
       />
     </v-fab-transition>
     <!-- StatusChange select Dialog -->
@@ -221,11 +226,11 @@
                 </v-col>
                 <!-- Select Switch -->
                 <v-col cols="4" class="pa-0">
-                  <v-switch
+                  <v-switchnewOrphanDialog
                     v-model="singleOrphanSelect"
                     :label="selectSwitch"
                     class="px-3 mt-0"
-                  ></v-switch>
+                  ></v-switchnewOrphanDialog>
                 </v-col>
                 <!-- status change dialog -->
                 <v-col class="mt-n4 pr-7" align="right">
@@ -529,164 +534,6 @@
             </v-card>
           </v-dialog>
         </v-row>
-        <!-- Create Support Plan dialog-->
-        <template>
-          <v-dialog
-            v-model="createSupportPlanDialog"
-            persistent
-            max-width="60%"
-          >
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">Create SupportPlan</span>
-              </v-card-title>
-              <v-card-text>
-                <v-form
-                  ref="createSupportPlanForm"
-                  v-model="validCreateSupportPlan"
-                  lazy-validation
-                >
-                  <v-row>
-                    <!-- start date -->
-                    <v-col class="" cols="12" sm="6" md="6" lg="2">
-                      <v-menu
-                        ref="supportPlanStartDateMenu"
-                        v-model="supportPlanStartDateMenu"
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="supportPlanStartDate"
-                            label="Start date"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            :rules="[rules.required]"
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="supportPlanStartDate"
-                          :active-picker.sync="supportPlanStartDateActivePicker"
-                          :min="
-                            new Date(
-                              Date.now() -
-                                new Date().getTimezoneOffset() * 60000
-                            )
-                              .toISOString()
-                              .substr(0, 10)
-                          "
-                          max="2070-01-01"
-                          @change="supportPlanStartDateSave"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                    <!-- period in months -->
-                    <v-col class="" cols="12" sm="6" md="6" lg="2">
-                      <v-text-field
-                        v-model="supportPlanPeriodInYears"
-                        label="Period*"
-                        type="number"
-                        :rules="[rules.required]"
-                        hint="duration of the support plan in years"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- payment interval -->
-                    <v-col class="" cols="12" sm="6" md="4" lg="3">
-                      <v-select
-                        v-model="supportPlanPaymentInterval"
-                        :items="paymentIntervals"
-                        :menu-props="{
-                          top: true,
-                          offsetY: true,
-                        }"
-                        label="Payment interval*"
-                        :rules="[rules.required]"
-                        hint="payment interval in months"
-                      ></v-select>
-                    </v-col>
-                    <!-- admin fee percentage -->
-                    <v-col class="" cols="12" sm="6" md="4" lg="2">
-                      <v-select
-                        v-model="supportPlanAdminFeePercent"
-                        :items="percent"
-                        :menu-props="{
-                          top: true,
-                          offsetY: true,
-                        }"
-                        label="Admin Fee %*"
-                        :rules="[rules.required]"
-                        hint="admin fee in percent"
-                      ></v-select>
-                    </v-col>
-                    <!-- donors -->
-                    <v-col class="" cols="12" sm="6" md="4" lg="2">
-                      <v-select
-                        v-model="supportPlanDonor"
-                        :items="donors"
-                        :item-text="donorText_Value"
-                        :item-value="donorText_Value"
-                        :menu-props="{
-                          top: true,
-                          offsetY: true,
-                        }"
-                        :rules="[rules.required]"
-                        label="Donors*"
-                      ></v-select>
-                    </v-col>
-                  </v-row>
-                </v-form>
-                <small>*indicates required field</small>
-              </v-card-text>
-              <v-divider></v-divider>
-              <v-card-text>
-                <v-data-table
-                  v-model="selectedVillageOrphans"
-                  :headers="villageOrphanHeaders"
-                  :items="villageOrphans"
-                  item-key="id"
-                  :single-select="villageOrphanSingleSelect"
-                  show-select
-                >
-                  <template v-slot:top>
-                    <v-switch
-                      v-model="villageOrphanSingleSelect"
-                      label="Single select"
-                      class="pt-3 "
-                    ></v-switch>
-                  </template>
-                  <template v-slot:item.fullName="{ item }">
-                    {{ fullName(item) }}
-                  </template>
-                  <template v-slot:item.age="{ item }">
-                    {{ calcAge(item) }}
-                  </template>
-                </v-data-table>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="red darken-1"
-                  text
-                  @click="createSupportPlanDialog = false"
-                >
-                  Close
-                </v-btn>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  :disabled="!validCreateSupportPlan"
-                  @click="createSupportPlanSave"
-                >
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </template>
         <!-- Project Main card -->
         <v-col cols="12">
           <v-card
@@ -857,7 +704,7 @@
 import axios from "axios";
 import OrphanList from "@/views/OrphanList.vue";
 import AppNavBar from "@/components/AppNavBar";
-import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
+// import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
 import SupportPlanTable from "../components/SupportPlanTable.vue";
 import OrphanRegistrationStepper from "../components/OrphanRegistrationStepper.vue"
 
@@ -865,7 +712,7 @@ export default {
   components: {
     OrphanList,
     AppNavBar,
-    NewOrphanRegistrationModel,
+    // NewOrphanRegistrationModel,
     SupportPlanTable,
     OrphanRegistrationStepper
   },
@@ -949,27 +796,6 @@ export default {
     projectProposalFile: null,
     projectProposalPreview: null,
     selectedProjectId: null,
-    createSupportPlanDialog: false,
-    validCreateSupportPlan: false,
-    supportPlanStartDateActivePicker: null,
-    supportPlanStartDate: null,
-    supportPlanStartDateMenu: false,
-    percent: [],
-    paymentIntervals: [],
-    supportPlanPeriodInYears: null,
-    supportPlanPaymentInterval: null,
-    supportPlanAdminFeePercent: null,
-    supportPlanDonor: null,
-    villageOrphans: [],
-    villageOrphanHeaders: [
-      { text: "Id", align: "start", value: "id" },
-      { text: "Orphan Name", value: "fullName" },
-      { text: "Age", value: "age" },
-      { text: "Gender", value: "gender" },
-      { text: "Account No", value: "accountNumber" },
-    ],
-    selectedVillageOrphans: [],
-    villageOrphanSingleSelect: false,
     newOrphanDialog: false,
     showVillagesSelectionDialog: false,
     selectedOrphanVillage: "",
@@ -1001,8 +827,6 @@ export default {
     this.initialize();
     this.initializeProjects();
     this.initializeAllVillages();
-    this.percentGenerator();
-    this.paymentIntervalGenerator();
   },
   computed: {
     // temporary filter for the notification panel
@@ -1023,7 +847,7 @@ export default {
           .post("/graphql", {
             query: `query getVillagesByCoordinatorId ($coordinatorId: ID!) {
                       getVillagesByCoordinatorId (coordinatorId: $coordinatorId) {
-                        idid
+                        id
                         name
                       }
                     }`,
@@ -1060,9 +884,6 @@ export default {
     },
     projectStartDateMenu(val) {
       val && setTimeout(() => (this.projectStartDateActivePicker = "YEAR"));
-    },
-    supportPlanStartDateMenu(val) {
-      val && setTimeout(() => (this.supportPlanStartDateActivePicker = "YEAR"));
     },
   },
   methods: {
@@ -1398,55 +1219,7 @@ export default {
         .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
     },
-    createSupportPlan(
-      name,
-      adminFeePercentage,
-      paymentInterval,
-      startDate,
-      endDate,
-      donorId,
-      projectId,
-      orphans
-    ) {
-      return axios
-        .post("/graphql/", {
-          query: `mutation createSupportPlan (
-                  $name: String!
-                  $adminFeePercentage: Float!
-                  $paymentInterval: String!
-                  $startDate: DateTime
-                  $endDate: DateTime
-                  $donorId: ID
-                  $projectId: ID
-                  $orphans: [ID]
-                  ) {
-                  createSupportPlan (
-                    name: $name
-                    adminFeePercentage: $adminFeePercentage
-                    paymentInterval: $paymentInterval
-                    startDate: $startDate
-                    endDate: $endDate
-                    donorId: $donorId
-                    projectId: $projectId
-                    orphans: $orphans
-                  ) {
-                    id
-                  }
-                }`,
-          variables: {
-            name,
-            adminFeePercentage,
-            paymentInterval,
-            startDate,
-            endDate,
-            donorId,
-            projectId,
-            orphans,
-          },
-        })
-        .then((res) => res.data.data.createSupportPlan)
-        .catch((err) => console.warn(err));
-    },
+    
     createProject(
       number,
       startDate,
@@ -1501,55 +1274,8 @@ export default {
         .catch((err) => console.warn(err));
     },
 
-    async createSupportPlanSave() {
-      if (this.$refs.createSupportPlanForm.validate()) {
-        const project = this.projects.filter(
-          (project) => project.id !== this.selectedProjectId
-        )[0];
-
-        const donor = this.donors.filter(
-          (donor) => donor.nameInitials === this.supportPlanDonor
-        )[0];
-
-        const name = `${donor.nameInitials}-${project.number}`;
-        const startDate = new Date(this.supportPlanStartDate).toISOString();
-
-        let tempDate = new Date(startDate);
-        const endDate = new Date(
-          tempDate.setFullYear(
-            tempDate.getFullYear() + parseInt(this.supportPlanPeriodInYears)
-          )
-        ).toISOString();
-
-        const orphanIds = this.selectedVillageOrphans.map(
-          (orphan) => orphan.id
-        );
-
-        const supportPlan = await this.createSupportPlan(
-          name,
-          parseFloat(this.supportPlanAdminFeePercent),
-          String(this.supportPlanPaymentInterval),
-          startDate,
-          endDate,
-          donor.id,
-          // project.id,
-          this.selectedProjectId,
-          orphanIds
-        );
-
-        console.log(supportPlan);
-
-        this.$refs.createSupportPlanForm.reset();
-        // this.createSupportPlanDialog = false;
-        this.showSupportPlanTable = false;
-      }
-    },
-
     openSupportPlanDialog(project) {
       this.selectedProjectId = project.id;
-      this.villageOrphans = project.location.reduce((acc, cur) => {
-        return acc.concat(...cur.orphans);
-      }, []);
 
       this.showSupportPlanTable = true;
     },
@@ -1647,27 +1373,10 @@ export default {
 
     cancelSupportPlan() {
       this.$refs.supportPlanForm.reset();
-      this.createSupportPlanDialog = false;
     },
 
     projectStartDateSave(date) {
       this.$refs.projectStartDateMenu.save(date);
-    },
-
-    supportPlanStartDateSave(date) {
-      // Why does this.$refs.supportPlanStartDateMenu give an array??!
-      this.$refs.supportPlanStartDateMenu.save(date);
-    },
-
-    percentGenerator() {
-      for (let i = 1; i <= 30; i++) {
-        this.percent.push(i);
-      }
-    },
-    paymentIntervalGenerator() {
-      for (let i = 1; i <= 12; i++) {
-        this.paymentIntervals.push(i);
-      }
     },
 
     donorText_Value(item) {

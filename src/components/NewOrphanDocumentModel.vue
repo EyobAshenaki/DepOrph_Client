@@ -1,485 +1,412 @@
 <template>
-  <div>
-    <!-- dialog -->
-    <div>
-      <v-card link max-width="15rem" @click="dialog = true">
-        <v-card-title class="headline justify-center">
-          Documents
-        </v-card-title>
-      </v-card>
-      <v-dialog v-model="dialog" max-width="60em">
-        <v-card>
-          <!-- <v-card-title>
-            <span class="headline">{{ formTitle }}</span>
-          </v-card-title> -->
-          <!-- the form part; the fields part-->
-          <v-card-text>
-            <v-form
-              ref="documentForm"
-              v-model="validDocumentForm"
-              lazy-validation
+  <v-form ref="documentForm" v-model="validDocumentForm" lazy-validation>
+    <v-container>
+      <v-row>
+        <!-- Orphan Documents -->
+        <template>
+          <v-col sm="12">
+            <div class="title mt-3 mb-n5">Orphan Documents</div>
+          </v-col>
+          <!-- Birth Certificate -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="birthCertificateFile"
+              accept="image/*, .pdf"
+              counter
+              chips
+              prepend-icon="mdi-file-document-outline"
+              :rules="[rules.required]"
+              label="Birth Certificate"
+              @change="toggleBirthCertificateInput($event)"
             >
-              <v-container>
-                <v-row>
-                  <!-- Orphan Documents -->
-                  <template>
-                    <v-col sm="12">
-                      <div class="title mt-3 mb-n5">Orphan Documents</div>
-                    </v-col>
-                    <!-- Birth Certificate -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="birthCertificateFile"
-                        accept="image/*, .pdf"
-                        counter
-                        chips
-                        prepend-icon="mdi-file-document-outline"
-                        :rules="[rules.required]"
-                        label="Birth Certificate"
-                        @change="toggleBirthCertificateInput($event)"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleBirthCertificateDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-
-                          <!-- preview image popup -->
-                          <v-dialog v-model="birthCertificateDialog">
-                            <v-container>
-                              <v-row>
-                                <!-- <v-col>what</v-col> -->
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="toggleBirthCertificateDialog"
-                                  >
-                                    mdi-close
-                                  </v-icon>
-                                </v-col>
-                              </v-row>
-
-                              <v-img
-                                height="82vh"
-                                :src="birthCertificatePreview"
-                                contain
-                                alt="birthCertificateimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Portrait Photo -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="portraitPhotoFile"
-                        accept="image/*, .pdf"
-                        counter
-                        chips
-                        prepend-icon="mdi-camera"
-                        label="Portrait Photo"
-                        @change="togglePortraitPhotoInput($event)"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="togglePortraitPhotoDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="portraitPhotoDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="togglePortraitPhotoDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-
-                              <v-img
-                                height="82vh"
-                                :src="portraitPhotoPreview"
-                                contain
-                                alt="portraitPhotoimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Orphan Id -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="orphanIdFile"
-                        accept="image/*, .pdf"
-                        counter
-                        chips
-                        prepend-icon="mdi-file-document-outline"
-                        label="Orphan Id"
-                        @change="toggleOrphanIdInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleOrphanIdDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="orphanIdDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon dark @click="toggleOrphanIdDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="orphanIdPreview"
-                                contain
-                                alt="orphanIdimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Orphan Passport -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="orphanPassportFile"
-                        accept="image/*, .pdf"
-                        counter
-                        prepend-icon="mdi-file-document-outline"
-                        label="Orphan Passport"
-                        @change="toggleOrphanPassportInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleOrphanPassportDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="orphanPassportDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="toggleOrphanPassportDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="orphanPassportPreview"
-                                contain
-                                alt="orphanPassportimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleBirthCertificateDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
                   </template>
-                  <!-- Father Documents -->
-                  <template>
-                    <v-col sm="12">
-                      <div class="title mt-n3 mb-n5">Father Documents</div>
-                    </v-col>
-                    <!-- Father Death Certificate -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="fatherDeathCertificateFile"
-                        accept="image/*, .pdf"
-                        counter
-                        prepend-icon="mdi-file-document-outline"
-                        :rules="[rules.required]"
-                        label="Death Certificate"
-                        @change="toggleFatherDeathCertificateInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleFatherDeathCertificateDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="fatherDeathCertificateDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="toggleFatherDeathCertificateDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="fatherDeathCertificatePreview"
-                                contain
-                                alt="fatherDeathCertificateimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                  </template>
-                  <!-- Guardian Documents -->
-                  <template>
-                    <v-col sm="12">
-                      <div class="title mt-n3 mb-n5">Guardian Documents</div>
-                    </v-col>
-                    <!-- Guardian Id -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="guardianIdFile"
-                        accept="image/*, .pdf"
-                        counter
-                        prepend-icon="mdi-file-document-outline"
-                        :rules="[rules.required]"
-                        label="Guardian Id"
-                        @change="toggleGuardianIdInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleGuardianIdDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="guardianIdDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon dark @click="toggleGuardianIdDialog"
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="guardianIdPreview"
-                                contain
-                                alt="guardianIdimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Guardian Confirmation Letter -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="guardianConfirmationLetterFile"
-                        accept="image/*, .pdf"
-                        counter
-                        prepend-icon="mdi-file-document-outline"
-                        :rules="[rules.required]"
-                        label="Guardian Confirmation Letter"
-                        @change="toggleGuardianConfirmationLetterInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleGuardianConfirmationLetterDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog v-model="guardianConfirmationLetterDialog">
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="
-                                      toggleGuardianConfirmationLetterDialog
-                                    "
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="guardianConfirmationLetterPreview"
-                                contain
-                                alt="guardianConfirmationLetterimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                    <!-- Guardian Legal Confirmation Letter -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-file-input
-                        v-model="guardianLegalConfirmationLetterFile"
-                        accept="image/*, .pdf"
-                        counter
-                        prepend-icon="mdi-file-document-outline"
-                        :rules="[rules.required]"
-                        label="Guardian Legal Confirmation Letter"
-                        @change="toggleGuardianLegalConfirmationLetterInput"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="
-                                  toggleGuardianLegalConfirmationLetterDialog
-                                "
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-                          <!-- preview image popup -->
-                          <v-dialog
-                            v-model="guardianLegalConfirmationLetterDialog"
-                          >
-                            <v-container>
-                              <v-row>
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="
-                                      toggleGuardianLegalConfirmationLetterDialog
-                                    "
-                                    >mdi-close</v-icon
-                                  ></v-col
-                                >
-                              </v-row>
-                              <v-img
-                                height="82vh"
-                                :src="guardianLegalConfirmationLetterPreview"
-                                contain
-                                alt="guardianLegalConfirmationLetterimage"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                  </template>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-          <v-divider class="mt-3"></v-divider>
-          <!-- the action part; the buttons part -->
-          <v-card-actions>
-            <v-btn color="red darken-1" text @click="documentDialogCancel">
-              Cancel
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-slide-x-reverse-transition>
-              <v-tooltip v-if="formHasErrors" left>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    icon
-                    class="my-0"
-                    v-bind="attrs"
-                    @click="documentDialogReset"
-                    v-on="on"
-                  >
-                    <v-icon>mdi-refresh</v-icon>
-                  </v-btn>
-                </template>
-                <span>Refresh form</span>
-              </v-tooltip>
-            </v-slide-x-reverse-transition>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="documentDialogSave"
-              :disabled="!validDocumentForm"
+                  <span>Preview</span>
+                </v-tooltip>
+
+                <!-- preview image popup -->
+                <v-dialog v-model="birthCertificateDialog">
+                  <v-container>
+                    <v-row>
+                      <!-- <v-col>what</v-col> -->
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="toggleBirthCertificateDialog">
+                          mdi-close
+                        </v-icon>
+                      </v-col>
+                    </v-row>
+
+                    <v-img
+                      height="82vh"
+                      :src="birthCertificatePreview"
+                      contain
+                      alt="birthCertificateimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+          <!-- Portrait Photo -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="portraitPhotoFile"
+              accept="image/*, .pdf"
+              counter
+              chips
+              prepend-icon="mdi-camera"
+              label="Portrait Photo"
+              @change="togglePortraitPhotoInput($event)"
             >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </div>
-  </div>
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="togglePortraitPhotoDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="portraitPhotoDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="togglePortraitPhotoDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+
+                    <v-img
+                      height="82vh"
+                      :src="portraitPhotoPreview"
+                      contain
+                      alt="portraitPhotoimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+          <!-- Orphan Id -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="orphanIdFile"
+              accept="image/*, .pdf"
+              counter
+              chips
+              prepend-icon="mdi-file-document-outline"
+              label="Orphan Id"
+              @change="toggleOrphanIdInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleOrphanIdDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="orphanIdDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="toggleOrphanIdDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="orphanIdPreview"
+                      contain
+                      alt="orphanIdimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+          <!-- Orphan Passport -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="orphanPassportFile"
+              accept="image/*, .pdf"
+              counter
+              prepend-icon="mdi-file-document-outline"
+              label="Orphan Passport"
+              @change="toggleOrphanPassportInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleOrphanPassportDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="orphanPassportDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="toggleOrphanPassportDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="orphanPassportPreview"
+                      contain
+                      alt="orphanPassportimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+        </template>
+        <!-- Father Documents -->
+        <template>
+          <v-col sm="12">
+            <div class="title mt-n3 mb-n5">Father Documents</div>
+          </v-col>
+          <!-- Father Death Certificate -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="fatherDeathCertificateFile"
+              accept="image/*, .pdf"
+              counter
+              prepend-icon="mdi-file-document-outline"
+              :rules="[rules.required]"
+              label="Death Certificate"
+              @change="toggleFatherDeathCertificateInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleFatherDeathCertificateDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="fatherDeathCertificateDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="toggleFatherDeathCertificateDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="fatherDeathCertificatePreview"
+                      contain
+                      alt="fatherDeathCertificateimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+        </template>
+        <!-- Guardian Documents -->
+        <template>
+          <v-col sm="12">
+            <div class="title mt-n3 mb-n5">Guardian Documents</div>
+          </v-col>
+          <!-- Guardian Id -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="guardianIdFile"
+              accept="image/*, .pdf"
+              counter
+              prepend-icon="mdi-file-document-outline"
+              :rules="[rules.required]"
+              label="Guardian Id"
+              @change="toggleGuardianIdInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleGuardianIdDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="guardianIdDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon dark @click="toggleGuardianIdDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="guardianIdPreview"
+                      contain
+                      alt="guardianIdimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+          <!-- Guardian Confirmation Letter -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="guardianConfirmationLetterFile"
+              accept="image/*, .pdf"
+              counter
+              prepend-icon="mdi-file-document-outline"
+              :rules="[rules.required]"
+              label="Guardian Confirmation Letter"
+              @change="toggleGuardianConfirmationLetterInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleGuardianConfirmationLetterDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="guardianConfirmationLetterDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon
+                          dark
+                          @click="toggleGuardianConfirmationLetterDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="guardianConfirmationLetterPreview"
+                      contain
+                      alt="guardianConfirmationLetterimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+          <!-- Guardian Legal Confirmation Letter -->
+          <v-col cols="12" sm="6" md="4">
+            <v-file-input
+              v-model="guardianLegalConfirmationLetterFile"
+              accept="image/*, .pdf"
+              counter
+              prepend-icon="mdi-file-document-outline"
+              :rules="[rules.required]"
+              label="Guardian Legal Confirmation Letter"
+              @change="toggleGuardianLegalConfirmationLetterInput"
+            >
+              <template v-slot:append>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      class="ml-auto"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="toggleGuardianLegalConfirmationLetterDialog"
+                    >
+                      mdi-file-eye-outline
+                    </v-icon>
+                  </template>
+                  <span>Preview</span>
+                </v-tooltip>
+                <!-- preview image popup -->
+                <v-dialog v-model="guardianLegalConfirmationLetterDialog">
+                  <v-container>
+                    <v-row>
+                      <v-spacer></v-spacer>
+                      <v-col class="mr-n12" sm="1">
+                        <v-icon
+                          dark
+                          @click="toggleGuardianLegalConfirmationLetterDialog"
+                          >mdi-close</v-icon
+                        ></v-col
+                      >
+                    </v-row>
+                    <v-img
+                      height="82vh"
+                      :src="guardianLegalConfirmationLetterPreview"
+                      contain
+                      alt="guardianLegalConfirmationLetterimage"
+                    ></v-img>
+                  </v-container>
+                </v-dialog>
+              </template>
+            </v-file-input>
+          </v-col>
+        </template>
+      </v-row>
+    </v-container>
+  </v-form>
 </template>
 
 <script>
@@ -492,6 +419,12 @@ export default {
     },
     orphanVillageId: {
       type: String,
+    },
+    save: {
+      type: Boolean,
+    },
+    cancel: {
+      type: Boolean,
     },
   },
   data() {
@@ -545,11 +478,23 @@ export default {
       guardianLegalConfirmationLetterPreview: null,
     };
   },
-  computed: {},
+  computed: {
+    orphanDocumentSave: function() {
+      return this.save;
+    },
+    orphanDocumentCancel: function() {
+      return this.cancel;
+    },
+  },
   watch: {
-    // dialog
-    dialog(val) {
-      val || this.documentDialogClose();
+    orphanDocumentSave(val) {
+      if (val) this.documentDialogSave();
+    },
+    orphanDocumentCancel(val) {
+      if (val) this.documentDialogCancel();
+    },
+    validDocumentForm(val) {
+      this.$emit("documentError", val);
     },
   },
   methods: {
@@ -640,368 +585,6 @@ export default {
         .guardianLegalConfirmationLetterDialog;
     },
 
-    getOrphanFather(
-      firstName,
-      lastName,
-      dateOfDeath,
-      causeOfDeath,
-      dateOfBirth,
-      deathCertificateUrl
-    ) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createFather(
-                    $firstName: String!
-                    $lastName: String!
-                    $dateOfDeath: DateTime!
-                    $causeOfDeath: String!
-                    $dateOfBirth: DateTime!
-                    $deathCertificateUrl: String!
-                  ) {
-                    createFather(
-                      firstName: $firstName
-                      lastName: $lastName
-                      dateOfDeath: $dateOfDeath
-                      causeOfDeath: $causeOfDeath
-                      dateOfBirth: $dateOfBirth
-                      deathCertificateUrl: $deathCertificateUrl
-                    ) {
-                      id
-                      firstName
-                      lastName
-                      deathCertificateUrl
-                    }
-                  }`,
-          variables: {
-            firstName: firstName,
-            lastName: lastName,
-            dateOfDeath: dateOfDeath,
-            causeOfDeath: causeOfDeath,
-            dateOfBirth: dateOfBirth,
-            deathCertificateUrl: deathCertificateUrl,
-          },
-        })
-        .then((res) => res.data.data.createFather)
-        .catch((err) => console.warn(err));
-    },
-
-    getOrphanMother(
-      firstName,
-      middleName,
-      lastName,
-      vitalStatus,
-      dateOfBirth,
-      dateOfDeath,
-      causeOfDeath,
-      maritalStatus,
-      mobileNumber,
-      monthlyExpense
-    ) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createMother(
-                  $firstName: String!
-                  $middleName: String!
-                  $lastName: String!
-                  $vitalStatus: motherVitalStatus!
-                  $dateOfBirth: DateTime!
-                  $dateOfDeath: DateTime
-                  $causeOfDeath: String
-                  $maritalStatus: motherMaritalStatus
-                  $mobileNumber: String!
-                  $monthlyExpense: Float!
-                ) {
-                  createMother(
-                    firstName: $firstName
-                    middleName: $middleName
-                    lastName: $lastName
-                    vitalStatus: $vitalStatus
-                    dateOfBirth: $dateOfBirth
-                    dateOfDeath: $dateOfDeath
-                    causeOfDeath: $causeOfDeath
-                    maritalStatus: $maritalStatus
-                    mobileNumber: $mobileNumber
-                    monthlyExpense: $monthlyExpense
-                  ) {
-                    id
-                    firstName
-                    vitalStatus
-                  }
-                }`,
-          variables: {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            vitalStatus: vitalStatus,
-            dateOfBirth: dateOfBirth,
-            dateOfDeath: dateOfDeath || null,
-            causeOfDeath: causeOfDeath || null,
-            maritalStatus: maritalStatus || null,
-            mobileNumber: mobileNumber,
-            monthlyExpense: monthlyExpense,
-          },
-        })
-        .then((res) => res.data.data.createMother)
-        .catch((err) => console.warn(err));
-    },
-
-    getOrphanEducation(
-      enrollmentStatus,
-      schoolName,
-      typeOfSchool,
-      year,
-      level,
-      reason
-    ) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createEducation(
-                  $enrollmentStatus: educationEnrollmentStatus!
-                  $schoolName: String
-                  $typeOfSchool: educationTypeOfSchool
-                  $year: String
-                  $level: educationLevel
-                  $reason: String
-                ) {
-                  createEducation(
-                    enrollmentStatus: $enrollmentStatus
-                    schoolName: $schoolName
-                    typeOfSchool: $typeOfSchool
-                    year: $year
-                    level: $level
-                    reason: $reason
-                  ) {
-                    id
-                    enrollmentStatus
-                    reason
-                  }
-                }`,
-          variables: {
-            enrollmentStatus: enrollmentStatus,
-            schoolName: schoolName || null,
-            typeOfSchool: typeOfSchool || "N_A",
-            year: String(year) || null,
-            level: level || "N_A",
-            reason: reason || null,
-          },
-        })
-        .then((res) => res.data.data.createEducation)
-        .catch((err) => console.warn(err));
-    },
-
-    getOrphanGuardian(
-      firstName,
-      middleName,
-      lastName,
-      dateOfBirth,
-      gender,
-      relationToOrphan,
-      nationality,
-      mobileNumber,
-      telephoneNumber,
-      email,
-      iDCardUrl,
-      confirmationLetterUrl,
-      legalConfirmationLetterUrl
-    ) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createGuardian(
-                  $firstName: String!
-                  $middleName: String!
-                  $lastName: String!
-                  $dateOfBirth: DateTime!
-                  $gender: guardianGender!
-                  $relationToOrphan: guardianRelationToOrphan!
-                  $nationality: guardianNationality!
-                  $mobileNumber: String!
-                  $telephoneNumber: String
-                  $email: String!
-                  $iDCardUrl: String!
-                  $confirmationLetterUrl: String!
-                  $legalConfirmationLetterUrl: String!
-                ) {
-                  createGuardian(
-                    firstName: $firstName
-                    middleName: $middleName
-                    lastName: $lastName
-                    dateOfBirth: $dateOfBirth
-                    gender: $gender
-                    relationToOrphan: $relationToOrphan
-                    nationality: $nationality
-                    mobileNumber: $mobileNumber
-                    telephoneNumber: $telephoneNumber
-                    email: $email
-                    iDCardUrl: $iDCardUrl
-                    confirmationLetterUrl: $confirmationLetterUrl
-                    legalConfirmationLetterUrl: $legalConfirmationLetterUrl
-                  ) {
-                    id
-                    firstName
-                    email
-                  }
-                }`,
-          variables: {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            dateOfBirth: dateOfBirth,
-            gender: gender,
-            relationToOrphan: relationToOrphan,
-            nationality: nationality,
-            mobileNumber: mobileNumber,
-            telephoneNumber: telephoneNumber,
-            email: email,
-            iDCardUrl: iDCardUrl,
-            confirmationLetterUrl: confirmationLetterUrl,
-            legalConfirmationLetterUrl: legalConfirmationLetterUrl,
-          },
-        })
-        .then((res) => res.data.data.createGuardian)
-        .catch((err) => console.warn(err));
-    },
-
-    getHouseProperty(housingSituation, otherProperty) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createHouse_property(
-                  $housingSituation: String!
-                  $otherProperty: String
-                ) {
-                  createHouse_property(
-                    housingSituation: $housingSituation
-                    otherProperty: $otherProperty
-                  ) {
-                    id
-                    housingSituation
-                  }
-                }`,
-          variables: {
-            housingSituation: housingSituation,
-            otherProperty: otherProperty,
-          },
-        })
-        .then((res) => res.data.data.createHouse_property)
-        .catch((err) => console.warn(err));
-    },
-
-    registerOrphan(
-      firstName,
-      gender,
-      placeOfBirth,
-      dateOfBirth,
-      spokenLanguages,
-      hobbies,
-      religion,
-      healthDescription,
-      psychologicalStatus,
-      idCardUrl,
-      passportUrl,
-      birthCertificateUrl,
-      fatherId,
-      educationId,
-      guardianId,
-      motherId,
-      house_propertyId,
-      villageId
-    ) {
-      return axios
-        .post("/graphql", {
-          query: `mutation createOrphan(
-                    $firstName: String!
-                    $gender: orphanGender!
-                    $placeOfBirth: String!
-                    $dateOfBirth: DateTime!
-                    $spokenLanguages: String
-                    $hobbies: String
-                    $religion: orphanReligion
-                    $healthDescription: String!
-                    $psychologicalStatus: orphanPsychologicalStatus
-                    $idCardUrl: String
-                    $passportUrl: String
-                    $birthCertificateUrl: String!
-                    $fatherId: ID
-                    $motherId: ID
-                    $educationId: ID
-                    $guardianId: ID
-                    $house_propertyId: ID
-                    $villageId: ID
-                  ) {
-                    createOrphan(
-                      firstName: $firstName
-                      gender: $gender
-                      placeOfBirth: $placeOfBirth
-                      dateOfBirth: $dateOfBirth
-                      spokenLanguages: $spokenLanguages
-                      hobbies: $hobbies
-                      religion: $religion
-                      healthDescription: $healthDescription
-                      psychologicalStatus: $psychologicalStatus
-                      idCardUrl: $idCardUrl
-                      passportUrl: $passportUrl
-                      birthCertificateUrl: $birthCertificateUrl
-                      fatherId: $fatherId
-                      motherId: $motherId
-                      educationId: $educationId
-                      guardianId: $guardianId
-                      house_propertyId: $house_propertyId
-                      villageId: $villageId
-                    ) {
-                      id
-                    }
-                  }`,
-          variables: {
-            firstName: firstName,
-            gender: gender,
-            placeOfBirth: placeOfBirth,
-            dateOfBirth: dateOfBirth,
-            spokenLanguages: spokenLanguages,
-            hobbies: hobbies,
-            religion: religion,
-            healthDescription: healthDescription,
-            psychologicalStatus: psychologicalStatus,
-            idCardUrl: idCardUrl,
-            passportUrl: passportUrl,
-            birthCertificateUrl: birthCertificateUrl,
-            fatherId: fatherId,
-            educationId: educationId,
-            guardianId: guardianId,
-            motherId: motherId,
-            house_propertyId: house_propertyId,
-            villageId: villageId,
-          },
-        })
-        .then((res) => res.data.data.createOrphan)
-        .catch((err) => console.warn(err));
-    },
-
-    async createSponsorshipStatus(orphanId) {
-      return await axios
-        .post("/graphql", {
-          query: `mutation createSponsorshipStatus(
-                  $status: sponsorshipStatus
-                  $date: DateTime!
-                  $orphanId: ID
-                ) {
-                  createSponsorshipStatus(status: $status, date: $date, orphanId: $orphanId) {
-                    id
-                    status
-                    date
-                    orphan {
-                      id
-                    }
-                  }
-                }`,
-          variables: {
-            status: "new",
-            date: new Date().toISOString(),
-            orphanId: orphanId,
-          },
-        })
-        .then((res) => res.data.data.createSponsorshipStatus)
-        .catch((err) => console.warn(err));
-    },
-
     documentDialogClose() {
       this.dialog = false;
     },
@@ -1014,279 +597,363 @@ export default {
     async documentDialogSave() {
       this.formHasErrors = false;
       if (this.$refs.documentForm.validate()) {
-        const birthCertificateFormData = new FormData();
-        birthCertificateFormData.append(
+        const documents = {
+          orphanBirthCertificateFormData: null,
+          orphanPortraitPhotoFormData: null,
+          orphanIdFormData: null,
+          orphanPassportFormData: null,
+          fatherDeathCertificateFormData: null,
+          guardianIdFormData: null,
+          guardianConfirmationLetterFormData: null,
+          guardianLegalConfirmationLetterFormData: null,
+        };
+
+        documents.orphanBirthCertificateFormData = new FormData();
+        documents.orphanBirthCertificateFormData.append(
           "orphanBirthCertificate",
           this.birthCertificateFile,
           this.birthCertificateFile.name
         );
+        this.orphan.birthCertificateUrl = await axios
+          .post(
+            `/public/images/orphanBirthCertificate/`,
+            documents.orphanBirthCertificateFormData
+          )
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
 
-        const fatherDeathCertificateFormData = new FormData();
-        fatherDeathCertificateFormData.append(
+        documents.fatherDeathCertificateFormData = new FormData();
+        documents.fatherDeathCertificateFormData.append(
           "fatherDeathCertificate",
           this.fatherDeathCertificateFile,
           this.fatherDeathCertificateFile.name
         );
-        const guardianIdFormData = new FormData();
-        guardianIdFormData.append(
+
+        documents.guardianIdFormData = new FormData();
+        documents.guardianIdFormData.append(
           "guardianIDCard",
           this.guardianIdFile,
           this.guardianIdFile.name
         );
-        const guardianConfirmationLetterFormData = new FormData();
-        guardianConfirmationLetterFormData.append(
+
+        documents.guardianConfirmationLetterFormData = new FormData();
+        documents.guardianConfirmationLetterFormData.append(
           "guardianConfirmationLetter",
           this.guardianConfirmationLetterFile,
           this.guardianConfirmationLetterFile.name
         );
-        const guardianLegalConfirmationLetterFormData = new FormData();
-        guardianLegalConfirmationLetterFormData.append(
+
+        documents.guardianLegalConfirmationLetterFormData = new FormData();
+        documents.guardianLegalConfirmationLetterFormData.append(
           "guardianLegalConfirmationLetter",
           this.guardianLegalConfirmationLetterFile,
           this.guardianLegalConfirmationLetterFile.name
         );
 
-        this.orphan = Object.assign(this.orphan ?? {}, this.updatedOrphan);
-
-        this.orphan.dateOfBirth = this.isoDateFormatter(
-          this.orphan.dateOfBirth
-        );
-
-        this.orphan.father = Object.assign(
-          this.orphan.father ?? {},
-          this.updatedOrphan?.father
-        );
-
-        this.orphan.mother = Object.assign(
-          this.orphan.mother ?? {},
-          this.updatedOrphan?.mother
-        );
-
-        this.orphan.House_property = Object.assign(
-          this.orphan.House_property ?? {},
-          this.updatedOrphan?.House_property
-        );
-
-        this.orphan.education = Object.assign(
-          this.orphan.education ?? {},
-          this.updatedOrphan?.education
-        );
-
-        this.orphan.guardian = Object.assign(
-          this.orphan.guardian ?? {},
-          this.updatedOrphan?.guardian
-        );
-
-        this.orphan.father.dateOfDeath = this.isoDateFormatter(
-          this.orphan.father.dateOfDeath
-        );
-        this.orphan.father.dateOfBirth = this.isoDateFormatter(
-          this.orphan.father.dateOfBirth
-        );
-
-        this.orphan.father.deathCertificateUrl = await axios
-          .post(
-            `/public/images/fatherDeathCertificate/`,
-            fatherDeathCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
-
-        const father = await this.getOrphanFather(
-          this.orphan.father.firstName,
-          this.orphan.father.lastName,
-          this.orphan.father.dateOfDeath,
-          this.orphan.father.causeOfDeath,
-          this.orphan.father.dateOfBirth,
-          this.orphan.father.deathCertificateUrl
-        );
-
-        const education = await this.getOrphanEducation(
-          this.orphan.education.enrollmentStatus,
-          this.orphan.education.schoolName,
-          this.orphan.education.typeOfSchool,
-          this.orphan.education.year,
-          this.orphan.education.level,
-          this.orphan.education.reason
-        );
-
-        this.orphan.mother.dateOfBirth = this.isoDateFormatter(
-          this.orphan.mother.dateOfBirth
-        );
-        this.orphan.mother.dateOfDeath = this.isoDateFormatter(
-          this.orphan.mother.dateOfDeath
-        );
-
-        const mother = await this.getOrphanMother(
-          this.orphan.mother.firstName,
-          this.orphan.mother.middleName,
-          this.orphan.mother.lastName,
-          this.orphan.mother.vitalStatus,
-          this.orphan.mother.dateOfBirth,
-          this.orphan.mother.dateOfDeath,
-          this.orphan.mother.causeOfDeath,
-          this.orphan.mother.maritalStatus,
-          this.orphan.mother.mobileNumber,
-          this.orphan.mother.monthlyExpense
-        );
-
-        this.orphan.guardian.dateOfBirth = this.isoDateFormatter(
-          this.orphan.guardian.dateOfBirth
-        );
-
-        this.orphan.guardian.idCardUrl = await axios
-          .post(`/public/images/guardianIDCard/`, guardianIdFormData)
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
-
-        this.orphan.guardian.confirmationLetterUrl = await axios
-          .post(
-            `/public/images/guardianConfirmationLetter/`,
-            guardianConfirmationLetterFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
-
-        this.orphan.guardian.legalConfirmationLetterUrl = await axios
-          .post(
-            `/public/images/guardianLegalConfirmationLetter/`,
-            guardianLegalConfirmationLetterFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
-
-        const guardian = await this.getOrphanGuardian(
-          this.orphan.guardian.firstName,
-          this.orphan.guardian.middleName,
-          this.orphan.guardian.lastName,
-          this.orphan.guardian.dateOfBirth,
-          this.orphan.guardian.gender,
-          this.orphan.guardian.relationToOrphan,
-          this.orphan.guardian.nationality,
-          this.orphan.guardian.mobileNumber,
-          this.orphan.guardian.telephoneNumber,
-          this.orphan.guardian.email,
-          this.orphan.guardian.idCardUrl,
-          this.orphan.guardian.confirmationLetterUrl,
-          this.orphan.guardian.legalConfirmationLetterUrl
-        );
-
-        const houseProperty = await this.getHouseProperty(
-          this.orphan.House_property.housingSituation,
-          this.orphan.House_property.otherProperty
-        );
-
-        this.orphan.birthCertificateUrl = await axios
-          .post(
-            `/public/images/orphanBirthCertificate/`,
-            birthCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
-
-        if (this.orphanIdFile) {
-          const orphanIdFormData = new FormData();
-          orphanIdFormData.append(
-            "orphanIdCard",
-            this.orphanIdFile,
-            this.orphanIdFile.name
-          );
-          this.orphan.idCardUrl = await axios
-            .post(`/public/images/orphanIdCard/`, orphanIdFormData)
-            .then((res) => res.data)
-            .catch((err) => console.warn(err));
-        }
-
-        if (this.orphanPassportFile) {
-          const orphanPassportFormData = new FormData();
-          orphanPassportFormData.append(
-            "orphanPassport",
-            this.orphanPassportFile,
-            this.orphanPassportFile.name
-          );
-          this.orphan.passportUrl = await axios
-            .post(`/public/images/orphanPassport/`, orphanPassportFormData)
-            .then((res) => res.data)
-            .catch((err) => console.warn(err));
-        }
-
-        const registeredOrphan = await this.registerOrphan(
-          this.orphan.firstName,
-          this.orphan.gender,
-          this.orphan.placeOfBirth,
-          this.orphan.dateOfBirth,
-          this.orphan.spokenLanguages,
-          this.orphan.hobbies,
-          this.orphan.religion,
-          this.orphan.healthDescription || "N/A",
-          this.orphan.psychologicalStatus,
-          this.orphan.idCardUrl || "idCardUrlPlaceHolder",
-          this.orphan.passportUrl || "passportUrlPlaceHolder",
-          this.orphan.birthCertificateUrl,
-          father.id,
-          education.id,
-          guardian.id,
-          mother.id,
-          houseProperty.id,
-          parseInt(this.orphanVillageId)
-        );
-
-        const status = await this.createSponsorshipStatus(registeredOrphan.id);
-
-        console.log("Status", status);
-
         if (this.portraitPhotoFile) {
-          const portraitPhotoFormData = new FormData();
-          portraitPhotoFormData.append(
+          documents.orphanPortraitPhotoFormData = new FormData();
+          documents.orphanPortraitPhotoFormData.append(
             "orphanPhotosPhotoPortrait",
             this.portraitPhotoFile,
             this.portraitPhotoFile.name
           );
-
-          axios
-            .post(
-              `/public/images/orphanPhotosPhotoPortrait/`,
-              portraitPhotoFormData
-            )
-            .then((res) => {
-              axios.post(`/graphql/`, {
-                query: `mutation createOrphanPhotos(
-                      $photoPortraitUrl: String!
-                      $orphanId: ID
-                      ) {
-                        createOrphanPhotos(
-                          photoPortraitUrl: $photoPortraitUrl
-                          orphanId: $orphanId
-                          ) { id }
-                      }`,
-                variables: {
-                  photoPortraitUrl: res.data,
-                  orphanId: registeredOrphan.id,
-                },
-              })
-              .then(res => res.data.data.createOrphanPhotos)
-              .catch(err => console.warn(err));
-            })
-            .catch((err) => console.warn(err));
         }
 
-        this.$emit("registrationDone", {
-          documentForm: this.$refs.documentForm,
-          newOrphanId: registeredOrphan.id
-        });
+        if (this.orphanIdFile) {
+          documents.orphanIdFormData = new FormData();
+          documents.orphanIdFormData.append(
+            "orphanIdCard",
+            this.orphanIdFile,
+            this.orphanIdFile.name
+          );
+        }
+
+        if (this.orphanPassportFile) {
+          documents.orphanPassportFormData = new FormData();
+          documents.orphanPassportFormData.append(
+            "orphanPassport",
+            this.orphanPassportFile,
+            this.orphanPassportFile.name
+          );
+        }
+
+        console.log("documents", documents);
+
+        this.$emit("documentDone", documents);
         this.documentDialogClose();
       } else {
         this.formHasErrors = true;
       }
     },
 
-    isoDateFormatter(dateString) {
-      return new Date(dateString).toISOString();
-    },
+    // async documentDialogSaveOld() {
+    //   this.formHasErrors = false;
+    //   if (this.$refs.documentForm.validate()) {
+    //     const birthCertificateFormData = new FormData();
+    //     birthCertificateFormData.append(
+    //       "orphanBirthCertificate",
+    //       this.birthCertificateFile,
+    //       this.birthCertificateFile.name
+    //     );
 
-    // dashDateFormatter(dateString) {
-    //   let dateFormat = new Date(dateString);
-    //   return `${dateFormat.getFullYear()}-${dateFormat.getMonth()}-${dateFormat.getDate()}`;
+    //     const fatherDeathCertificateFormData = new FormData();
+    //     fatherDeathCertificateFormData.append(
+    //       "fatherDeathCertificate",
+    //       this.fatherDeathCertificateFile,
+    //       this.fatherDeathCertificateFile.name
+    //     );
+    //     const guardianIdFormData = new FormData();
+    //     guardianIdFormData.append(
+    //       "guardianIDCard",
+    //       this.guardianIdFile,
+    //       this.guardianIdFile.name
+    //     );
+    //     const guardianConfirmationLetterFormData = new FormData();
+    //     guardianConfirmationLetterFormData.append(
+    //       "guardianConfirmationLetter",
+    //       this.guardianConfirmationLetterFile,
+    //       this.guardianConfirmationLetterFile.name
+    //     );
+    //     const guardianLegalConfirmationLetterFormData = new FormData();
+    //     guardianLegalConfirmationLetterFormData.append(
+    //       "guardianLegalConfirmationLetter",
+    //       this.guardianLegalConfirmationLetterFile,
+    //       this.guardianLegalConfirmationLetterFile.name
+    //     );
+
+    //     this.orphan = Object.assign(this.orphan ?? {}, this.updatedOrphan);
+
+    //     this.orphan.dateOfBirth = this.isoDateFormatter(
+    //       this.orphan.dateOfBirth
+    //     );
+
+    //     this.orphan.father = Object.assign(
+    //       this.orphan.father ?? {},
+    //       this.updatedOrphan?.father
+    //     );
+
+    //     this.orphan.mother = Object.assign(
+    //       this.orphan.mother ?? {},
+    //       this.updatedOrphan?.mother
+    //     );
+
+    //     this.orphan.House_property = Object.assign(
+    //       this.orphan.House_property ?? {},
+    //       this.updatedOrphan?.House_property
+    //     );
+
+    //     this.orphan.educationalRecord = Object.assign(
+    //       this.orphan.educationalRecord ?? {},
+    //       this.updatedOrphan?.educationalRecord
+    //     );
+
+    //     this.orphan.guardian = Object.assign(
+    //       this.orphan.guardian ?? {},
+    //       this.updatedOrphan?.guardian
+    //     );
+
+    //     this.orphan.father.dateOfDeath = this.isoDateFormatter(
+    //       this.orphan.father.dateOfDeath
+    //     );
+    //     this.orphan.father.dateOfBirth = this.isoDateFormatter(
+    //       this.orphan.father.dateOfBirth
+    //     );
+
+    //     this.orphan.father.deathCertificateUrl = await axios
+    //       .post(
+    //         `/public/images/fatherDeathCertificate/`,
+    //         fatherDeathCertificateFormData
+    //       )
+    //       .then((res) => res.data)
+    //       .catch((err) => console.warn(err));
+
+    //     const father = await this.getOrphanFather(
+    //       this.orphan.father.firstName,
+    //       this.orphan.father.lastName,
+    //       this.orphan.father.dateOfDeath,
+    //       this.orphan.father.causeOfDeath,
+    //       this.orphan.father.dateOfBirth,
+    //       this.orphan.father.deathCertificateUrl
+    //     );
+
+    //     const educationalRecord = await this.getOrphanEducationalRecord(
+    //       this.orphan.educationalRecord.enrollmentStatus,
+    //       this.orphan.educationalRecord.schoolName,
+    //       this.orphan.educationalRecord.typeOfSchool,
+    //       this.orphan.educationalRecord.year,
+    //       this.orphan.educationalRecord.level,
+    //       this.orphan.educationalRecord.reason
+    //     );
+
+    //     this.orphan.mother.dateOfBirth = this.isoDateFormatter(
+    //       this.orphan.mother.dateOfBirth
+    //     );
+    //     this.orphan.mother.dateOfDeath = this.isoDateFormatter(
+    //       this.orphan.mother.dateOfDeath
+    //     );
+
+    //     const mother = await this.getOrphanMother(
+    //       this.orphan.mother.firstName,
+    //       this.orphan.mother.middleName,
+    //       this.orphan.mother.lastName,
+    //       this.orphan.mother.vitalStatus,
+    //       this.orphan.mother.dateOfBirth,
+    //       this.orphan.mother.dateOfDeath,
+    //       this.orphan.mother.causeOfDeath,
+    //       this.orphan.mother.maritalStatus,
+    //       this.orphan.mother.mobileNumber,
+    //       this.orphan.mother.monthlyExpense
+    //     );
+
+    //     this.orphan.guardian.dateOfBirth = this.isoDateFormatter(
+    //       this.orphan.guardian.dateOfBirth
+    //     );
+
+    //     this.orphan.guardian.idCardUrl = await axios
+    //       .post(`/public/images/guardianIDCard/`, guardianIdFormData)
+    //       .then((res) => res.data)
+    //       .catch((err) => console.warn(err));
+
+    //     this.orphan.guardian.confirmationLetterUrl = await axios
+    //       .post(
+    //         `/public/images/guardianConfirmationLetter/`,
+    //         guardianConfirmationLetterFormData
+    //       )
+    //       .then((res) => res.data)
+    //       .catch((err) => console.warn(err));
+
+    //     this.orphan.guardian.legalConfirmationLetterUrl = await axios
+    //       .post(
+    //         `/public/images/guardianLegalConfirmationLetter/`,
+    //         guardianLegalConfirmationLetterFormData
+    //       )
+    //       .then((res) => res.data)
+    //       .catch((err) => console.warn(err));
+
+    //     const guardian = await this.getOrphanGuardian(
+    //       this.orphan.guardian.firstName,
+    //       this.orphan.guardian.middleName,
+    //       this.orphan.guardian.lastName,
+    //       this.orphan.guardian.dateOfBirth,
+    //       this.orphan.guardian.gender,
+    //       this.orphan.guardian.relationToOrphan,
+    //       this.orphan.guardian.nationality,
+    //       this.orphan.guardian.mobileNumber,
+    //       this.orphan.guardian.telephoneNumber,
+    //       this.orphan.guardian.email,
+    //       this.orphan.guardian.idCardUrl,
+    //       this.orphan.guardian.confirmationLetterUrl,
+    //       this.orphan.guardian.legalConfirmationLetterUrl
+    //     );
+
+    //     const houseProperty = await this.getHouseProperty(
+    //       this.orphan.House_property.housingSituation,
+    //       this.orphan.House_property.otherProperty
+    //     );
+
+    //     this.orphan.birthCertificateUrl = await axios
+    //       .post(
+    //         `/public/images/orphanBirthCertificate/`,
+    //         birthCertificateFormData
+    //       )
+    //       .then((res) => res.data)
+    //       .catch((err) => console.warn(err));
+
+    //     if (this.orphanIdFile) {
+    //       const orphanIdFormData = new FormData();
+    //       orphanIdFormData.append(
+    //         "orphanIdCard",
+    //         this.orphanIdFile,
+    //         this.orphanIdFile.name
+    //       );
+    //       this.orphan.idCardUrl = await axios
+    //         .post(`/public/images/orphanIdCard/`, orphanIdFormData)
+    //         .then((res) => res.data)
+    //         .catch((err) => console.warn(err));
+    //     }
+
+    //     if (this.orphanPassportFile) {
+    //       const orphanPassportFormData = new FormData();
+    //       orphanPassportFormData.append(
+    //         "orphanPassport",
+    //         this.orphanPassportFile,
+    //         this.orphanPassportFile.name
+    //       );
+    //       this.orphan.passportUrl = await axios
+    //         .post(`/public/images/orphanPassport/`, orphanPassportFormData)
+    //         .then((res) => res.data)
+    //         .catch((err) => console.warn(err));
+    //     }
+
+    //     const registeredOrphan = await this.registerOrphan(
+    //       this.orphan.firstName,
+    //       this.orphan.gender,
+    //       this.orphan.placeOfBirth,
+    //       this.orphan.dateOfBirth,
+    //       this.orphan.spokenLanguages,
+    //       this.orphan.hobbies,
+    //       this.orphan.religion,
+    //       this.orphan.healthDescription || "N/A",
+    //       this.orphan.psychologicalStatus,
+    //       this.orphan.idCardUrl || "idCardUrlPlaceHolder",
+    //       this.orphan.passportUrl || "passportUrlPlaceHolder",
+    //       this.orphan.birthCertificateUrl,
+    //       father.id,
+    //       educationalRecord.id,
+    //       guardian.id,
+    //       mother.id,
+    //       houseProperty.id,
+    //       parseInt(this.orphanVillageId)
+    //     );
+
+    //     const status = await this.createSponsorshipStatus(registeredOrphan.id);
+
+    //     console.log("Status", status);
+
+    //     if (this.portraitPhotoFile) {
+    //       const portraitPhotoFormData = new FormData();
+    //       portraitPhotoFormData.append(
+    //         "orphanPhotosPhotoPortrait",
+    //         this.portraitPhotoFile,
+    //         this.portraitPhotoFile.name
+    //       );
+
+    //       axios
+    //         .post(
+    //           `/public/images/orphanPhotosPhotoPortrait/`,
+    //           portraitPhotoFormData
+    //         )
+    //         .then((res) => {
+    //           axios
+    //             .post(`/graphql/`, {
+    //               query: `mutation createOrphanPhotos(
+    //                   $photoPortraitUrl: String!
+    //                   $orphanId: ID
+    //                   ) {
+    //                     createOrphanPhotos(
+    //                       photoPortraitUrl: $photoPortraitUrl
+    //                       orphanId: $orphanId
+    //                       ) { id }
+    //                   }`,
+    //               variables: {
+    //                 photoPortraitUrl: res.data,
+    //                 orphanId: registeredOrphan.id,
+    //               },
+    //             })
+    //             .then((res) => res.data.data.createOrphanPhotos)
+    //             .catch((err) => console.warn(err));
+    //         })
+    //         .catch((err) => console.warn(err));
+    //     }
+
+    //     this.$emit("registrationDone", {
+    //       documentForm: this.$refs.documentForm,
+    //       newOrphanId: registeredOrphan.id,
+    //     });
+    //     this.documentDialogClose();
+    //   } else {
+    //     this.formHasErrors = true;
+    //   }
     // },
 
     documentDialogCancel() {

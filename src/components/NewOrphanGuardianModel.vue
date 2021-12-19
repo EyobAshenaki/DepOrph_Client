@@ -1,233 +1,195 @@
 <template>
-  <div>
-    <v-card link max-width="15rem" @click="dialog = true">
-      <v-card-title class="headline justify-center">
-        Guardian Info
-      </v-card-title>
-    </v-card>
-    <v-dialog v-model="dialog" max-width="60em">
-      <v-card>
-        <!-- the form part; the fields part-->
-        <v-card-text>
-          <v-form
-            ref="guardianForm"
-            v-model="validGuardianForm"
-            lazy-validation
-          >
-            <v-container>
-              <v-row>
-                <v-col sm="12">
-                  <div class="title mt-3 mb-n5">Guardian</div>
-                </v-col>
-                <!-- Guardian First Name field-->
-                <v-col cols="12" sm="6" md="4">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.firstName"
-                      :rules="[rules.required, rules.name]"
-                      label="First Name*"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- Guardian Middle Name field-->
-                <v-col cols="12" sm="6" md="4">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.middleName"
-                      :rules="[rules.required, rules.name]"
-                      label="Middle Name*"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- Guardian Last Name field -->
-                <v-col cols="12" sm="6" md="4">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.lastName"
-                      :rules="[rules.required, rules.name]"
-                      label="Last Name*"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- Guardian Date of Birth field -->
-                <v-col cols="12" sm="6" md="4">
-                  <v-responsive max-width="" class="">
-                    <v-menu
-                      ref="guardianDateOfBirthMenu"
-                      v-model="guardianDateOfBirthMenu"
-                      :close-on-content-click="false"
-                      transition="scale-transition"
-                      offset-y
-                      min-width="auto"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-text-field
-                          v-model="orphan.guardian.dateOfBirth"
-                          label="Date of Birth*"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                          :rules="[rules.required]"
-                        ></v-text-field>
-                      </template>
-                      <v-date-picker
-                        ref="guardianDateOfBirthPicker"
-                        v-model="orphan.guardian.dateOfBirth"
-                        no-title
-                        scrollable
-                        :max="
-                          new Date(
-                            new Date().setFullYear(
-                              new Date().getFullYear() - this.GUARDIAN_AGE_LIMIT
-                            )
-                          )
-                            .toISOString()
-                            .substr(0, 10)
-                        "
-                        min="1950-01-01"
-                        @change="guardianDateOfBirthSave"
-                      >
-                      </v-date-picker>
-                    </v-menu>
-                  </v-responsive>
-                </v-col>
-                <!-- Gender field -->
-                <v-col cols="12" sm="6" md="2">
-                  <v-responsive max-width="" class="">
-                    <v-select
-                      v-model="selectedOrphan.gender"
-                      :items="guardianGenderOptions"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      label="Gender*"
-                      :rules="[rules.required]"
-                    ></v-select>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # add legal adoption Parents field -->
-                <!-- Relation to Orphan field -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-responsive max-width="" class="">
-                    <v-select
-                      v-model="selectedOrphan.relationToOrphan"
-                      :items="guardianRelationToOrphanOptions"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      label="Relation to Orphan*"
-                      :rules="[rules.required]"
-                    ></v-select>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # make it a select with the data provided -->
-                <!-- Guardian Job Title field -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.jobTitle"
-                      :rules="[rules.name]"
-                      label="Job Title"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # -- Done -- make it a select with the data provided -->
-                <!-- Guardian Nationality field -->
-                <v-col cols="12" sm="6" md="2">
-                  <v-responsive max-width="" class="">
-                    <v-select
-                      v-model="orphan.guardian.nationality"
-                      :items="guardianNationalityOptions"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      label="Nationality*"
-                      :rules="[rules.required]"
-                    ></v-select>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # -- DONE -- change this field to mobile number -->
-                <!-- Guardian Mobile field -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.mobileNumber"
-                      placeholder="09XXXXXXXX*"
-                      :rules="[rules.required, rules.mobileNumber]"
-                      label="Mobile Phone*"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # -- DONE -- change this field to home number -->
-                <!-- Guardian Telephone field -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.telephoneNumber"
-                      placeholder="01XXXXXXXX"
-                      :rules="[rules.telephoneNumber]"
-                      label="Telephone"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-                <!-- TODO # -- DONE -- change the Email to E-mail -->
-                <!-- Guardian E-mail field -->
-                <v-col cols="12" sm="6" md="4">
-                  <v-responsive max-width="" class="">
-                    <v-text-field
-                      v-model="orphan.guardian.email"
-                      type="email"
-                      label="E-mail*"
-                      :rules="[rules.required, rules.email]"
-                      placeholder="CDN@gmail.com"
-                    >
-                    </v-text-field>
-                  </v-responsive>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
-        </v-card-text>
-        <v-divider class="mt-3"></v-divider>
-        <!-- the action part; the buttons part -->
-        <v-card-actions>
-          <v-btn color="red darken-1" text @click="guardianDialogCancel">
-            Cancel
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-slide-x-reverse-transition>
-            <v-tooltip v-if="formHasErrors" left>
+  <v-form ref="guardianForm" v-model="validGuardianForm" lazy-validation>
+    <v-container>
+      <v-row>
+        <v-col sm="12">
+          <div class="title mt-3 mb-n5">Guardian</div>
+        </v-col>
+        <!-- Guardian First Name field-->
+        <v-col cols="12" sm="6" md="4">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.firstName"
+              :rules="[rules.required, rules.name]"
+              label="First Name*"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+        <!-- Guardian Middle Name field-->
+        <v-col cols="12" sm="6" md="4">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.middleName"
+              :rules="[rules.required, rules.name]"
+              label="Middle Name*"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+        <!-- Guardian Last Name field -->
+        <v-col cols="12" sm="6" md="4">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.lastName"
+              :rules="[rules.required, rules.name]"
+              label="Last Name*"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+        <!-- Guardian Date of Birth field -->
+        <v-col cols="12" sm="6" md="4">
+          <v-responsive max-width="" class="">
+            <v-menu
+              ref="guardianDateOfBirthMenu"
+              v-model="guardianDateOfBirthMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
               <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  class="my-0"
+                <v-text-field
+                  v-model="orphan.guardian.dateOfBirth"
+                  label="Date of Birth*"
+                  prepend-icon="mdi-calendar"
+                  readonly
                   v-bind="attrs"
-                  @click="guardianDialogReset"
                   v-on="on"
-                >
-                  <v-icon>mdi-refresh</v-icon>
-                </v-btn>
+                  :rules="[rules.required]"
+                ></v-text-field>
               </template>
-              <span>Refresh form</span>
-            </v-tooltip>
-          </v-slide-x-reverse-transition>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="guardianDialogNext"
-            :disabled="!validGuardianForm"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+              <v-date-picker
+                ref="guardianDateOfBirthPicker"
+                v-model="orphan.guardian.dateOfBirth"
+                no-title
+                scrollable
+                :max="
+                  new Date(
+                    new Date().setFullYear(
+                      new Date().getFullYear() - this.GUARDIAN_AGE_LIMIT
+                    )
+                  )
+                    .toISOString()
+                    .substr(0, 10)
+                "
+                min="1950-01-01"
+                @change="guardianDateOfBirthSave"
+              >
+              </v-date-picker>
+            </v-menu>
+          </v-responsive>
+        </v-col>
+        <!-- Gender field -->
+        <v-col cols="12" sm="6" md="2">
+          <v-responsive max-width="" class="">
+            <v-select
+              v-model="selectedOrphan.gender"
+              :items="guardianGenderOptions"
+              :menu-props="{ bottom: true, offsetY: true }"
+              label="Gender*"
+              :rules="[rules.required]"
+            ></v-select>
+          </v-responsive>
+        </v-col>
+        <!-- TODO # add legal adoption Parents field -->
+        <!-- Relation to Orphan field -->
+        <v-col cols="12" sm="6" md="3">
+          <v-responsive max-width="" class="">
+            <v-select
+              v-model="selectedOrphan.relationToOrphan"
+              :items="guardianRelationToOrphanOptions"
+              :menu-props="{ bottom: true, offsetY: true }"
+              label="Relation to Orphan*"
+              :rules="[rules.required]"
+            ></v-select>
+          </v-responsive>
+        </v-col>
+        <!-- TODO # make it a select with the data provided -->
+        <!-- Guardian Job Title field -->
+        <!-- <v-col cols="12" sm="6" md="3">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.jobTitle"
+              :rules="[rules.name]"
+              label="Job Title"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col> -->
+        <!-- TODO # -- Done -- make it a select with the data provided -->
+        <!-- Guardian Nationality field -->
+        <v-col cols="12" sm="6" md="2">
+          <v-responsive max-width="" class="">
+            <v-select
+              v-model="orphan.guardian.nationality"
+              :items="guardianNationalityOptions"
+              :menu-props="{ bottom: true, offsetY: true }"
+              label="Nationality*"
+              :rules="[rules.required]"
+            ></v-select>
+          </v-responsive>
+        </v-col>
+        <!-- TODO # -- DONE -- change this field to mobile number -->
+        <!-- Guardian Mobile field -->
+        <v-col cols="12" sm="6" md="3">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.mobileNumber"
+              placeholder="09XXXXXXXX*"
+              :rules="[rules.required, rules.mobileNumber]"
+              label="Mobile Phone*"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+        <!-- TODO # -- DONE -- change this field to home number -->
+        <!-- Guardian Telephone field -->
+        <v-col cols="12" sm="6" md="3">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.telephoneNumber"
+              placeholder="01XXXXXXXX"
+              :rules="[rules.telephoneNumber]"
+              label="Telephone"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+        <!-- TODO # -- DONE -- change the Email to E-mail -->
+        <!-- Guardian E-mail field -->
+        <v-col cols="12" sm="6" md="4">
+          <v-responsive max-width="" class="">
+            <v-text-field
+              v-model="orphan.guardian.email"
+              type="email"
+              label="E-mail*"
+              :rules="[rules.required, rules.email]"
+              placeholder="CDN@gmail.com"
+            >
+            </v-text-field>
+          </v-responsive>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-form>
 </template>
 
 <script>
 export default {
+  props: {
+    save: {
+      type: Boolean,
+    },
+    cancel: {
+      type: Boolean,
+    },
+  },
+  updatedOrphan: {
+    type: Object,
+  },
+
   data() {
     return {
       GUARDIAN_AGE_LIMIT: 18,
@@ -243,7 +205,6 @@ export default {
           dateOfBirth: null,
           gender: null,
           relationToOrphan: null,
-          jobTitle: null,
           nationality: null,
           mobileNumber: null,
           telephoneNumber: null,
@@ -308,9 +269,24 @@ export default {
       // ],
     };
   },
-  computed: {},
+  computed: {
+    orphanGuardianSave: function() {
+      return this.save;
+    },
+    orphanGuardianCancel: function() {
+      return this.cancel;
+    },
+  },
   watch: {
-    // dialog
+    orphanGuardianSave(val) {
+      if (val) this.guardianDialogNext();
+    },
+    orphanGuardianCancel(val) {
+      if (val) this.guardianDialogCancel();
+    },
+    validGuardianForm(val) {
+      this.$emit("guardianError", val);
+    },
     guardianDateOfBirthMenu(val) {
       // Changes the active picker from the default "DATE" to "YEAR"
       val &&
@@ -318,23 +294,14 @@ export default {
           () => (this.$refs.guardianDateOfBirthPicker.activePicker = "YEAR")
         );
     },
-    dialog(val) {
-      val || this.guardianDialogClose();
-    },
   },
   methods: {
     // dialog
     guardianDateOfBirthSave(date) {
-      // console.log(this.$refs.menu);
       this.$refs.guardianDateOfBirthMenu.save(date);
     },
     guardianDialogClose() {
       this.dialog = false;
-
-      // this.$nextTick(() => {
-      //   this.orphanItem = Object.assign({}, this.defaultItem);
-      //   this.orphanIndex = -1;
-      // });
     },
 
     guardianDialogReset() {
@@ -343,16 +310,9 @@ export default {
     },
 
     guardianDialogNext() {
-      // if (this.orphanIndex > -1) {
-      //   Object.assign(this.orphans[this.orphanIndex], this.orphanItem);
-      // } else {
-      //   this.orphans.push(this.orphanItem);
-      // }
       this.formHasErrors = false;
 
       if (this.$refs.guardianForm.validate()) {
-        // console.log(this.orphan);
-
         this.orphan.guardian.gender = this.selectedOrphan.gender.slice(0, 1);
 
         this.orphan.guardian.relationToOrphan =
