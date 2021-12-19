@@ -1,17 +1,19 @@
 <template>
   <div>
     <!-- <v-app-bar absolute elevate-on-scroll style="background: #eee;"> -->
-    <v-app-bar absolute dark elevate-on-scroll>
+    <v-app-bar absolute elevate-on-scroll>
       <template v-slot:img="{ props }">
         <v-img
           v-bind="props"
-          gradient="to top right, rgba(100,115,201,.5), rgba(25,32,72,.7)"
+          gradient="to top right, rgba(255,255,255,.5), rgba(255,255,255,.7)"
         ></v-img>
       </template>
 
       <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
 
-      <v-toolbar-title>CDN</v-toolbar-title>
+      <v-toolbar-title>
+        <v-img src="@/assets/logo2.png"></v-img>
+      </v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -19,7 +21,7 @@
       <template v-if="user.role === 'Coordinator'">
         <v-btn
           text
-          class="mr-0 py-8"
+          class="mr-0 py-8 indigo--text"
           :class="{ active: isNewOrphan }"
           @click.stop="toggleNewOrphanDialog"
         >
@@ -27,7 +29,7 @@
         </v-btn>
         <v-btn
           text
-          class="py-8"
+          class="py-8 indigo--text"
           :class="{ active: isSupportPlan }"
           @click.stop="toggleSupportPlanComponent"
         >
@@ -35,7 +37,7 @@
         </v-btn>
         <v-btn
           text
-          class="mr-0 py-8"
+          class="mr-0 py-8 indigo--text"
           :class="{ active: isChangeStatus }"
           @click.stop="toggleChangeStatusDialog"
         >
@@ -49,7 +51,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               text
-              class="mr-0 py-8"
+              class="mr-0 py-8 indigo--text"
               :class="{ active: isProcessing }"
               v-bind="attrs"
               v-on="on"
@@ -64,7 +66,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               text
-              class="mr-0 py-8"
+              class="mr-0 py-8 indigo--text"
               :class="{ active: isPending }"
               v-bind="attrs"
               v-on="on"
@@ -79,7 +81,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               text
-              class="mr-0 py-8"
+              class="mr-0 py-8 indigo--text"
               :class="{ active: isSponsored }"
               v-bind="attrs"
               v-on="on"
@@ -94,7 +96,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               text
-              class="mr-0 py-8"
+              class="mr-0 py-8 indigo--text"
               :class="{ active: isGraduated }"
               v-bind="attrs"
               v-on="on"
@@ -108,9 +110,9 @@
 
       <!-- Head Part -->
       <template v-else-if="user.role === 'Head'">
-        <v-btn text class="mr-0 py-8">View</v-btn>
-        <v-btn text class="mr-0 py-8">Register</v-btn>
-        <v-btn text class="mr-0 py-8">User</v-btn>
+        <v-btn text class="mr-0 py-8 indigo--text">View</v-btn>
+        <v-btn text class="mr-0 py-8 indigo--text">Register</v-btn>
+        <v-btn text class="mr-0 py-8 indigo--text">User</v-btn>
       </template>
 
       <!-- <template v-else-if="user.role === 'SocialWorker'">
@@ -127,7 +129,7 @@
           label="Search"
           single-line
           class="pt-5"
-          color="orange"
+          color="indigo"
         ></v-text-field>
       </v-responsive>
       <!-- user profile menu -->
@@ -139,7 +141,7 @@
         nudge-bottom="5"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-btn icon v-bind="attrs" v-on="on">
+          <v-btn icon v-bind="attrs" v-on="on" color="indigo">
             <v-icon size="27">mdi-account</v-icon>
           </v-btn>
         </template>

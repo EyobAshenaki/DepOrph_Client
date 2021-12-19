@@ -325,7 +325,7 @@
       </v-card>
     </v-dialog>
 
-    <orphan-registration-stepper />
+    <!-- <orphan-registration-stepper /> -->
 
     <template v-if="showSupportPlanTable">
       <v-fab-transition>
@@ -343,12 +343,12 @@
                 cols="12"
                 class="text-center"
                 dark
-                v-bind="attrs"
-                v-on="on"
+                
                 style="margin-top: 6rem"
               >
                 <v-btn fab dark color="indigo">
-                  <v-icon dark>
+                  <v-icon dark v-bind="attrs"
+                v-on="on">
                     mdi-plus
                   </v-icon>
                 </v-btn>
