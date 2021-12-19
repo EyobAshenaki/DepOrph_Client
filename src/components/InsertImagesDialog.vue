@@ -116,6 +116,7 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from "vuex";
 export default {
   props: ["open", "item"],
   data() {
@@ -139,11 +140,12 @@ export default {
       validImagesForm: false
     };
   },
-  created() {
-    this.initialize();
-  },
   methods: {
-    initialize() {},
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     openPortraitImagePreviewDialog() {
       if (this.$refs.imagesForm.inputs[0].validate()) {
         this.portraitImagePreview = URL.createObjectURL(this.portraitImage);
@@ -214,23 +216,39 @@ export default {
                     orphanId: item.id
                   }
                 };
-                // const createPhotosRes =
-                await axios.post(`/graphql/`, queryOptions);
-                // ! log create result, // TODO finc a better way to perform feedback
-                this.insertImageDialog = false;
+                const createPhotosRes = await axios.post(
+                  `/graphql/`,
+                  queryOptions
+                );
+                if (createPhotosRes.data.errors?.length)
+                  throw new Error(
+                    createPhotosRes.data.errors[0].message.message
+                  );
+                // ! log create result
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("success");
+                this.SET_SNACKBAR_TEXT("Images uploaded successfullly.");
+
+                this.closeImageInsertDialog();
                 this.$refs.imagesForm.reset();
               } catch (err) {
+                this.SET_SNACKBAR(true);
+                this.SET_SNACKBAR_COLOR("error");
+                this.SET_SNACKBAR_TEXT(
+                  "Server error. Reload the page and try again."
+                );
                 console.error(err);
               }
             })();
           } catch (error) {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_TEXT(
+              "Server error. Reload the page and try again."
+            );
             console.error(error);
           }
         })();
-        this.isOpen = false;
-        this.snackBarText = "Uploading Images...";
-        this.snackBarColor = "sky-blue";
-        this.snackBar = true;
       }
     }
   }

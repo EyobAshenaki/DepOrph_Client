@@ -176,6 +176,7 @@ import axios from "axios";
 import moment from "moment";
 import InsertEducationalRecordDialog from "./InsertEducationalRecordDialog.vue";
 import CustomImage from "./CustomImage.vue";
+import { mapMutations } from "vuex";
 export default {
   components: { InsertEducationalRecordDialog, CustomImage },
   props: ["open", "item", "isEditable", "isOrphanDetail"],
@@ -255,6 +256,11 @@ export default {
   },
   computed: {},
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     populateEducationalRecordsTable(item) {
       (async () => {
         try {
@@ -287,6 +293,9 @@ export default {
               `;
           const requestOptions = { query, variables: { orphanId: item.id } };
           const ERRes = await axios.post(`/graphql/`, requestOptions);
+          if (ERRes.data.errors?.length) {
+            throw new Error(ERRes.data.errors[0].message.message);
+          }
           this.orphanId = ERRes.data.data.orphan.id;
           let tempRecords = ERRes.data.data.orphan.educationalRecords.map(
             item => {
@@ -322,6 +331,11 @@ export default {
 
           this.educationalRecordsTableItems = tempRecords;
         } catch (error) {
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_TEXT(
+            "Server error. Reload the page and try again."
+          );
           console.error(error);
         }
       })();

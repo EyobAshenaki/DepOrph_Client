@@ -4,16 +4,7 @@
     <social-worker-orphan-list
       class="mt-16 pt-3"
       :socialWorerkId="$route.params.id"
-    ></social-worker-orphan-list
-    ><v-snackbar v-model="snackBar" top right :color="snackBarColor" outlined>
-      <v-row>
-        <div class="ml-2">{{ snackbarText }}</div>
-        <v-spacer></v-spacer>
-        <v-icon color="gray" @click="snackBar = false" right>
-          mdi-close</v-icon
-        ></v-row
-      >
-    </v-snackbar>
+    ></social-worker-orphan-list>
   </div>
 </template>
 
@@ -21,13 +12,11 @@
 import SocialWorkerOrphanList from "@/components/SocialWorkerOrphanList.vue";
 import AppNavBar from "@/components/AppNavBar.vue";
 import axios from "axios";
+import { mapMutations } from "vuex";
 
 export default {
   data() {
     return {
-      snackBar: false,
-      snackbarText: "",
-      snackBarColor: "success",
       socialWorker: null,
       socialWorkerUser: {
         firstName: "",
@@ -46,6 +35,11 @@ export default {
     this.initializeSocialWorker();
   },
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     initializeSocialWorker() {
       axios
         .post("/graphql/", {
@@ -69,7 +63,15 @@ export default {
         .then(res => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
-          else return res.data.data.socialWorker;
+          else {
+            this.SET_SNACKBAR(true);
+            this.SET_SNACKBAR_COLOR("success");
+            this.SET_SNACKBAR_TEXT(
+              `Welcome ${res.data.data.socialWorker.firstName}`
+            );
+
+            return res.data.data.socialWorker;
+          }
         })
         .then(socialWorker => {
           this.socialWorker = Object.assign({}, socialWorker);
@@ -84,9 +86,11 @@ export default {
           }
         })
         .catch(error => {
-          this.snackBar = true;
-          this.snackBarColor = "error";
-          this.snackbarText = error;
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_TEXT(
+            "Server error. Reload the page and try again."
+          );
           console.error(error);
         });
     }

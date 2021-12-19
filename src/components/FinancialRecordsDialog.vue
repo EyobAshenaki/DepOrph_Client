@@ -65,6 +65,7 @@
 import axios from "axios";
 import moment from "moment";
 import InsertFinancialRecordDialog from "./InsertFinancialRecordDialog.vue";
+import { mapMutations } from "vuex";
 export default {
   props: ["open", "item"],
   components: {
@@ -101,6 +102,11 @@ export default {
     items: []
   }),
   methods: {
+    ...mapMutations([
+      "SET_SNACKBAR",
+      "SET_SNACKBAR_COLOR",
+      "SET_SNACKBAR_TEXT"
+    ]),
     populateFinancialRecordsTable(item) {
       const query = `
         query($orphanId: ID!){
@@ -120,22 +126,34 @@ export default {
         variables: { orphanId: item.id }
       };
       (async () => {
-        const response = await axios.post("graphql", requestOptions);
-        const financialRecords =
-          response.data.data.getFinancialRecordsByOrphanId;
-        this.items = financialRecords.map(item => ({
-          ...item,
-          transactionDate: moment(item.transactionDate).format("DD/MM/YY"),
-          reason: String(item.reason).includes("EW")
-            ? "Educational Material Withdrawal"
-            : String(item.reason).includes("NW")
-            ? "Necessities (food, clothes, rent, ...)"
-            : String(item.reason).includes("HW")
-            ? "Health support withdrawal"
-            : String(item.reason).includes("SCW")
-            ? "Special case withdrawal"
-            : item.reason
-        }));
+        try {
+          const response = await axios.post("graphql", requestOptions);
+          if (response.data.errors?.length) {
+            throw new Error(response.data.errors[0].message.message);
+          }
+          const financialRecords =
+            response.data.data.getFinancialRecordsByOrphanId;
+          this.items = financialRecords.map(item => ({
+            ...item,
+            transactionDate: moment(item.transactionDate).format("DD/MM/YY"),
+            reason: String(item.reason).includes("EW")
+              ? "Educational Material Withdrawal"
+              : String(item.reason).includes("NW")
+              ? "Necessities (food, clothes, rent, ...)"
+              : String(item.reason).includes("HW")
+              ? "Health support withdrawal"
+              : String(item.reason).includes("SCW")
+              ? "Special case withdrawal"
+              : item.reason
+          }));
+        } catch (error) {
+          this.SET_SNACKBAR(true);
+          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_TEXT(
+            "Server error. Reload the page and try again."
+          );
+          console.error(error);
+        }
       })();
     }
   }
