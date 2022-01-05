@@ -13,21 +13,21 @@
         min-height: 83.5vh;
         max-height: 90.5vh;
         margin-top: 4rem;
-        width: 15%;
+        width: 20%;
       "
-      color="rgba(25,32,72, 0.5)"
+      color="indigo lighten-1"
     >
       <v-list nav>
         <!-- Registeration tab -->
         <v-list-group
-          active-class="orange"
+          active-class="indigo lighten-4"
           :value="false"
           no-action
           prepend-icon="mdi-book-plus-multiple"
         >
           <template v-slot:activator>
-            <v-list-item-content>
-              <v-list-item-title>Registeration</v-list-item-title>
+            <v-list-item-content style="margin-left: -24px">
+              <v-list-item-title>Registration</v-list-item-title>
             </v-list-item-content>
           </template>
           <!-- Coordinator Registration -->
@@ -431,7 +431,7 @@
                   <v-list-item-icon>
                     <v-icon>mdi-book-plus</v-icon>
                   </v-list-item-icon>
-                  <v-list-item-title>Peasant Association</v-list-item-title>
+                  <v-list-item-title> Village</v-list-item-title>
                 </v-list-item>
               </template>
               <!-- Peasant Association Registration Card-->
@@ -448,7 +448,7 @@
                         <v-text-field
                           v-model="villageName"
                           :rules="nameRules"
-                          label="Peasant Association Name"
+                          label="Village Name"
                         >
                         </v-text-field>
                       </v-responsive>
@@ -622,7 +622,7 @@
                           :item-text="villageText_Value"
                           :item-value="villageText_Value"
                           :menu-props="{ bottom: true, offsetY: true }"
-                          label="Peasant Associations"
+                          label="Villages"
                           clearable
                           :disabled="socialWorkerVillageDisabled"
                         ></v-select>
@@ -647,13 +647,13 @@
         </v-list-group>
         <!-- Viewing -->
         <v-list-group
-          active-class="orange"
+          active-class="indigo lighten-4"
           :value="false"
           no-action
           prepend-icon="mdi-book-plus-multiple"
         >
           <template v-slot:activator>
-            <v-list-item-content>
+            <v-list-item-content style="margin-left: -24px">
               <v-list-item-title>Views</v-list-item-title>
             </v-list-item-content>
           </template>
@@ -679,18 +679,18 @@
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
-            <v-list-item-content> Peasant Associations </v-list-item-content>
+            <v-list-item-content> Village </v-list-item-content>
           </v-list-item>
         </v-list-group>
         <!-- Users -->
         <v-list-group
-          active-class="orange"
+          active-class="indigo lighten-4"
           :value="true"
           no-action
           prepend-icon="mdi-book-plus-multiple"
         >
           <template v-slot:activator>
-            <v-list-item-content>
+            <v-list-item-content style="margin-left: -24px">
               <v-list-item-title>Users</v-list-item-title>
             </v-list-item-content>
           </template>
@@ -1680,11 +1680,12 @@
         "
       >
         <v-card
-          style="margin-left: 6rem;"
+          style="margin-left: 12rem;"
           elevation="0"
           min-height="81vh"
           max-height="81vh"
           color="grey lighten-2"
+          max-width="1000"
         >
           <v-row class="px-3">
             <v-col cols="6">
@@ -1875,76 +1876,6 @@
             ></v-col> </v-row
         ></v-card>
       </template>
-
-      <!-- the notification panel -->
-      <div class="text-center">
-        <v-menu
-          transition="scale-transition"
-          origin="bottom right"
-          min-width="330"
-          :close-on-content-click="sheet"
-          internal-activator
-          :value="sheet"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="orange"
-              right
-              fab
-              bottom
-              fixed
-              dark
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>mdi-message-text</v-icon>
-            </v-btn>
-          </template>
-          <!-- <v-btn
-              small
-              fixed
-              top
-              right
-              fab
-              class="mt-n3"
-              color="error"
-              @click="sheet = false"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn> -->
-          <!-- Notification Panel -->
-          <!-- TODO: # figure out a way to do notification -->
-
-          <v-card elevation="1">
-            <v-virtual-scroll
-              :bench="benched"
-              :items="items"
-              max-height="500"
-              item-height="64"
-            >
-              <template v-slot:default="{ item }">
-                <v-list-item :key="item">
-                  <v-list-item-action>
-                    <v-btn fab small depressed color="rgba(19,84,122,.5)">
-                      {{ item }}
-                    </v-btn>
-                  </v-list-item-action>
-
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      User Database Record <strong>ID {{ item }}</strong>
-                    </v-list-item-title>
-                  </v-list-item-content>
-
-                  <v-list-item-action>
-                    <v-icon small> mdi-open-in-new </v-icon>
-                  </v-list-item-action>
-                </v-list-item>
-              </template>
-            </v-virtual-scroll>
-          </v-card>
-        </v-menu>
-      </div>
     </v-container>
   </div>
 </template>

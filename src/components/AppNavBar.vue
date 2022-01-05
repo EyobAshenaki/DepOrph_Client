@@ -27,14 +27,14 @@
         >
           New Orphan
         </v-btn>
-        <v-btn
+        <!-- <v-btn
           text
           class="py-8 indigo--text"
           :class="{ active: isSupportPlan }"
           @click.stop="toggleSupportPlanComponent"
         >
           Support Plans
-        </v-btn>
+        </v-btn> -->
         <v-btn
           text
           class="mr-0 py-8 indigo--text"
@@ -46,7 +46,7 @@
       </template>
 
       <!-- Donor part -->
-      <template v-else-if="user.role === 'Donor'">
+      <!-- <template v-else-if="user.role === 'Donor'">
         <v-tooltip bottom nudge-top="8">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -106,14 +106,14 @@
           </template>
           <span>Graduated Orphans</span>
         </v-tooltip>
-      </template>
+      </template> -->
 
       <!-- Head Part -->
-      <template v-else-if="user.role === 'Head'">
+      <!-- <template v-else-if="user.role === 'Head'">
         <v-btn text class="mr-0 py-8 indigo--text">View</v-btn>
         <v-btn text class="mr-0 py-8 indigo--text">Register</v-btn>
         <v-btn text class="mr-0 py-8 indigo--text">User</v-btn>
-      </template>
+      </template> -->
 
       <!-- <template v-else-if="user.role === 'SocialWorker'">
         <v-btn text class="mr-0 py-8">View</v-btn>
@@ -122,7 +122,7 @@
       </template> -->
 
       <v-spacer></v-spacer>
-      <v-responsive max-width="300" class="mr-3">
+      <!-- <v-responsive max-width="300" class="mr-3">
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -131,7 +131,7 @@
           class="pt-5"
           color="indigo"
         ></v-text-field>
-      </v-responsive>
+      </v-responsive> -->
       <!-- user profile menu -->
       <v-menu
         v-model="accountMenu"

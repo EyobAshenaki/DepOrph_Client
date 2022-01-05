@@ -1,17 +1,19 @@
 <template>
-  <div style="height: 100vh; padding-top: 200px;">
+  <div style="height: 100vh; padding-top: 120px;">
     <v-card class="mx-auto" max-width="450">
       <v-card-text class="px-6">
         <!-- <h2 class="text-h3 text-center pt-3">Welcome</h2>
-      <h3 class="text-center">To Your Account</h3>
+        <h3 class="text-center">To Your Account</h3> -->
 
-      <v-row justfiy="center" style="margin: 30px">
-        <v-avatar class="mx-auto" size="70">
-          <v-icon size="100" class="mx-auto"> mdi-account-circle </v-icon>
-        </v-avatar>
-      </v-row> -->
+        <v-row justfiy="center" class="ma-4 mb-0">
+          <v-avatar class="mx-auto" size="100">
+            <v-img src="../assets/cda-6.png"></v-img>
+            <!-- <v-icon size="100" class="mx-auto"> mdi-account-circle </v-icon> -->
+          </v-avatar>
+        </v-row>
 
-        <h2 class="text-h3 text-center pt-3">Login</h2>
+        <h2 class="text-h3 text-center pt-3 mb-9">Login</h2>
+
         <v-form>
           <p class="my-1 ml-1 error--text">{{ loginError }}</p>
           <v-text-field
@@ -273,20 +275,23 @@ export default {
           if (user.role === "Head") {
             this.$router.push({
               name: "Head_v2",
-              params: { id: user.head.id }
+              params: { id: Number(user.head.id) }
             });
           } else if (user.role === "Donor") {
-            this.$router.push({ name: "Donor", params: { id: user.donor.id } });
+            this.$router.push({
+              name: "Donor",
+              params: { id: Number(user.donor.id) }
+            });
           } else if (user.role === "Coordinator") {
             this.$router.push({
               name: "Coordinator",
-              params: { id: user.coordinator.id }
+              params: { id: Number(user.coordinator.id) }
             });
           } else if (user.role === "SocialWorker") {
             this.$router.push({
               name: "SocialWorker",
               params: {
-                id: user.socialWorker.id,
+                id: Number(user.socialWorker.id),
                 firstName: user.socialWorker.firstName
               }
             });

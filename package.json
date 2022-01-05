@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "caniuse-lite": "^1.0.30001291",
     "core-js": "^3.6.5",
     "css-loader": "^5.0.1",
     "dataloader": "^2.0.0",
@@ -17,6 +18,7 @@
     "file-saver": "^2.0.5",
     "fs-extra": "^9.1.0",
     "image-downloader": "^4.0.2",
+    "logo": "^0.2.0",
     "moment": "^2.29.1",
     "multer": "^1.4.2",
     "npm": "^8.1.3",

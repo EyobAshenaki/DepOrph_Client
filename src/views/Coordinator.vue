@@ -888,7 +888,7 @@ export default {
   },
   methods: {
     initialize() {
-      // console.log("routerCoordinatorId: ", this.$route.params.id);
+      console.log("routerCoordinatorId: ", typeof this.$route.params.id);
       axios
         .post("/graphql/", {
           query: `query coordinator($id: ID!) {
