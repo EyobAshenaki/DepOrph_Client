@@ -1,159 +1,155 @@
 <template>
   <v-dialog v-model="dialog">
     <v-stepper
-    v-model="currentRegistrationPosition"
-    max-width="90%"
-    class="mx-auto"
-  >
-    <v-stepper-header>
-      <v-stepper-step :complete="currentRegistrationPosition > 1" step="1">
-        Personal
-      </v-stepper-step>
+      v-model="currentRegistrationPosition"
+      max-width="90%"
+      class="mx-auto"
+    >
+      <v-stepper-header>
+        <v-stepper-step :complete="currentRegistrationPosition > 1" step="1">
+          Personal
+        </v-stepper-step>
 
-      <v-divider></v-divider>
+        <v-divider></v-divider>
 
-      <v-stepper-step :complete="currentRegistrationPosition > 2" step="2">
-        Education
-      </v-stepper-step>
+        <v-stepper-step :complete="currentRegistrationPosition > 2" step="2">
+          Education
+        </v-stepper-step>
 
-      <v-divider></v-divider>
+        <v-divider></v-divider>
 
-      <v-stepper-step :complete="currentRegistrationPosition > 3" step="3">
-        Guardian
-      </v-stepper-step>
+        <v-stepper-step :complete="currentRegistrationPosition > 3" step="3">
+          Guardian
+        </v-stepper-step>
 
-      <v-divider></v-divider>
+        <v-divider></v-divider>
 
-      <v-stepper-step :complete="currentRegistrationPosition > 4" step="4">
-        Family
-      </v-stepper-step>
+        <v-stepper-step :complete="currentRegistrationPosition > 4" step="4">
+          Family
+        </v-stepper-step>
 
-      <v-divider></v-divider>
+        <v-divider></v-divider>
 
-      <v-stepper-step :complete="currentRegistrationPosition > 5" step="5">
-        Document
-      </v-stepper-step>
-    </v-stepper-header>
+        <v-stepper-step :complete="currentRegistrationPosition > 5" step="5">
+          Document
+        </v-stepper-step>
+      </v-stepper-header>
 
-    <v-stepper-items>
-      <!-- Personal Stepper -->
-      <v-stepper-content step="1">
-        <new-orphan-personal-model
-          :save="savePersonalData"
-          @personalDone="addPersonalInfo($event)"
-          @personalError="handlePersonalError($event)"
-        />
+      <v-stepper-items>
+        <!-- Personal Stepper -->
+        <v-stepper-content step="1">
+          <new-orphan-personal-model
+            :save="savePersonalData"
+            @personalDone="addPersonalInfo($event)"
+            @personalError="handlePersonalError($event)"
+          />
 
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="savePersonalInfo"
-          :disabled="!personalFormError"
-        >
-          Continue
-        </v-btn>
-      </v-stepper-content>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="savePersonalInfo"
+            :disabled="!personalFormError"
+          >
+            Continue
+          </v-btn>
+        </v-stepper-content>
 
-      <!-- Education Stepper -->
-      <v-stepper-content step="2">
-        <new-orphan-education-model
-          :save="saveEducationalData"
-          :updatedOrphan="orphan"
-          @educationDone="addEducationalInfo($event)"
-          @educationalError="handleEducationalError($event)"
-        />
+        <!-- Education Stepper -->
+        <v-stepper-content step="2">
+          <new-orphan-education-model
+            :save="saveEducationalData"
+            :updatedOrphan="orphan"
+            @educationDone="addEducationalInfo($event)"
+            @educationalError="handleEducationalError($event)"
+          />
 
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="saveEducationalInfo"
-          :disabled="!educationalFormError"
-        >
-          Continue
-        </v-btn>
+          <v-btn color="red darken-1" text @click="cancelEducationalInfo">
+            Back
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="saveEducationalInfo"
+            :disabled="!educationalFormError"
+          >
+            Continue
+          </v-btn>
+        </v-stepper-content>
 
-        <v-btn color="red darken-1" text @click="cancelEducationalInfo">
-          Back
-        </v-btn>
-      </v-stepper-content>
+        <!-- Guardian Stepper -->
+        <v-stepper-content step="3">
+          <new-orphan-guardian-model
+            :save="saveGuardianData"
+            @guardianDone="addGuardianInfo($event)"
+            @guardianError="handleGuardianError($event)"
+          />
 
-      <!-- Guardian Stepper -->
-      <v-stepper-content step="3">
-        <new-orphan-guardian-model
-          :save="saveGuardianData"
-          @guardianDone="addGuardianInfo($event)"
-          @guardianError="handleGuardianError($event)"
-        />
+          <v-btn color="red darken-1" text @click="cancelGuardianInfo">
+            Back
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="saveGuardianInfo"
+            :disabled="!guardianFormError"
+          >
+            Continue
+          </v-btn>
+        </v-stepper-content>
 
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="saveGuardianInfo"
-          :disabled="!guardianFormError"
-        >
-          Continue
-        </v-btn>
+        <!-- Family Stepper -->
+        <v-stepper-content step="4">
+          <new-orphan-family-model
+            :save="saveFamilyData"
+            @familyDone="addFamilyInfo($event)"
+            @familyError="handleFamilyError($event)"
+          />
 
-        <v-btn color="red darken-1" text @click="cancelGuardianInfo">
-          Back
-        </v-btn>
-      </v-stepper-content>
+          <v-btn color="red darken-1" text @click="cancelFamilyInfo">
+            Back
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="saveFamilyInfo"
+            :disabled="!familyFormError"
+          >
+            Continue
+          </v-btn>
+        </v-stepper-content>
 
-      <!-- Family Stepper -->
-      <v-stepper-content step="4">
-        <new-orphan-family-model
-          :save="saveFamilyData"
-          @familyDone="addFamilyInfo($event)"
-          @familyError="handleFamilyError($event)"
-        />
+        <!-- Document Stepper -->
+        <v-stepper-content step="5">
+          <new-orphan-document-model
+            :save="saveDocumentData"
+            @documentDone="addDocumentInfo($event)"
+            @documentError="handleDocumentError($event)"
+          />
 
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="saveFamilyInfo"
-          :disabled="!familyFormError"
-        >
-          Continue
-        </v-btn>
-
-        <v-btn color="red darken-1" text @click="cancelFamilyInfo">
-          Back
-        </v-btn>
-      </v-stepper-content>
-
-      <!-- Document Stepper -->
-      <v-stepper-content step="5">
-        <new-orphan-document-model
-          :save="saveDocumentData"
-          @documentDone="addDocumentInfo($event)"
-          @documentError="handleDocumentError($event)"
-        />
-
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="saveDocumentInfo"
-          :disabled="!documentFormError"
-        >
-          Save
-        </v-btn>
-
-        <v-btn color="red darken-1" text @click="cancelDocumentInfo">
-          Back
-        </v-btn>
-      </v-stepper-content>
-    </v-stepper-items>
-  </v-stepper>
+          <v-btn color="red darken-1" text @click="cancelDocumentInfo">
+            Back
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="saveDocumentInfo"
+            :disabled="!documentFormError"
+          >
+            Save
+          </v-btn>
+        </v-stepper-content>
+      </v-stepper-items>
+    </v-stepper>
   </v-dialog>
 </template>
 
 <script>
-import axios from "axios";
-import NewOrphanPersonalModel from "./NewOrphanPersonalModel.vue";
-import NewOrphanEducationModel from "./NewOrphanEducationModel.vue";
-import NewOrphanGuardianModel from "./NewOrphanGuardianModel.vue";
-import NewOrphanFamilyModel from "./NewOrphanFamilyModel.vue";
-import NewOrphanDocumentModel from "./NewOrphanDocumentModel.vue";
+import axios from 'axios';
+import NewOrphanPersonalModel from './NewOrphanPersonalModel.vue';
+import NewOrphanEducationModel from './NewOrphanEducationModel.vue';
+import NewOrphanGuardianModel from './NewOrphanGuardianModel.vue';
+import NewOrphanFamilyModel from './NewOrphanFamilyModel.vue';
+import NewOrphanDocumentModel from './NewOrphanDocumentModel.vue';
 
 export default {
   components: {
@@ -161,7 +157,7 @@ export default {
     NewOrphanEducationModel,
     NewOrphanGuardianModel,
     NewOrphanFamilyModel,
-    NewOrphanDocumentModel,
+    NewOrphanDocumentModel
   },
   props: {
     newOrphanDialog: {
@@ -186,7 +182,7 @@ export default {
       saveFamilyData: false,
       familyFormError: false,
       saveDocumentData: false,
-      documentFormError: false,
+      documentFormError: false
     };
   },
 
@@ -200,9 +196,9 @@ export default {
       this.dialog = val;
     },
     dialog(val) {
-      if (val === false) this.$emit("dialogClosed", false)
+      if (val === false) this.$emit('dialogClosed', false);
       val || this.orphanDialogClose();
-    },
+    }
   },
 
   methods: {
@@ -216,7 +212,7 @@ export default {
       this.savePersonalData = false;
       // changes the steeper to the next
       this.currentRegistrationPosition = 2;
-      console.log("personalDone", updatedOrphan);
+      console.log('personalDone', updatedOrphan);
     },
     handlePersonalError(error) {
       this.personalFormError = error;
@@ -239,12 +235,12 @@ export default {
         updatedOrphan.educationalRecord
       );
       // creates hobbies property on orphan object and assign it a value from the updated orphan object
-      this.orphan["hobbies"] = updatedOrphan.hobbies;
+      this.orphan['hobbies'] = updatedOrphan.hobbies;
       // this variables change enables for the proper functioning of the educational continue button
       this.saveEducationalData = false;
       // changes the steeper to the next
       this.currentRegistrationPosition = 3;
-      console.log("educationalDone", updatedOrphan);
+      console.log('educationalDone', updatedOrphan);
     },
     handleEducationalError(error) {
       this.educationalFormError = error;
@@ -270,7 +266,7 @@ export default {
       this.saveGuardianData = false;
       // this has to point to the next steeper not the previous
       this.currentRegistrationPosition = 4;
-      console.log("guardianDone", updatedOrphan);
+      console.log('guardianDone', updatedOrphan);
     },
     handleGuardianError(error) {
       this.guardianFormError = error;
@@ -304,7 +300,7 @@ export default {
       this.saveFamilyData = false;
       // this has to point to the next steeper not the previous
       this.currentRegistrationPosition = 5;
-      console.log("familyDone", updatedOrphan);
+      console.log('familyDone', updatedOrphan);
     },
     handleFamilyError(error) {
       this.familyFormError = error;
@@ -324,43 +320,46 @@ export default {
       // assings orphan document data from the document form to the orphan object
 
       this.orphan.birthCertificateUrl = await axios
-          .post(
-            `/public/images/orphanBirthCertificate/`,
-            documents.orphanBirthCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+        .post(
+          `/public/images/orphanBirthCertificate/`,
+          documents.orphanBirthCertificateFormData
+        )
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.photoPortraitUrl = await axios
-            .post(
-              `/public/images/orphanPhotosPhotoPortrait/`,
-              documents.orphanPortraitPhotoFormData
-            )
-            .then((res) => res.data)
-            .catch((err) => console.warn(err));
+        .post(
+          `/public/images/orphanPhotosPhotoPortrait/`,
+          documents.orphanPortraitPhotoFormData
+        )
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.idCardUrl = await axios
-            .post(`/public/images/orphanIdCard/`, documents.orphanIdFormData)
-            .then((res) => res.data)
-            .catch((err) => console.warn(err));
+        .post(`/public/images/orphanIdCard/`, documents.orphanIdFormData)
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.passportUrl = await axios
-            .post(`/public/images/orphanPassport/`, documents.orphanPassportFormData)
-            .then((res) => res.data)
-            .catch((err) => console.warn(err));
+        .post(
+          `/public/images/orphanPassport/`,
+          documents.orphanPassportFormData
+        )
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.father.deathCertificateUrl = await axios
-          .post(
-            `/public/images/fatherDeathCertificate/`,
-            documents.fatherDeathCertificateFormData
-          )
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+        .post(
+          `/public/images/fatherDeathCertificate/`,
+          documents.fatherDeathCertificateFormData
+        )
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.guardian.idCardUrl = await axios
-          .post(`/public/images/guardianIDCard/`, documents.guardianIdFormData)
-          .then((res) => res.data)
-          .catch((err) => console.warn(err));
+        .post(`/public/images/guardianIDCard/`, documents.guardianIdFormData)
+        .then((res) => res.data)
+        .catch((err) => console.warn(err));
 
       this.orphan.guardian.confirmationLetterUrl = await axios
         .post(
@@ -378,65 +377,63 @@ export default {
         .then((res) => res.data)
         .catch((err) => console.warn(err));
 
-      this.orphan.dateOfBirth = this.isoDateFormatter(
-          this.orphan.dateOfBirth
-        );
+      this.orphan.dateOfBirth = this.isoDateFormatter(this.orphan.dateOfBirth);
 
       this.orphan.father.dateOfDeath = this.isoDateFormatter(
-          this.orphan.father.dateOfDeath
-        );
+        this.orphan.father.dateOfDeath
+      );
       this.orphan.father.dateOfBirth = this.isoDateFormatter(
-          this.orphan.father.dateOfBirth
-        );
+        this.orphan.father.dateOfBirth
+      );
 
       this.orphan.mother.dateOfBirth = this.isoDateFormatter(
-          this.orphan.mother.dateOfBirth
-        );
+        this.orphan.mother.dateOfBirth
+      );
       this.orphan.mother.dateOfDeath = this.isoDateFormatter(
-          this.orphan.mother.dateOfDeath
-        );
+        this.orphan.mother.dateOfDeath
+      );
 
       this.orphan.guardian.dateOfBirth = this.isoDateFormatter(
-          this.orphan.guardian.dateOfBirth
-        );
+        this.orphan.guardian.dateOfBirth
+      );
 
       const registeredOrphan = await this.registerOrphanWithBaselineData(
-          this.orphan.firstName,
-          this.orphan.gender,
-          this.orphan.placeOfBirth,
-          this.orphan.dateOfBirth,
-          this.orphan.spokenLanguages,
-          "gradeAgeMismatchReasonPlaceholder",
-          this.orphan.hobbies,
-          this.orphan.religion,
-          this.orphan.idCardUrl || "idCardUrlPlaceHolder",
-          this.orphan.passportUrl || "passportUrlPlaceHolder",
-          this.orphan.birthCertificateUrl,
-          // "accountNumberPlaceholder",
-          // "currentBalancePlaceholder",
-          this.orphan.father,
-          this.orphan.mother,
-          this.orphan.guardian,
-          this.orphan.House_property,
-          {
-            healthDescription: this.orphan.healthDescription || "N/A",
-          psychologicalStatus: this.orphan.psychologicalStatus,
-          },
-          {
-            photoPortraitUrl: this.orphan.photoPortraitUrl,
-            photoLongUrl: "photoLongUrlPlaceholder",
-          },
-          this.orphan.educationalRecord,
-          parseInt(this.villageId)
-        );
+        this.orphan.firstName,
+        this.orphan.gender,
+        this.orphan.placeOfBirth,
+        this.orphan.dateOfBirth,
+        this.orphan.spokenLanguages,
+        'gradeAgeMismatchReasonPlaceholder',
+        this.orphan.hobbies,
+        this.orphan.religion,
+        this.orphan.idCardUrl || 'idCardUrlPlaceHolder',
+        this.orphan.passportUrl || 'passportUrlPlaceHolder',
+        this.orphan.birthCertificateUrl,
+        // "accountNumberPlaceholder",
+        // "currentBalancePlaceholder",
+        this.orphan.father,
+        this.orphan.mother,
+        this.orphan.guardian,
+        this.orphan.House_property,
+        {
+          healthDescription: this.orphan.healthDescription || 'N/A',
+          psychologicalStatus: this.orphan.psychologicalStatus
+        },
+        {
+          photoPortraitUrl: this.orphan.photoPortraitUrl,
+          photoLongUrl: 'photoLongUrlPlaceholder'
+        },
+        this.orphan.educationalRecord,
+        parseInt(this.villageId)
+      );
 
-      console.log("Registered Orphan", registeredOrphan)
+      console.log('Registered Orphan', registeredOrphan);
       // const status = await this.createSponsorshipStatus(registeredOrphan.id);
 
       // console.log("Status", status);object
       // this variables change enables for the proper functioning of the document continue button
       this.saveDocumentData = false;
-      console.log("documentDone", documents);
+      console.log('documentDone', documents);
     },
     handleDocumentError(error) {
       this.documentFormError = error;
@@ -486,7 +483,7 @@ export default {
       villageId
     ) {
       return axios
-        .post("graphql", {
+        .post('graphql', {
           query: `mutation createOrphanWithBaselineData (
                   $firstName: String!
                   $gender: orphanGender!
@@ -557,8 +554,8 @@ export default {
             firstHealthStatus,
             firstPhotos,
             firstEducationalRecord,
-            villageId,
-          },
+            villageId
+          }
         })
         .then((res) => res.data.data.createOrphanWithBaselineData)
         .catch((err) => console.warn(err));
@@ -566,7 +563,7 @@ export default {
 
     async createSponsorshipStatus(orphanId) {
       return await axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `mutation createSponsorshipStatus(
                   $status: sponsorshipStatus
                   $date: DateTime!
@@ -582,14 +579,14 @@ export default {
                   }
                 }`,
           variables: {
-            status: "new",
+            status: 'new',
             date: new Date().toISOString(),
-            orphanId: orphanId,
-          },
+            orphanId: orphanId
+          }
         })
         .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
-    },
-  },
+    }
+  }
 };
 </script>
