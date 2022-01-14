@@ -180,14 +180,14 @@
 export default {
   props: {
     save: {
-      type: Boolean,
+      type: Boolean
     },
     cancel: {
-      type: Boolean,
-    },
+      type: Boolean
+    }
   },
   updatedOrphan: {
-    type: Object,
+    type: Object
   },
 
   data() {
@@ -208,57 +208,57 @@ export default {
           nationality: null,
           mobileNumber: null,
           telephoneNumber: null,
-          email: null,
-        },
+          email: null
+        }
       },
       selectedOrphan: {
         gender: null,
-        relationToOrphan: null,
+        relationToOrphan: null
       },
       rules: {
-        required: (value) => !!value || "Required.",
+        required: (value) => !!value || 'Required.',
         name: (value) => {
           const namePattern = /(^[A-z][A-Z-a-z/'.,/]+)[A-z]\s*$/g;
-          return namePattern.test(value) || !value || "Invalid name";
+          return namePattern.test(value) || !value || 'Invalid name';
         },
         email: (value) => {
           const emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return emailPattern.test(value) || "Invalid e-mail";
+          return emailPattern.test(value) || 'Invalid e-mail';
         },
         telephoneNumber: (value) => {
           const telephonePattern = /(^01[0-9]{8}$)/g;
-          return telephonePattern.test(value) || !value || "Invalid Number";
+          return telephonePattern.test(value) || !value || 'Invalid Number';
         },
         mobileNumber: (value) => {
           const mobilePattern = /^09[0-9]{8}$/g;
-          return mobilePattern.test(value) || "Invalid Number";
-        },
+          return mobilePattern.test(value) || 'Invalid Number';
+        }
       },
       guardianDateOfBirthMenu: false,
-      guardianGenderOptions: ["Male", "Female"],
+      guardianGenderOptions: ['Male', 'Female'],
       guardianRelationToOrphanOptions: [
-        "Mother",
-        "Grandmother",
-        "Grandfather",
-        "Sister",
-        "Brother",
-        "Uncle",
-        "Aunt",
-        "Cousin",
-        "Niece",
-        "Nephew",
-        "Legal Guardian",
-        "Other",
+        'Mother',
+        'Grandmother',
+        'Grandfather',
+        'Sister',
+        'Brother',
+        'Uncle',
+        'Aunt',
+        'Cousin',
+        'Niece',
+        'Nephew',
+        'Legal Guardian',
+        'Other'
       ],
       guardianNationalityOptions: [
-        "Ethiopian",
-        "Eritrean",
-        "Kenyan",
-        "Sudanese",
-        "South_Sudanese",
-        "Somali",
-        "Djiboutian",
-      ],
+        'Ethiopian',
+        'Eritrean',
+        'Kenyan',
+        'Sudanese',
+        'South_Sudanese',
+        'Somali',
+        'Djiboutian'
+      ]
 
       // orphanHousingSituationSelect: [],
       // orphanHousingSituationOptions: [
@@ -275,7 +275,7 @@ export default {
     },
     orphanGuardianCancel: function() {
       return this.cancel;
-    },
+    }
   },
   watch: {
     orphanGuardianSave(val) {
@@ -285,15 +285,15 @@ export default {
       if (val) this.guardianDialogCancel();
     },
     validGuardianForm(val) {
-      this.$emit("guardianError", val);
+      this.$emit('guardianError', val);
     },
     guardianDateOfBirthMenu(val) {
       // Changes the active picker from the default "DATE" to "YEAR"
       val &&
         setTimeout(
-          () => (this.$refs.guardianDateOfBirthPicker.activePicker = "YEAR")
+          () => (this.$refs.guardianDateOfBirthPicker.activePicker = 'YEAR')
         );
-    },
+    }
   },
   methods: {
     // dialog
@@ -315,17 +315,21 @@ export default {
       if (this.$refs.guardianForm.validate()) {
         this.orphan.guardian.gender = this.selectedOrphan.gender.slice(0, 1);
 
-        this.orphan.guardian.relationToOrphan =
-          this.selectedOrphan.relationToOrphan.slice(0, 1).toLowerCase() +
-          this.selectedOrphan.relationToOrphan.slice(1);
-        if (this.selectedOrphan.relationToOrphan.includes(" ")) {
+        if (this.selectedOrphan.relationToOrphan.includes(' ')) {
           this.orphan.guardian.relationToOrphan = this.selectedOrphan.relationToOrphan
-            .split(" ")
-            .join("");
+            .split(' ')
+            .join('');
+          this.orphan.guardian.relationToOrphan =
+            this.orphan.guardian.relationToOrphan.slice(0, 1).toLowerCase() +
+            this.orphan.guardian.relationToOrphan.slice(1);
+        } else {
+          this.orphan.guardian.relationToOrphan =
+            this.selectedOrphan.relationToOrphan.slice(0, 1).toLowerCase() +
+            this.selectedOrphan.relationToOrphan.slice(1);
         }
 
-        this.$emit("guardianDone", this.orphan);
-        this.$emit("guardianRefs", this.$refs.guardianForm);
+        this.$emit('guardianDone', this.orphan);
+        this.$emit('guardianRefs', this.$refs.guardianForm);
         this.guardianDialogClose();
       } else if (!this.$refs.guardianForm.validate()) {
         this.formHasErrors = true;
@@ -335,7 +339,7 @@ export default {
     guardianDialogCancel() {
       this.guardianDialogReset();
       this.guardianDialogClose();
-    },
-  },
+    }
+  }
 };
 </script>
