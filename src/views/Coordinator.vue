@@ -403,6 +403,7 @@
                         ></v-date-picker>
                       </v-menu>
                     </v-col>
+                    <!-- Project Number -->
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectNumber"
@@ -411,6 +412,7 @@
                         :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
+                    <!-- Project duration in years -->
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectDurationInYears"
@@ -420,6 +422,7 @@
                         hint="duration of the project in years"
                       ></v-text-field>
                     </v-col>
+                    <!-- Project maximum number of orphans -->
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectMaxBeneficiaries"
@@ -428,6 +431,7 @@
                         :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
+                    <!-- Project total budget -->
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectTotalBudget"
@@ -436,6 +440,7 @@
                         :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
+                    <!-- Project admin cost -->
                     <v-col cols="12" md="6" sm="4">
                       <v-text-field
                         v-model="projectAdministrativeCost"
@@ -444,6 +449,7 @@
                         :rules="[rules.required]"
                       ></v-text-field>
                     </v-col>
+                    <!-- Project location/village -->
                     <v-col cols="12" md="6" sm="6">
                       <v-select
                         v-model="projectLocation"

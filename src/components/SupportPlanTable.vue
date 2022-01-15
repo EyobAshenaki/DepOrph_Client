@@ -13,7 +13,9 @@
           </v-icon>
         </v-col>
         <v-col class="d-flex justify-start">
-          <v-btn @click="openCreateSupportPlanDialog(items)">Create SupportPlan</v-btn>
+          <v-btn @click="openCreateSupportPlanDialog(items)"
+            >Create SupportPlan</v-btn
+          >
         </v-col>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -119,7 +121,7 @@
                     :items="paymentIntervals"
                     :menu-props="{
                       top: true,
-                      offsetY: true,
+                      offsetY: true
                     }"
                     label="Payment interval*"
                     :rules="[rules.required]"
@@ -133,7 +135,7 @@
                     :items="percent"
                     :menu-props="{
                       top: true,
-                      offsetY: true,
+                      offsetY: true
                     }"
                     label="Admin Fee %*"
                     :rules="[rules.required]"
@@ -149,7 +151,7 @@
                     :item-value="donorText_Value"
                     :menu-props="{
                       top: true,
-                      offsetY: true,
+                      offsetY: true
                     }"
                     :rules="[rules.required]"
                     label="Donors*"
@@ -162,16 +164,16 @@
           <v-divider></v-divider>
           <v-card-text>
             <v-data-table
-              v-model="selectedVillageOrphans"
+              v-model="selectedNewVillageOrphans"
               :headers="villageOrphanHeaders"
-              :items="villageOrphans"
+              :items="newVillageOrphans"
               item-key="id"
-              :single-select="villageOrphanSingleSelect"
+              :single-select="newVillageOrphanSingleSelect"
               show-select
             >
               <template v-slot:top>
                 <v-switch
-                  v-model="villageOrphanSingleSelect"
+                  v-model="newVillageOrphanSingleSelect"
                   label="Single select"
                   class="pt-3 "
                 ></v-switch>
@@ -193,11 +195,14 @@
             >
               Close
             </v-btn>
-            <!-- add a snack bar that indicated the operation did not complete if selectedVillageOrphans.length === 0 -->
+            <!-- add a snack bar that indicated the operation did not complete if selectedNewVillageOrphans.length === 0 -->
             <v-btn
               color="blue darken-1"
               text
-              :disabled="!validCreateSupportPlan && (selectedVillageOrphans.length === 0)"
+              :disabled="
+                !validCreateSupportPlan &&
+                  selectedNewVillageOrphans.length === 0
+              "
               @click="createSupportPlanSave"
             >
               Save
@@ -267,7 +272,7 @@
                   :items="paymentCurrenciesOptions"
                   :menu-props="{
                     top: true,
-                    offsetY: true,
+                    offsetY: true
                   }"
                   lable="Payment currencies*"
                   solo
@@ -563,7 +568,7 @@
               <div
                 :style="{
                   'background-color': totalAndSummationConflictColor,
-                  color: totalAndSummationConflictTextColor,
+                  color: totalAndSummationConflictTextColor
                 }"
               >
                 <v-edit-dialog
@@ -796,44 +801,44 @@
 </template>
 
 <script>
-import axios from "axios";
-import XLSX from "xlsx";
-import XLSXStyle from "xlsx-style";
-import { saveAs } from "file-saver";
+import axios from 'axios';
+import XLSX from 'xlsx';
+import XLSXStyle from 'xlsx-style';
+import { saveAs } from 'file-saver';
 
 export default {
   props: {
     projectId: {
-      type: String,
-    },
+      type: String
+    }
   },
 
   data: () => ({
     supportPlans: [],
     supportPlanHeaders: [
       {
-        text: "Id",
-        align: "start",
-        value: "id",
+        text: 'Id',
+        align: 'start',
+        value: 'id'
       },
-      { text: "Name", value: "name" },
-      { text: "Period of Support", value: "supportPeriod" },
-      { text: "Donor", value: "donor.nameInitials" },
-      { text: "Number of Orphans", value: "orphans.length" },
-      { text: "Admin Fee%", value: "adminFeePercentage" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: 'Name', value: 'name' },
+      { text: 'Period of Support', value: 'supportPeriod' },
+      { text: 'Donor', value: 'donor.nameInitials' },
+      { text: 'Number of Orphans', value: 'orphans.length' },
+      { text: 'Admin Fee%', value: 'adminFeePercentage' },
+      { text: 'Actions', value: 'actions', sortable: false }
     ],
     rules: {
-      required: (value) => !!value || "Required.",
+      required: (value) => !!value || 'Required.'
     },
     showSetInitDateDialog: false,
     showAssignSocialWorkerDialog: false,
     showEditDialog: false,
     validSetInitDateForm: false,
     validAssignSocialWorkerForm: false,
-    exchangeRate: "",
+    exchangeRate: '',
     initDateMenu: false,
-    initDate: "",
+    initDate: '',
     selectedSupportPlan: null,
     showSupportPlanOrphansDialog: false,
     // --------------------
@@ -848,22 +853,22 @@ export default {
     supportPlanPaymentInterval: null,
     supportPlanAdminFeePercent: null,
     supportPlanDonor: null,
-    villageOrphans: [],
+    newVillageOrphans: [],
     villageOrphanHeaders: [
-      { text: "Id", align: "start", value: "id" },
-      { text: "Orphan Name", value: "fullName" },
-      { text: "Age", value: "age" },
-      { text: "Gender", value: "gender" },
-      { text: "Account No", value: "accountNumber" },
+      { text: 'Id', align: 'start', value: 'id' },
+      { text: 'Orphan Name', value: 'fullName' },
+      { text: 'Age', value: 'age' },
+      { text: 'Gender', value: 'gender' },
+      { text: 'Account No', value: 'accountNumber' }
     ],
-    selectedVillageOrphans: [],
-    villageOrphanSingleSelect: false,
+    selectedNewVillageOrphans: [],
+    newVillageOrphanSingleSelect: false,
     donors: [],
     // ..................
     createPaymentDialog: false,
     validCreatePaymentForm: false,
     paymentStartDateMenu: false,
-    paymentStartDate: "",
+    paymentStartDate: '',
     paymentDuration: null,
     paymentCurrencies: null,
     paymentCurrenciesOptions: [1, 2, 3],
@@ -875,98 +880,98 @@ export default {
     secondaryFC: null,
     secondaryExchangeRate: null,
     currencyOptions: [
-      { name: "Australian dollar", acronym: "AUD", symbol: "A$" },
-      { name: "Brazilian real", acronym: "BRL", symbol: "R$" },
-      { name: "Canadian dollar", acronym: "CAD", symbol: "C$" },
-      { name: "Chilean peso", acronym: "CLP", symbol: "CLP$" },
-      { name: "Colombian peso", acronym: "COP", symbol: "COL$" },
-      { name: "Czech koruna", acronym: "CZK", symbol: "Kč" },
-      { name: "Danish krone", acronym: "DKK", symbol: "kr" },
-      { name: "Euro", acronym: "EUR", symbol: "€" },
-      { name: "Hong Kong dollar", acronym: "HKD", symbol: "HK$" },
-      { name: "Hungarian forint", acronym: "HUF", symbol: "Ft" },
-      { name: "Indian rupee", acronym: "INR", symbol: "₹" },
-      { name: "Indonesian rupiah", acronym: "IDR", symbol: "Rp" },
-      { name: "Israeli new shekel", acronym: "ILS", symbol: "₪" },
-      { name: "Japanese yen", acronym: "JPY", symbol: "¥" },
-      { name: "Malaysian ringgit", acronym: "MYR", symbol: "RM" },
-      { name: "Mexican peso", acronym: "MXN", symbol: "$" },
-      { name: "New Taiwan dollar", acronym: "TWD", symbol: "NT$" },
-      { name: "New Zealand dollar", acronym: "NZD", symbol: "NZ$" },
-      { name: "Norwegian krone", acronym: "NOK", symbol: "kr" },
-      { name: "Philippine peso", acronym: "PHP", symbol: "₱" },
-      { name: "Polish złoty", acronym: "PLN", symbol: "zł" },
-      { name: "Pound sterling	", acronym: "GBP", symbol: "£" },
-      { name: "Renminbi", acronym: "CNY", symbol: "元 / ¥" },
-      { name: "Romanian leu", acronym: "RON", symbol: "L" },
-      { name: "Russian ruble", acronym: "RUB", symbol: "₽" },
-      { name: "Saudi riyal", acronym: "SAR", symbol: "﷼" },
-      { name: "Singapore dollar", acronym: "SGD", symbol: "S$" },
-      { name: "South African rand", acronym: "ZAR", symbol: "R" },
-      { name: "South Korean won", acronym: "KRW", symbol: "₩" },
-      { name: "Swedish krona", acronym: "SEK", symbol: "kr" },
-      { name: "Swiss franc", acronym: "CHF", symbol: "CHF" },
-      { name: "Thai baht", acronym: "THB", symbol: "฿" },
-      { name: "Turkish lira", acronym: "TRY", symbol: "₺" },
-      { name: "UAE dirham", acronym: "AED", symbol: "د.إ" },
-      { name: "United States dollar", acronym: "USD", symbol: "US$" },
+      { name: 'Australian dollar', acronym: 'AUD', symbol: 'A$' },
+      { name: 'Brazilian real', acronym: 'BRL', symbol: 'R$' },
+      { name: 'Canadian dollar', acronym: 'CAD', symbol: 'C$' },
+      { name: 'Chilean peso', acronym: 'CLP', symbol: 'CLP$' },
+      { name: 'Colombian peso', acronym: 'COP', symbol: 'COL$' },
+      { name: 'Czech koruna', acronym: 'CZK', symbol: 'Kč' },
+      { name: 'Danish krone', acronym: 'DKK', symbol: 'kr' },
+      { name: 'Euro', acronym: 'EUR', symbol: '€' },
+      { name: 'Hong Kong dollar', acronym: 'HKD', symbol: 'HK$' },
+      { name: 'Hungarian forint', acronym: 'HUF', symbol: 'Ft' },
+      { name: 'Indian rupee', acronym: 'INR', symbol: '₹' },
+      { name: 'Indonesian rupiah', acronym: 'IDR', symbol: 'Rp' },
+      { name: 'Israeli new shekel', acronym: 'ILS', symbol: '₪' },
+      { name: 'Japanese yen', acronym: 'JPY', symbol: '¥' },
+      { name: 'Malaysian ringgit', acronym: 'MYR', symbol: 'RM' },
+      { name: 'Mexican peso', acronym: 'MXN', symbol: '$' },
+      { name: 'New Taiwan dollar', acronym: 'TWD', symbol: 'NT$' },
+      { name: 'New Zealand dollar', acronym: 'NZD', symbol: 'NZ$' },
+      { name: 'Norwegian krone', acronym: 'NOK', symbol: 'kr' },
+      { name: 'Philippine peso', acronym: 'PHP', symbol: '₱' },
+      { name: 'Polish złoty', acronym: 'PLN', symbol: 'zł' },
+      { name: 'Pound sterling	', acronym: 'GBP', symbol: '£' },
+      { name: 'Renminbi', acronym: 'CNY', symbol: '元 / ¥' },
+      { name: 'Romanian leu', acronym: 'RON', symbol: 'L' },
+      { name: 'Russian ruble', acronym: 'RUB', symbol: '₽' },
+      { name: 'Saudi riyal', acronym: 'SAR', symbol: '﷼' },
+      { name: 'Singapore dollar', acronym: 'SGD', symbol: 'S$' },
+      { name: 'South African rand', acronym: 'ZAR', symbol: 'R' },
+      { name: 'South Korean won', acronym: 'KRW', symbol: '₩' },
+      { name: 'Swedish krona', acronym: 'SEK', symbol: 'kr' },
+      { name: 'Swiss franc', acronym: 'CHF', symbol: 'CHF' },
+      { name: 'Thai baht', acronym: 'THB', symbol: '฿' },
+      { name: 'Turkish lira', acronym: 'TRY', symbol: '₺' },
+      { name: 'UAE dirham', acronym: 'AED', symbol: 'د.إ' },
+      { name: 'United States dollar', acronym: 'USD', symbol: 'US$' }
     ],
     selectedPayment: null,
     paymentDialog: null,
     supportPlanPayments: [],
     supportPlanPaymentHeaders: [
-      { text: "Id", align: "start", value: "id" },
-      { text: "Period", value: "paymentPeriodInMonths" },
-      { text: "Primary FC", value: "primaryForeignCurrency" },
+      { text: 'Id', align: 'start', value: 'id' },
+      { text: 'Period', value: 'paymentPeriodInMonths' },
+      { text: 'Primary FC', value: 'primaryForeignCurrency' },
       {
-        text: "Payment In Primary FC",
-        value: "paymentInPrimaryForeignCurrency",
+        text: 'Payment In Primary FC',
+        value: 'paymentInPrimaryForeignCurrency'
       },
-      { text: "Primary Exchange Rate", value: "primaryExchangeRate" },
-      { text: "Secondary FC", value: "secondaryForeignCurrency" },
+      { text: 'Primary Exchange Rate', value: 'primaryExchangeRate' },
+      { text: 'Secondary FC', value: 'secondaryForeignCurrency' },
       {
-        text: "Payment In Secondary FC",
-        value: "paymentInSecondaryForeignCurrency",
+        text: 'Payment In Secondary FC',
+        value: 'paymentInSecondaryForeignCurrency'
       },
-      { text: "Secondary Exchange Rate", value: "secondaryExchangeRate" },
+      { text: 'Secondary Exchange Rate', value: 'secondaryExchangeRate' },
       {
-        text: "Gross Payment In Birr",
-        value: "grossPaymentInDomesticCurrency",
+        text: 'Gross Payment In Birr',
+        value: 'grossPaymentInDomesticCurrency'
       },
-      { text: "Admin Fee In Birr", value: "adminFeeInDomesticCurrency" },
-      { text: "NetPayment In Birr", value: "netPaymentInDomesticCurrency" },
-      { text: "Actions", value: "actions", sortable: false, width: 105 },
+      { text: 'Admin Fee In Birr', value: 'adminFeeInDomesticCurrency' },
+      { text: 'NetPayment In Birr', value: 'netPaymentInDomesticCurrency' },
+      { text: 'Actions', value: 'actions', sortable: false, width: 105 }
     ],
     individualPaymentDialog: false,
     individualPayments: [],
     individualPaymentHeaders: [
-      { text: "Id", align: "start", value: "id" },
-      { text: "Orphan Name", value: "orphanFullName" },
-      { text: "Age", value: "age" },
-      { text: "Gender", value: "gender" },
-      { text: "Guardian Name", value: "guardianFullName" },
-      { text: "Account Number", value: "accountNumber" },
-      { text: "Period", value: "payment.paymentPeriodInMonths" },
+      { text: 'Id', align: 'start', value: 'id' },
+      { text: 'Orphan Name', value: 'orphanFullName' },
+      { text: 'Age', value: 'age' },
+      { text: 'Gender', value: 'gender' },
+      { text: 'Guardian Name', value: 'guardianFullName' },
+      { text: 'Account Number', value: 'accountNumber' },
+      { text: 'Period', value: 'payment.paymentPeriodInMonths' },
       {
-        text: "Deposit In Primary FC",
-        value: "depositInPrimaryForeignCurrency",
+        text: 'Deposit In Primary FC',
+        value: 'depositInPrimaryForeignCurrency'
       },
       {
-        text: "Deposit In Secondary FC",
-        value: "depositInSecondaryForeignCurrency",
+        text: 'Deposit In Secondary FC',
+        value: 'depositInSecondaryForeignCurrency'
       },
       {
-        text: "Gross Deposit In Birr",
-        value: "grossDepositInDomesticCurrency",
+        text: 'Gross Deposit In Birr',
+        value: 'grossDepositInDomesticCurrency'
       },
       {
-        text: "Admin Fee In Birr",
-        value: "adminFeeInDomesticCurrency",
+        text: 'Admin Fee In Birr',
+        value: 'adminFeeInDomesticCurrency'
       },
       {
-        text: "NetPayment In Birr",
-        value: "netDepositInDomesticCurrency",
-      },
+        text: 'NetPayment In Birr',
+        value: 'netDepositInDomesticCurrency'
+      }
     ],
     editableIndividualTable: false,
     editIndividualPayment: {
@@ -975,7 +980,7 @@ export default {
         firstName: null,
         father: {
           firstName: null,
-          lastName: null,
+          lastName: null
         },
         dateOfBirth: null,
         gender: null,
@@ -983,17 +988,17 @@ export default {
         guardian: {
           firstName: null,
           middleName: null,
-          lastName: null,
-        },
+          lastName: null
+        }
       },
       payment: {
-        paymentPeriodInMonths: null,
+        paymentPeriodInMonths: null
       },
       depositInPrimaryForeignCurrency: null,
       depositInSecondaryForeignCurrency: null,
       grossDepositInDomesticCurrency: null,
       adminFeeInDomesticCurrency: null,
-      netDepositInDomesticCurrency: null,
+      netDepositInDomesticCurrency: null
     },
     totalAndSummationConflict: false,
     totalAndSummationConflictMsg: null,
@@ -1004,29 +1009,28 @@ export default {
     selectedIndividualPayments: [],
     supportPlanOrphans: [],
     supportPlanOrphanHeaders: [
-      { text: "Id", align: "start", value: "id" },
-      { text: "Orphan Name", value: "orphanFullName" },
-      { text: "Guardian Name", value: "guardianFullName" },
-      { text: "Account No", value: "accountNumber" },
-      { text: "Period", value: "supportPlan.supportPeriod" },
-      { text: "Total Fund in FC", value: "supportPlan.individualFund_fc" },
-      { text: "Total Fund in Birr", value: "supportPlan.individualFund_brr" },
-      { text: "Admin. Fee", value: "supportPlan.adminFee_brr" },
-      { text: "Net Payment", value: "supportPlan.netPayment_brr" },
+      { text: 'Id', align: 'start', value: 'id' },
+      { text: 'Orphan Name', value: 'orphanFullName' },
+      { text: 'Guardian Name', value: 'guardianFullName' },
+      { text: 'Account No', value: 'accountNumber' },
+      { text: 'Period', value: 'supportPlan.supportPeriod' },
+      { text: 'Total Fund in FC', value: 'supportPlan.individualFund_fc' },
+      { text: 'Total Fund in Birr', value: 'supportPlan.individualFund_brr' },
+      { text: 'Admin. Fee', value: 'supportPlan.adminFee_brr' },
+      { text: 'Net Payment', value: 'supportPlan.netPayment_brr' }
     ],
     supportPlanInitDate: null,
     supportPlanTermDate: null,
     orphanSocialWorker: null,
     orphanSocialWorkerOptions: [],
     villageIds: [],
-    socialWorkers: [],
+    socialWorkers: []
   }),
 
   computed: {
     // supportPeriod(item) {
     //   return item;
     // },
-    
   },
 
   watch: {
@@ -1053,19 +1057,19 @@ export default {
     //   },
     //   deep: true,
     // },
-    
+
     supportPlanStartDateMenu(val) {
-      val && setTimeout(() => (this.supportPlanStartDateActivePicker = "YEAR"));
+      val && setTimeout(() => (this.supportPlanStartDateActivePicker = 'YEAR'));
     },
     initDateMenu(val) {
       // Changes the active picker from the default "DATE" to "YEAR"
       val &&
-        setTimeout(() => (this.$refs.initDatepicker.activePicker = "YEAR"));
+        setTimeout(() => (this.$refs.initDatepicker.activePicker = 'YEAR'));
     },
     showSupportPlanOrphansDialog(val) {
       // to update exchangeRate of each support plan until subscription is done on the server side.
       if (val) this.initialize();
-    },
+    }
   },
 
   created() {
@@ -1078,11 +1082,11 @@ export default {
 
   methods: {
     save() {
-      console.log("saved");
+      console.log('saved');
     },
     initialize() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query getSupportPlansByProjectId ($projectId: ID!) {
                     getSupportPlansByProjectId (projectId: $projectId) {
                       id
@@ -1116,51 +1120,16 @@ export default {
                           }
                         }
                       }
-                      orphans {
-                        id
-                        firstName
-                        father {
-                          firstName
-                          lastName
-                        }
-                        dateOfBirth
-                        gender
-                        accountNumber
-                        guardian {
-                          id
-                          firstName
-                          middleName
-                          lastName
-                        }
-                        individualPayments {
-                          id
-                          created_at
-                          depositInPrimaryForeignCurrency
-                          depositInSecondaryForeignCurrency
-                          grossDepositInDomesticCurrency
-                          adminFeeInDomesticCurrency
-                          netDepositInDomesticCurrency
-                        }
-                        village {
-                          id
-                          name
-                          socialWorker {
-                            id
-                            firstName
-                            middleName
-                            lastName
-                          }
-                        }
-                      }
                     }
                   }`,
           variables: {
-            projectId: this.projectId,
-          },
+            projectId: this.projectId
+          }
         })
         .then((res) => res.data.data.getSupportPlansByProjectId)
         .then((supportPlans) => {
           this.supportPlans = [...supportPlans];
+          console.log(supportPlans);
 
           // copies the support plans which are not null
           // this.supportPlans = coordinator.donors
@@ -1180,7 +1149,7 @@ export default {
       termDate
     ) {
       return axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `mutation updateSupportPlan(
                     $id: ID!
                     $exchangeRate: Float
@@ -1256,8 +1225,8 @@ export default {
             adminFee_brr: parseFloat(adminFee_brr),
             netPayment_brr: parseFloat(netPayment_brr),
             initDate: initDate,
-            termDate: termDate,
-          },
+            termDate: termDate
+          }
         })
         .then((res) => res.data.data.updateSupportPlan)
         .catch((err) => console.warn(err));
@@ -1265,7 +1234,7 @@ export default {
 
     createSponsorshipStatus(orphanId, status) {
       return axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `mutation createSponsorshipStatus(
                   $status: sponsorshipStatus
                   $date: DateTime!
@@ -1283,8 +1252,8 @@ export default {
           variables: {
             status: status,
             date: new Date().toISOString(),
-            orphanId: orphanId,
-          },
+            orphanId: orphanId
+          }
         })
         .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
@@ -1297,8 +1266,9 @@ export default {
     },
 
     getDonorsByCoordinatorId(coordinatorId) {
-      return axios.post("/graphql/", {
-        query: `query getDonorsByCoordinatorId($coordinatorId: ID!) {
+      return axios
+        .post('/graphql/', {
+          query: `query getDonorsByCoordinatorId($coordinatorId: ID!) {
                   getDonorsByCoordinatorId(coordinatorId: $coordinatorId) {
                     id
                     companyName
@@ -1308,18 +1278,18 @@ export default {
                     }
                   }
                 }`,
-        variables: {
-          coordinatorId
-        }
-      })
-      .then(res => res.data.data.getDonorsByCoordinatorId)
-      .then(donors => this.donors = [...donors])
-      .catch(err => console.warn(err));
+          variables: {
+            coordinatorId
+          }
+        })
+        .then((res) => res.data.data.getDonorsByCoordinatorId)
+        .then((donors) => (this.donors = [...donors]))
+        .catch((err) => console.warn(err));
     },
 
     initializeProjects() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query getProjectsByCoordinatorId ($coordinatorId: ID!) {
                   getProjectsByCoordinatorId(coordinatorId: $coordinatorId) {
                     id
@@ -1356,15 +1326,15 @@ export default {
                   }
                 }`,
           variables: {
-            coordinatorId: this.$route.params.id,
-          },
+            coordinatorId: this.$route.params.id
+          }
         })
         .then((res) => res.data.data.getProjectsByCoordinatorId)
         .then((projects) => (this.projects = [...projects]))
         .catch((err) => console.warn(err));
     },
 
-     createSupportPlan(
+    createSupportPlan(
       name,
       adminFeePercentage,
       paymentInterval,
@@ -1375,7 +1345,7 @@ export default {
       orphans
     ) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createSupportPlan (
                   $name: String!
                   $adminFeePercentage: Float!
@@ -1410,15 +1380,18 @@ export default {
             endDate,
             donorId,
             projectId,
-            orphans,
-          },
+            orphans
+          }
         })
         .then((res) => res.data.data.createSupportPlan)
         .catch((err) => console.warn(err));
     },
 
     async createSupportPlanSave() {
-      if (this.$refs.createSupportPlanForm.validate() && this.selectedVillageOrphans.length > 0) {
+      if (
+        this.$refs.createSupportPlanForm.validate() &&
+        this.selectedNewVillageOrphans.length > 0
+      ) {
         // replace this with getProjectByProjectId when the function is finished
         const project = this.projects.filter(
           (project) => project.id !== this.projectId
@@ -1438,7 +1411,7 @@ export default {
           )
         ).toISOString();
 
-        const orphanIds = this.selectedVillageOrphans.map(
+        const orphanIds = this.selectedNewVillageOrphans.map(
           (orphan) => orphan.id
         );
 
@@ -1487,14 +1460,93 @@ export default {
       return item.nameInitials;
     },
 
-    openCreateSupportPlanDialog(items) {
-      console.log("item", items);
+    async openCreateSupportPlanDialog(items) {
+      console.log('item', items);
 
-      this.villageOrphans = items[0].project.location?.reduce((acc, cur) => {
-        return acc.concat(...cur.orphans);
-      }, []);
+      const projectOrphans = await this.getOrphansByProjectId(this.projectId);
+
+      const orphansToBeFiltered = projectOrphans.map((orphan) => ({
+        orphan: orphan,
+        lastStatusChangeDate: new Date(
+          orphan.sponsorshipStatuses.reduce(
+            (lastSponsorshipStatusChangeDate, sponsorshipStatus) =>
+              Math.max(
+                lastSponsorshipStatusChangeDate,
+                new Date(sponsorshipStatus.date).getTime()
+              ),
+            0
+          )
+        ).toISOString()
+      }));
+
+      this.newVillageOrphans = orphansToBeFiltered
+        .filter((orphanObj) => {
+          const lastSponsorshipStatus = orphanObj.orphan.sponsorshipStatuses.filter(
+            (sponsorshipStatus) =>
+              String(sponsorshipStatus.date) ===
+              String(orphanObj.lastStatusChangeDate)
+          );
+          return lastSponsorshipStatus[0].status === 'new';
+        })
+        .map((orphanObj) => orphanObj.orphan);
+
+      console.log(this.newVillageOrphans);
 
       this.createSupportPlanDialog = true;
+    },
+
+    getOrphansByProjectId(projectId) {
+      return axios
+        .post('graphql', {
+          query: `query getOrphansByProjectId($projectId: ID!) {
+                  getOrphansByProjectId(projectId: $projectId) {
+                    id
+                    firstName
+                    father {
+                      firstName
+                      lastName
+                    }
+                    dateOfBirth
+                    gender
+                    accountNumber
+                    guardian {
+                      id
+                      firstName
+                      middleName
+                      lastName
+                    }
+                    individualPayments {
+                      id
+                      created_at
+                      depositInPrimaryForeignCurrency
+                      depositInSecondaryForeignCurrency
+                      grossDepositInDomesticCurrency
+                      adminFeeInDomesticCurrency
+                      netDepositInDomesticCurrency
+                    }
+                    village {
+                      id
+                      name
+                      socialWorker {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                      }
+                    }
+                    sponsorshipStatuses {
+                      id
+                      date
+                      status
+                    }
+                  }
+                }`,
+          variables: {
+            projectId
+          }
+        })
+        .then((res) => res.data.data.getOrphansByProjectId)
+        .catch((err) => console.warn(err));
     },
 
     openCreatePaymentDialog() {
@@ -1503,7 +1555,7 @@ export default {
 
     getPaymentsBySupportPlanId(supportPlanId) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query getPaymentsBySupportPlanId($supportPlanId: ID!) {
                   getPaymentsBySupportPlanId(supportPlanId: $supportPlanId) {
                     id
@@ -1522,8 +1574,8 @@ export default {
                   }
                 }`,
           variables: {
-            supportPlanId,
-          },
+            supportPlanId
+          }
         })
         .then((res) => res.data.data.getPaymentsBySupportPlanId)
         .catch((err) => console.warn(err));
@@ -1586,7 +1638,7 @@ export default {
       paymentId
     ) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createIndividualPayment(
                   $depositInPrimaryForeignCurrency: Float
                   $depositInSecondaryForeignCurrency: Float
@@ -1615,8 +1667,8 @@ export default {
             adminFeeInDomesticCurrency,
             netDepositInDomesticCurrency,
             orphanId,
-            paymentId,
-          },
+            paymentId
+          }
         })
         .then((res) => res.data.data.createIndividualPayment)
         .catch((err) => console.warn(err));
@@ -1636,8 +1688,8 @@ export default {
         parseFloat(this.selectedPayment.paymentInPrimaryForeignCurrency)
       ) {
         this.totalAndSummationConflict = false;
-        this.totalAndSummationConflictColor = "white";
-        this.totalAndSummationConflictTextColor = "black";
+        this.totalAndSummationConflictColor = 'white';
+        this.totalAndSummationConflictTextColor = 'black';
 
         this.selectedIndividualPayments = [...items];
 
@@ -1662,8 +1714,8 @@ export default {
         this.showAssignSocialWorkerDialog = true;
       } else {
         this.totalAndSummationConflict = true;
-        this.totalAndSummationConflictColor = "red";
-        this.totalAndSummationConflictTextColor = "white";
+        this.totalAndSummationConflictColor = 'red';
+        this.totalAndSummationConflictTextColor = 'white';
 
         let totalAndSummationDifference = 0;
         if (
@@ -1683,13 +1735,13 @@ export default {
           this.totalAndSummationConflictMsg = `There is ${totalAndSummationDifference} fc missing from the total amount`;
         }
 
-        console.log("something went wrong");
+        console.log('something went wrong');
       }
     },
 
     getIndividualPaymentsByPaymentId(paymentId) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query getIndividualPaymentByPaymentId($paymentId: ID!) {
                   getIndividualPaymentsByPaymentId(paymentId: $paymentId) {
                     id
@@ -1746,8 +1798,8 @@ export default {
                   }
                 }`,
           variables: {
-            paymentId,
-          },
+            paymentId
+          }
         })
         .then((res) => res.data.data.getIndividualPaymentsByPaymentId)
         .catch((err) => console.warn(err));
@@ -1765,7 +1817,7 @@ export default {
     },
 
     priviewSupportPlan(item) {
-      console.log("priviewSupportPlan", item);
+      console.log('priviewSupportPlan', item);
 
       // axios
       //   .post("/graphql", {
@@ -1907,11 +1959,11 @@ export default {
         grossPaymentInDomesticCurrency,
         adminFeeInDomesticCurrency,
         netPaymentInDomesticCurrency,
-        supportPlanId,
+        supportPlanId
       };
 
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createPayment(
                   $endDate: DateTime
                   $startDate: DateTime
@@ -1957,7 +2009,7 @@ export default {
                     netPaymentInDomesticCurrency
                   }
                 }`,
-          variables,
+          variables
         })
         .then((res) => res.data.data.createPayment)
         .catch((err) => console.warn(err));
@@ -2052,7 +2104,7 @@ export default {
     },
 
     closeSupportPlanTable() {
-      this.$emit("closeSupportPlanTable", false);
+      this.$emit('closeSupportPlanTable', false);
     },
 
     cancelAssignSocialWorker() {
@@ -2072,7 +2124,7 @@ export default {
 
         for (const individualPayment of this.selectedIndividualPayments) {
           if (this.selectedPayment.paymentInPrimaryForeignCurrency === null) {
-            console.log("1");
+            console.log('1');
             depositInPFC = 0;
             depositInSFC = 0;
             grossDepositInDC = individualPayment.grossDepositInDomesticCurrency;
@@ -2082,12 +2134,12 @@ export default {
             if (
               this.selectedPayment.paymentInSecondaryForeignCurrency === null
             ) {
-              console.log("2");
+              console.log('2');
               depositInSFC = 0;
               grossDepositInDC =
                 depositInPFC * this.selectedPayment.primaryExchangeRate;
             } else {
-              console.log("3");
+              console.log('3');
               depositInSFC =
                 depositInPFC * this.selectedPayment.primaryExchangeRate;
               grossDepositInDC =
@@ -2120,7 +2172,7 @@ export default {
 
           const sponsorshipStatus = await this.createSponsorshipStatus(
             individualPayment.orphan.id,
-            "active"
+            'active'
           );
           console.log(`sponsorshipStatus`, sponsorshipStatus);
 
@@ -2180,13 +2232,13 @@ export default {
 
       let variables = {
         id: orphanId,
-        socialWorkerId: socialWorkerId,
+        socialWorkerId: socialWorkerId
       };
 
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: query,
-          variables: variables,
+          variables: variables
         })
         .then((res) => res.data.data.updateOrphan)
         .catch((err) => console.warn(err));
@@ -2226,15 +2278,13 @@ export default {
     orphanCalcAge(item) {
       return (
         new Date().getUTCFullYear() -
-        new Date(
-          Date.parse(item.dateOfBirth.toString())
-        ).getUTCFullYear()
+        new Date(Date.parse(item.dateOfBirth.toString())).getUTCFullYear()
       );
     },
 
     individualGuardianFullName(item) {
       if (!item.orphan.guardian) {
-        return "N/A";
+        return 'N/A';
       } else {
         return (
           `${item.orphan.guardian.firstName
@@ -2274,7 +2324,7 @@ export default {
 
     guardianFullName(item) {
       if (!item.guardian) {
-        return "N/A";
+        return 'N/A';
       } else {
         return (
           `${item.guardian.firstName
@@ -2307,14 +2357,14 @@ export default {
 
       let jsonExportData = [
         [
-          "Charity and Development Association (CDA)",
+          'Charity and Development Association (CDA)',
           null,
           null,
           null,
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Payment Sheet For Orphans Project ${projectNo}`,
@@ -2324,7 +2374,7 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Funding Agency: ${agencyName}`,
@@ -2334,17 +2384,17 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
-          "Cooperative Bank of Oromia Adaba Branch",
+          'Cooperative Bank of Oromia Adaba Branch',
           null,
           null,
           null,
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Payment Period From ${startDate} - ${endDate}`,
@@ -2354,7 +2404,7 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Zone: ${zoneName}`,
@@ -2363,44 +2413,44 @@ export default {
           null,
           `Village: ${villageName}`,
           null,
-          "Date___________",
-          null,
+          'Date___________',
+          null
         ],
         [
-          "Orphan Name",
-          "Guardian Name",
-          "Account No",
-          "Period",
-          "Total Fund in PFC",
-          "Total Fund in SFC",
-          "Total Fund in Birr",
-          "Admin. Fee",
-          "Net Payment",
-        ],
+          'Orphan Name',
+          'Guardian Name',
+          'Account No',
+          'Period',
+          'Total Fund in PFC',
+          'Total Fund in SFC',
+          'Total Fund in Birr',
+          'Admin. Fee',
+          'Net Payment'
+        ]
       ];
 
       const exoprtTableData = individualPayments.map((individualPayment) => {
         let modifiedIndividualPaymentsArray = [];
 
-        if (Object.hasOwnProperty.call(individualPayment, "orphan")) {
-          if (Object.hasOwnProperty.call(individualPayment.orphan, "father")) {
+        if (Object.hasOwnProperty.call(individualPayment, 'orphan')) {
+          if (Object.hasOwnProperty.call(individualPayment.orphan, 'father')) {
             modifiedIndividualPaymentsArray[0] = `${individualPayment.orphan.firstName} ${individualPayment.orphan.father?.firstName} ${individualPayment.orphan.father?.lastName}`;
           }
           if (
-            Object.hasOwnProperty.call(individualPayment.orphan, "guardian")
+            Object.hasOwnProperty.call(individualPayment.orphan, 'guardian')
           ) {
             modifiedIndividualPaymentsArray[1] = `${individualPayment.orphan.guardian?.firstName} ${individualPayment.orphan.guardian?.middleName} ${individualPayment.orphan.guardian?.lastName}`;
           }
           if (
             Object.hasOwnProperty.call(
               individualPayment.orphan,
-              "accountNumber"
+              'accountNumber'
             )
           ) {
             modifiedIndividualPaymentsArray[2] =
               individualPayment.orphan.accountNumber;
           }
-          if (Object.hasOwnProperty.call(individualPayment, "payment")) {
+          if (Object.hasOwnProperty.call(individualPayment, 'payment')) {
             modifiedIndividualPaymentsArray[3] =
               individualPayment.payment.paymentPeriodInMonths;
           }
@@ -2425,7 +2475,7 @@ export default {
       const workSheet = XLSX.utils.aoa_to_sheet(jsonExportData);
 
       // handle merge
-      workSheet["!merges"] = [
+      workSheet['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
         { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
         { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } },
@@ -2434,11 +2484,11 @@ export default {
         // { s: { r: 5, c: 0 }, e: { r: 5, c: 1 } },
         { s: { r: 5, c: 2 }, e: { r: 5, c: 3 } },
         { s: { r: 5, c: 4 }, e: { r: 5, c: 5 } },
-        { s: { r: 5, c: 6 }, e: { r: 5, c: 8 } },
+        { s: { r: 5, c: 6 }, e: { r: 5, c: 8 } }
       ];
 
       // sets the width of colns
-      workSheet["!cols"] = [
+      workSheet['!cols'] = [
         { wpx: 150 }, // A
         { wpx: 150 }, // B
         { wpx: 100 }, // C
@@ -2447,19 +2497,19 @@ export default {
         { wpx: 100 }, // F
         { wpx: 100 }, // G
         { wpx: 100 }, // H
-        { wpx: 100 }, // I
+        { wpx: 100 } // I
       ];
 
       // sets the first 5 rows bold and centered
       for (let i = 1; i <= 5; i++) {
         workSheet[`A${i}`].s = {
           font: {
-            bold: true,
+            bold: true
           },
           alignment: {
-            horizontal: "center",
-            vertical: "center",
-          },
+            horizontal: 'center',
+            vertical: 'center'
+          }
         };
       }
 
@@ -2468,38 +2518,38 @@ export default {
         const char = String.fromCharCode(65 + i);
         workSheet[`${char}6`].s = {
           font: {
-            bold: true,
-          },
+            bold: true
+          }
         };
       }
 
       // sets border to the table
       for (const key in workSheet) {
-        const flag = key.localeCompare("A8", undefined, { numeric: true });
-        if (flag < 0 || key === "C6" || key === "E6" || key === "G6") continue;
+        const flag = key.localeCompare('A8', undefined, { numeric: true });
+        if (flag < 0 || key === 'C6' || key === 'E6' || key === 'G6') continue;
         workSheet[key].s = {
           alignment: {
-            horizontal: "center",
-            wrapText: true,
+            horizontal: 'center',
+            wrapText: true
           },
           border: {
             top: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             bottom: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             left: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             right: {
-              style: "thin",
-              color: "000000",
-            },
-          },
+              style: 'thin',
+              color: '000000'
+            }
+          }
         };
       }
 
@@ -2508,60 +2558,60 @@ export default {
         const char = String.fromCharCode(65 + i);
         workSheet[`${char}7`].s = {
           font: {
-            bold: true,
+            bold: true
           },
           alignment: {
-            horizontal: "center",
-            vertical: "center",
-            wrapText: true,
+            horizontal: 'center',
+            vertical: 'center',
+            wrapText: true
           },
           border: {
             top: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             bottom: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             left: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             right: {
-              style: "thin",
-              color: "000000",
-            },
-          },
+              style: 'thin',
+              color: '000000'
+            }
+          }
         };
       }
 
       // sets the text rotaion of D7 cell
-      Object.assign(workSheet["D7"].s, {
+      Object.assign(workSheet['D7'].s, {
         alignment: {
-          horizontal: "center",
-          vertical: "center",
-          textRotation: 90,
-        },
+          horizontal: 'center',
+          vertical: 'center',
+          textRotation: 90
+        }
       });
 
       // sets the text rotaion of G6 cell
-      Object.assign(workSheet["E6"].s, {
+      Object.assign(workSheet['E6'].s, {
         alignment: {
-          horizontal: "right",
-        },
+          horizontal: 'right'
+        }
       });
 
       // sets the text rotaion of G6 cell
-      Object.assign(workSheet["G6"].s, {
+      Object.assign(workSheet['G6'].s, {
         alignment: {
-          horizontal: "right",
-        },
+          horizontal: 'right'
+        }
       });
 
       // creates an output buffer
       function s2ab(s) {
-        if (typeof ArrayBuffer !== "undefined") {
+        if (typeof ArrayBuffer !== 'undefined') {
           const buf = new ArrayBuffer(s.length);
           const view = new Uint8Array(buf);
           for (let i = 0; i !== s.length; ++i) {
@@ -2577,15 +2627,15 @@ export default {
         }
       }
 
-      XLSX.utils.book_append_sheet(workBook, workSheet, "Orphan Payment Sheet");
+      XLSX.utils.book_append_sheet(workBook, workSheet, 'Orphan Payment Sheet');
 
       // XLSX.writeFile(workBook, "orphanTest.xlsx");
       const wbOut = XLSXStyle.write(workBook, {
         bookSST: false,
-        type: "binary",
+        type: 'binary'
       });
 
-      saveAs(new Blob([s2ab(wbOut)], { type: "" }), "OrphanPaymentSheet.xlsx");
+      saveAs(new Blob([s2ab(wbOut)], { type: '' }), 'OrphanPaymentSheet.xlsx');
     },
 
     downloadPaymentSheetOld(supportedOrphans) {
@@ -2600,14 +2650,14 @@ export default {
 
       let jsonExportData = [
         [
-          "Charity and Development Association (CDA)",
+          'Charity and Development Association (CDA)',
           null,
           null,
           null,
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Payment Sheet For Orphans Project ${projectNo}`,
@@ -2617,7 +2667,7 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Funding Agency: ${agencyName}`,
@@ -2627,17 +2677,17 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
-          "Cooperative Bank of Oromia Adaba Branch",
+          'Cooperative Bank of Oromia Adaba Branch',
           null,
           null,
           null,
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Payment Period From ${initDate} - ${termDate}`,
@@ -2647,7 +2697,7 @@ export default {
           null,
           null,
           null,
-          null,
+          null
         ],
         [
           `Zone: ${zoneName}`,
@@ -2656,33 +2706,33 @@ export default {
           null,
           `Village: ${villageName}`,
           null,
-          "Date___________",
-          null,
+          'Date___________',
+          null
         ],
         [
-          "Orphan Name",
-          "Guardian Name",
-          "Account No",
-          "Period",
-          "Total Fund in GBP",
-          "Total Fund in Birr",
-          "Admin. Fee",
-          "Net Payment",
-        ],
+          'Orphan Name',
+          'Guardian Name',
+          'Account No',
+          'Period',
+          'Total Fund in GBP',
+          'Total Fund in Birr',
+          'Admin. Fee',
+          'Net Payment'
+        ]
       ];
 
       const modifiedSupportPlanOrphans = supportedOrphans.map((orphan) => {
         let modifiedOrphansArray = [];
-        if (Object.hasOwnProperty.call(orphan, "father")) {
+        if (Object.hasOwnProperty.call(orphan, 'father')) {
           modifiedOrphansArray[0] = `${orphan.firstName} ${orphan.father?.firstName} ${orphan.father?.lastName}`;
         }
-        if (Object.hasOwnProperty.call(orphan, "guardian")) {
+        if (Object.hasOwnProperty.call(orphan, 'guardian')) {
           modifiedOrphansArray[1] = `${orphan.guardian?.firstName} ${orphan.guardian?.middleName} ${orphan.guardian?.lastName}`;
         }
-        if (Object.hasOwnProperty.call(orphan, "accountNumber")) {
+        if (Object.hasOwnProperty.call(orphan, 'accountNumber')) {
           modifiedOrphansArray[2] = orphan.accountNumber;
         }
-        if (Object.hasOwnProperty.call(orphan, "supportPlan")) {
+        if (Object.hasOwnProperty.call(orphan, 'supportPlan')) {
           modifiedOrphansArray[3] = orphan.supportPlan.supportPeriod;
           modifiedOrphansArray[4] = orphan.supportPlan.individualFund_fc;
           modifiedOrphansArray[5] = orphan.supportPlan.individualFund_brr;
@@ -2698,7 +2748,7 @@ export default {
       const workSheet = XLSX.utils.aoa_to_sheet(jsonExportData);
 
       // handle merge
-      workSheet["!merges"] = [
+      workSheet['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
         { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
         { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
@@ -2707,11 +2757,11 @@ export default {
         // { s: { r: 5, c: 0 }, e: { r: 5, c: 1 } },
         { s: { r: 5, c: 2 }, e: { r: 5, c: 3 } },
         { s: { r: 5, c: 4 }, e: { r: 5, c: 5 } },
-        { s: { r: 5, c: 6 }, e: { r: 5, c: 7 } },
+        { s: { r: 5, c: 6 }, e: { r: 5, c: 7 } }
       ];
 
       // sets the width of colns
-      workSheet["!cols"] = [
+      workSheet['!cols'] = [
         { wpx: 150 },
         { wpx: 150 },
         { wpx: 100 },
@@ -2719,19 +2769,19 @@ export default {
         { wpx: 70 },
         { wpx: 70 },
         { wpx: 70 },
-        { wpx: 70 },
+        { wpx: 70 }
       ];
 
       // sets the first 5 rows bold and centered
       for (let i = 1; i <= 5; i++) {
         workSheet[`A${i}`].s = {
           font: {
-            bold: true,
+            bold: true
           },
           alignment: {
-            horizontal: "center",
-            vertical: "center",
-          },
+            horizontal: 'center',
+            vertical: 'center'
+          }
         };
       }
 
@@ -2740,38 +2790,38 @@ export default {
         const char = String.fromCharCode(65 + i);
         workSheet[`${char}6`].s = {
           font: {
-            bold: true,
-          },
+            bold: true
+          }
         };
       }
 
       // sets border to the table
       for (const key in workSheet) {
-        const flag = key.localeCompare("A8", undefined, { numeric: true });
-        if (flag < 0 || key === "C6" || key === "E6" || key === "G6") continue;
+        const flag = key.localeCompare('A8', undefined, { numeric: true });
+        if (flag < 0 || key === 'C6' || key === 'E6' || key === 'G6') continue;
         workSheet[key].s = {
           alignment: {
-            horizontal: "center",
-            wrapText: true,
+            horizontal: 'center',
+            wrapText: true
           },
           border: {
             top: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             bottom: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             left: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             right: {
-              style: "thin",
-              color: "000000",
-            },
-          },
+              style: 'thin',
+              color: '000000'
+            }
+          }
         };
       }
 
@@ -2780,46 +2830,46 @@ export default {
         const char = String.fromCharCode(65 + i);
         workSheet[`${char}7`].s = {
           font: {
-            bold: true,
+            bold: true
           },
           alignment: {
-            horizontal: "center",
-            vertical: "center",
-            wrapText: true,
+            horizontal: 'center',
+            vertical: 'center',
+            wrapText: true
           },
           border: {
             top: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             bottom: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             left: {
-              style: "thin",
-              color: "000000",
+              style: 'thin',
+              color: '000000'
             },
             right: {
-              style: "thin",
-              color: "000000",
-            },
-          },
+              style: 'thin',
+              color: '000000'
+            }
+          }
         };
       }
 
       // sets the text rotaion of D7 cell
-      Object.assign(workSheet["D7"].s, {
+      Object.assign(workSheet['D7'].s, {
         alignment: {
-          horizontal: "center",
-          vertical: "center",
-          textRotation: 90,
-        },
+          horizontal: 'center',
+          vertical: 'center',
+          textRotation: 90
+        }
       });
 
       // creates an output buffer
       function s2ab(s) {
-        if (typeof ArrayBuffer !== "undefined") {
+        if (typeof ArrayBuffer !== 'undefined') {
           const buf = new ArrayBuffer(s.length);
           const view = new Uint8Array(buf);
           for (let i = 0; i !== s.length; ++i) {
@@ -2835,15 +2885,15 @@ export default {
         }
       }
 
-      XLSX.utils.book_append_sheet(workBook, workSheet, "Orphan Payment Sheet");
+      XLSX.utils.book_append_sheet(workBook, workSheet, 'Orphan Payment Sheet');
 
       // XLSX.writeFile(workBook, "orphanTest.xlsx");
       const wbOut = XLSXStyle.write(workBook, {
         bookSST: false,
-        type: "binary",
+        type: 'binary'
       });
 
-      saveAs(new Blob([s2ab(wbOut)], { type: "" }), "OrphanPaymentSheet.xlsx");
+      saveAs(new Blob([s2ab(wbOut)], { type: '' }), 'OrphanPaymentSheet.xlsx');
 
       // console.log(jsonExportData);
     },
@@ -2858,7 +2908,7 @@ export default {
 
     closeIndividualPaymentDialog() {
       this.individualPaymentDialog = false;
-    },
-  },
+    }
+  }
 };
 </script>
