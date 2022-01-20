@@ -53,7 +53,7 @@
         @dialogClosed="newOrphanDialog = $event"
         @registrationDone="addNewOrphan($event)"
       /> -->
-      <orphan-registration-stepper 
+      <orphan-registration-stepper
         :newOrphanDialog="newOrphanDialog"
         :villageId="selectedOrphanVillage"
         @dialogClosed="newOrphanDialog = $event"
@@ -226,11 +226,11 @@
                 </v-col>
                 <!-- Select Switch -->
                 <v-col cols="4" class="pa-0">
-                  <v-switchnewOrphanDialog
+                  <v-switch
                     v-model="singleOrphanSelect"
                     :label="selectSwitch"
                     class="px-3 mt-0"
-                  ></v-switchnewOrphanDialog>
+                  ></v-switch>
                 </v-col>
                 <!-- status change dialog -->
                 <v-col class="mt-n4 pr-7" align="right">
@@ -329,7 +329,10 @@
 
     <template v-if="showSupportPlanTable">
       <v-fab-transition>
-        <support-plan-table :projectId="selectedProjectId" @closeSupportPlanTable="showSupportPlanTable = $event"/>
+        <support-plan-table
+          :projectId="selectedProjectId"
+          @closeSupportPlanTable="showSupportPlanTable = $event"
+        />
       </v-fab-transition>
     </template>
 
@@ -343,12 +346,10 @@
                 cols="12"
                 class="text-center"
                 dark
-                
                 style="margin-top: 6rem"
               >
                 <v-btn fab dark color="indigo">
-                  <v-icon dark v-bind="attrs"
-                v-on="on">
+                  <v-icon dark v-bind="attrs" v-on="on">
                     mdi-plus
                   </v-icon>
                 </v-btn>
@@ -458,7 +459,7 @@
                         :item-value="villageText_Value"
                         :menu-props="{
                           top: true,
-                          offsetY: true,
+                          offsetY: true
                         }"
                         :rules="[rules.required]"
                         label="Locations*"
@@ -606,7 +607,7 @@
                                 .slice(
                                   new Date(item.startDate)
                                     .toDateString()
-                                    .indexOf(" ")
+                                    .indexOf(' ')
                                 )
                             }}
                           </p>
@@ -616,13 +617,17 @@
 
                         <v-col cols="">
                           <v-card-subtitle class="pa-0">To:</v-card-subtitle>
-                          <p>{{ new Date(item.endDate)
+                          <p>
+                            {{
+                              new Date(item.endDate)
                                 .toDateString()
                                 .slice(
                                   new Date(item.endDate)
                                     .toDateString()
-                                    .indexOf(" ")
-                                ) }}</p>
+                                    .indexOf(' ')
+                                )
+                            }}
+                          </p>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -634,7 +639,9 @@
                         <v-card-subtitle style="font-size: 1em"
                           >Total Budget:</v-card-subtitle
                         >
-                        <p class="mb-0 pa-4 pl-0">{{ item.grandTotalBudget }}</p>
+                        <p class="mb-0 pa-4 pl-0">
+                          {{ item.grandTotalBudget }}
+                        </p>
                       </v-row>
                     </v-col>
                   </v-card-text>
@@ -707,12 +714,12 @@
 <style scoped></style>
 
 <script>
-import axios from "axios";
-import OrphanList from "@/views/OrphanList.vue";
-import AppNavBar from "@/components/AppNavBar";
+import axios from 'axios';
+import OrphanList from '@/views/OrphanList.vue';
+import AppNavBar from '@/components/AppNavBar';
 // import NewOrphanRegistrationModel from "@/components/NewOrphanRegistrationModel.vue";
-import SupportPlanTable from "../components/SupportPlanTable.vue";
-import OrphanRegistrationStepper from "../components/OrphanRegistrationStepper.vue"
+import SupportPlanTable from '../components/SupportPlanTable.vue';
+import OrphanRegistrationStepper from '../components/OrphanRegistrationStepper.vue';
 
 export default {
   components: {
@@ -724,29 +731,29 @@ export default {
   },
 
   data: () => ({
-    search: "", // used for filter
-    orphanSearch: "",
-    searchProject: "",
+    search: '', // used for filter
+    orphanSearch: '',
+    searchProject: '',
     singleOrphanSelect: false,
     selectedOrphans: [],
-    selectSwitch: "Multiple Orphans",
+    selectSwitch: 'Multiple Orphans',
     drawer: false, // constroles the sidebar
     // test fields *****************
-    test: "",
+    test: '',
     benched: 0,
     snack: false,
-    snackColor: "",
-    snackText: "",
-    max25chars: (v) => v.length <= 25 || "Input too long!",
+    snackColor: '',
+    snackText: '',
+    max25chars: (v) => v.length <= 25 || 'Input too long!',
     // *****************************
     // used in filter selection items
     filterItems: [
-      "Id",
-      "Village Name",
-      "District",
-      "Registred on",
-      "Donor",
-      "Social Worker",
+      'Id',
+      'Village Name',
+      'District',
+      'Registred on',
+      'Donor',
+      'Social Worker'
     ],
     orphanFilterItems: [],
     filterValue: [],
@@ -754,38 +761,38 @@ export default {
     // used for filter selection
     // table headers if that wasn't clear enough LOL
     orphanHeaders: [
-      { text: "Id", value: "id" },
+      { text: 'Id', value: 'id' },
       {
-        text: "Full Name",
-        align: "start",
-        value: "fullName",
+        text: 'Full Name',
+        align: 'start',
+        value: 'fullName'
       },
       {
-        text: "Age",
-        value: "age",
+        text: 'Age',
+        value: 'age'
       },
       {
-        text: "Gender",
-        value: "gender",
+        text: 'Gender',
+        value: 'gender'
       },
       {
-        text: "Sponsorship Status",
-        value: "sponsorshipStatus",
+        text: 'Sponsorship Status',
+        value: 'sponsorshipStatus'
       },
-      { text: "Sponsored Date", value: "sponsoredDate" },
+      { text: 'Sponsored Date', value: 'sponsoredDate' }
     ],
     coordinator: {},
     donors: [],
     coordinatorUser: {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      email: "",
-      role: "",
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      role: ''
     },
     projects: [],
     rules: {
-      required: (value) => !!value || "Required.",
+      required: (value) => !!value || 'Required.'
     },
     createProjectDialog: false,
     validCreateProject: false,
@@ -804,30 +811,30 @@ export default {
     selectedProjectId: null,
     newOrphanDialog: false,
     showVillagesSelectionDialog: false,
-    selectedOrphanVillage: "",
+    selectedOrphanVillage: '',
     selectedOrphanVillageOptions: [],
     validVillageChoice: false,
     showSupportPlanTable: false,
     showStatusChangeSelectionDialog: false,
     validStatusSelect: false,
-    currentStatus: "",
+    currentStatus: '',
     currentStatusOptions: [
-      { text: "New", value: "new" },
-      { text: "Active", value: "active" },
+      { text: 'New', value: 'new' },
+      { text: 'Active', value: 'active' }
     ],
-    changedStatus: "",
+    changedStatus: '',
     changedStatusOptions: [
-      { text: "Processing", value: "processing" },
-      { text: "Graduated", value: "graduated" },
+      { text: 'Processing', value: 'processing' },
+      { text: 'Graduated', value: 'graduated' }
     ],
     changeStatusOrphanDialog: false,
-    statusChangeReason: "",
+    statusChangeReason: '',
     // table rows/items
     orphans: [],
     villages: [],
     allVillages: [],
     showOrphans: false,
-    selectedOrphanIds: { ids: [] },
+    selectedOrphanIds: { ids: [] }
   }),
   created() {
     this.initialize();
@@ -841,7 +848,7 @@ export default {
     },
     length() {
       return 7000;
-    },
+    }
     // used in new orphan dialog
   },
   watch: {
@@ -850,7 +857,7 @@ export default {
         this.selectedOrphanVillageOptions = [];
 
         const villages = await axios
-          .post("/graphql", {
+          .post('/graphql', {
             query: `query getVillagesByCoordinatorId ($coordinatorId: ID!) {
                       getVillagesByCoordinatorId (coordinatorId: $coordinatorId) {
                         id
@@ -858,8 +865,8 @@ export default {
                       }
                     }`,
             variables: {
-              coordinatorId: this.$route.params.id,
-            },
+              coordinatorId: this.$route.params.id
+            }
           })
           .then((res) => res.data.data.getVillagesByCoordinatorId)
           .catch((err) => console.warn(err));
@@ -868,35 +875,35 @@ export default {
       }
     },
     currentStatus(val) {
-      if (val === "new")
+      if (val === 'new')
         this.changedStatusOptions = this.changedStatusOptions.filter(
-          (cur) => cur.value === "graduated"
+          (cur) => cur.value === 'graduated'
         );
       else {
         const processingIndex = this.changedStatusOptions.findIndex((elmt) => {
-          return elmt.value === "processing";
+          return elmt.value === 'processing';
         });
         if (processingIndex === -1) {
           this.changedStatusOptions.unshift({
-            text: "Processing",
-            value: "processing",
+            text: 'Processing',
+            value: 'processing'
           });
         }
       }
     },
     singleOrphanSelect() {
       this.selectSwitch =
-        this.singleOrphanSelect === true ? "Single Orphan" : "Multiple Orphans";
+        this.singleOrphanSelect === true ? 'Single Orphan' : 'Multiple Orphans';
     },
     projectStartDateMenu(val) {
-      val && setTimeout(() => (this.projectStartDateActivePicker = "YEAR"));
-    },
+      val && setTimeout(() => (this.projectStartDateActivePicker = 'YEAR'));
+    }
   },
   methods: {
     initialize() {
-      console.log("routerCoordinatorId: ", typeof this.$route.params.id);
+      console.log('routerCoordinatorId: ', typeof this.$route.params.id);
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query coordinator($id: ID!) {
                   coordinator(id: $id) {
                     id
@@ -918,8 +925,8 @@ export default {
                   }
                 }`,
           variables: {
-            id: this.$route.params.id,
-          },
+            id: this.$route.params.id
+          }
         })
         // .then(res => console.log(res.data.data.coordinator))
         .then((res) => res.data.data.coordinator)
@@ -931,14 +938,6 @@ export default {
           );
           this.donors = [...this.coordinator.donors];
 
-          // #          // change this with the getVillagebyCoordinatorId
-
-          // this.villages.push(...this.coordinator.villages);
-
-          // amended
-          this.orphans = this.coordinator.donors.reduce((acc, village) => {
-            return acc.concat(village.orphans);
-          }, []);
           for (const property in this.coordinatorUser) {
             if (Object.hasOwnProperty.call(this.coordinator, property)) {
               this.coordinatorUser[property] = coordinator[property];
@@ -948,9 +947,34 @@ export default {
         })
         .catch((err) => console.warn(err));
     },
+    getAllOrphans() {
+      return axios
+        .post('graphql/', {
+          query: `query {
+          allOrphans {
+            id
+            firstName
+            gender
+            dateOfBirth
+            father {
+              id
+              firstName
+              lastName
+            }
+            sponsorshipStatuses {
+              id
+              status
+              date
+            }
+          }
+        }`
+        })
+        .then((res) => res.data.data.allOrphans)
+        .catch((err) => console.warn(err));
+    },
     initializeProjects() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query getProjectsByCoordinatorId ($coordinatorId: ID!) {
                   getProjectsByCoordinatorId(coordinatorId: $coordinatorId) {
                     id
@@ -987,8 +1011,8 @@ export default {
                   }
                 }`,
           variables: {
-            coordinatorId: this.$route.params.id,
-          },
+            coordinatorId: this.$route.params.id
+          }
         })
         .then((res) => res.data.data.getProjectsByCoordinatorId)
         .then((projects) => (this.projects = [...projects]))
@@ -996,13 +1020,13 @@ export default {
     },
     initializeAllVillages() {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allVillages {
                     id
                     name
                   }
-                }`,
+                }`
         })
         .then((res) => res.data.data.allVillages)
         .then((allVillages) => (this.allVillages = [...allVillages]))
@@ -1012,7 +1036,7 @@ export default {
       this.showVillagesSelectionDialog = val;
     },
     toggleSupportPlanTable(val) {
-      console.log(val)
+      console.log(val);
       // this.showSupportPlanTable = val;
     },
     toggleChangeStatus(val) {
@@ -1023,19 +1047,19 @@ export default {
         this.projectProposalPreview = URL.createObjectURL(
           this.projectProposalFile
         );
-        console.log("Preview", this.projectProposalPreview);
+        console.log('Preview', this.projectProposalPreview);
       }
     },
     toggleProjectProposalDialog() {
       this.projectProposalDialog = !this.projectProposalDialog;
     },
     // #
-    goToOrphansTable() {
-      this.showOrphans = true;
-      this.selectedOrphanIds.ids = this.orphans.map((orphan) =>
-        parseInt(orphan.id)
-      );
-    },
+    // goToOrphansTable() {
+    //   this.showOrphans = true;
+    //   this.selectedOrphanIds.ids = this.orphans.map((orphan) =>
+    //     parseInt(orphan.id)
+    //   );
+    // },
     addNewOrphan(newOrphanId) {
       console.log(`adding new orhan`, newOrphanId);
       this.selectedOrphanIds.ids.push(parseInt(newOrphanId));
@@ -1078,7 +1102,7 @@ export default {
         } else {
           return (
             this.fullName(item) != null &&
-            typeof this.fullName(item) === "string" &&
+            typeof this.fullName(item) === 'string' &&
             this.fullName(item)
               .toString()
               .toLowerCase()
@@ -1113,9 +1137,9 @@ export default {
     calcSponsoredDate(item) {
       const options = {
         // weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       };
       return new Date(
         Date.parse(
@@ -1137,7 +1161,7 @@ export default {
       }
     },
     cancelVillagesChoice() {
-      this.selectedOrphanVillage = "";
+      this.selectedOrphanVillage = '';
       this.villageChoiceClose();
       this.villageChoiceReset();
     },
@@ -1148,9 +1172,10 @@ export default {
       this.$refs.villageSelect.reset();
     },
 
-    confirmStatusChangeSelection() {
+    async confirmStatusChangeSelection() {
       if (this.$refs.statusSelect.validate()) {
-        this.orphans = this.orphans.filter((orphan) => {
+        const allOrphans = await this.getAllOrphans();
+        this.orphans = allOrphans.filter((orphan) => {
           const statuses = orphan.sponsorshipStatuses;
           return statuses[statuses.length - 1].status === this.currentStatus;
         });
@@ -1177,25 +1202,21 @@ export default {
     cancelStatusChange(dialog) {
       dialog.value = false;
     },
-    confirmStatusChange(dialog) {
+    async confirmStatusChange(dialog) {
       for (const orphan of this.selectedOrphans) {
         const orphanId = orphan.id;
-        this.createSponsorshipStatus(orphanId, this.changedStatus)
-          .then((sponsorshipStatuse) => {
-            console.log("SponsoreStatus:", sponsorshipStatuse);
-          })
-          .catch((err) => console.warn(err));
+        await this.createSponsorshipStatus(orphanId, this.changedStatus);
       }
       dialog.value = false;
     },
     createSponsorshipStatus(orphanId, status) {
       return axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `mutation createSponsorshipStatus(
                   $status: sponsorshipStatus
                   $date: DateTime!
                   $reason: String
-                  $orphanId: ID
+                  $orphanId: ID!
                 ) {
                   createSponsorshipStatus(status: $status, date: $date, reason: $reason, orphanId: $orphanId) {
                     id
@@ -1219,13 +1240,13 @@ export default {
             status: status,
             date: new Date().toISOString(),
             reason: this.statusChangeReason,
-            orphanId: orphanId,
-          },
+            orphanId: orphanId
+          }
         })
         .then((res) => res.data.data.createSponsorshipStatus)
         .catch((err) => console.warn(err));
     },
-    
+
     createProject(
       number,
       startDate,
@@ -1238,7 +1259,7 @@ export default {
       coordinators
     ) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createProject (
                   $number: String!
                   $startDate: DateTime
@@ -1273,8 +1294,8 @@ export default {
             location: location,
             grandTotalBudget: grandTotalBudget,
             administrativeCost: administrativeCost,
-            coordinators: coordinators,
-          },
+            coordinators: coordinators
+          }
         })
         .then((res) => res.data.data.createProject)
         .catch((err) => console.warn(err));
@@ -1287,7 +1308,7 @@ export default {
     },
     async createProjectDocuments(documentUrl, documentType, projectId) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createProjectDocument (
                   $documentUrl: String!
                   $documentType: projectDocumentType!
@@ -1305,8 +1326,8 @@ export default {
           variables: {
             documentUrl: documentUrl,
             documentType: documentType,
-            projectId: projectId,
-          },
+            projectId: projectId
+          }
         })
         .then((res) => res.data.data.createProjectDocuments)
         .catch((err) => console.warn(err));
@@ -1333,7 +1354,7 @@ export default {
           .map((village) => village.id);
 
         const coordinators = [this.coordinator.id];
-        const projectProposalUrl = "qwertyuiop";
+        const projectProposalUrl = 'qwertyuiop';
 
         // const projectProposalFormData = new FormData();
         // projectProposalFormData.append(
@@ -1364,7 +1385,7 @@ export default {
 
         const projectDocument = await this.createProjectDocuments(
           projectProposalUrl,
-          "proposal",
+          'proposal',
           project.id
         );
 
@@ -1402,26 +1423,26 @@ export default {
       // send the edited data to the server after validation via the rule/s prop
       // maybe impliment a loding functionality
       this.snack = true;
-      this.snackColor = "success";
-      this.snackText = "Data saved";
+      this.snackColor = 'success';
+      this.snackText = 'Data saved';
     },
     cancel() {
       // nothing happens keep the current changes
       this.snack = true;
-      this.snackColor = "error";
-      this.snackText = "Canceled";
+      this.snackColor = 'error';
+      this.snackText = 'Canceled';
     },
     open() {
       // maybe fireup validation functions
       this.snack = true;
-      this.snackColor = "info";
-      this.snackText = "Dialog opened";
+      this.snackColor = 'info';
+      this.snackText = 'Dialog opened';
     },
     close() {
       // this comes at the very last of the process so:
       // notify the user weither the operation was successful or keep/write to the log functionality
-      console.log("Dialog closed");
-    },
-  },
+      console.log('Dialog closed');
+    }
+  }
 };
 </script>
