@@ -162,6 +162,7 @@
             <small>*indicates required field</small>
           </v-card-text>
           <v-divider></v-divider>
+          <!-- Orphans table -->
           <v-card-text>
             <v-data-table
               v-model="selectedNewVillageOrphans"
@@ -184,6 +185,9 @@
               <template v-slot:item.age="{ item }">
                 {{ orphanCalcAge(item) }}
               </template>
+              <template v-slot:item.sponsorshipStatus="{ item }">
+                {{ orphanCalcSponsorshipStatus(item) }}
+              </template>
             </v-data-table>
           </v-card-text>
           <v-card-actions>
@@ -200,7 +204,7 @@
               color="blue darken-1"
               text
               :disabled="
-                !validCreateSupportPlan &&
+                !validCreateSupportPlan ||
                   selectedNewVillageOrphans.length === 0
               "
               @click="createSupportPlanSave"
@@ -859,6 +863,10 @@ export default {
       { text: 'Orphan Name', value: 'fullName' },
       { text: 'Age', value: 'age' },
       { text: 'Gender', value: 'gender' },
+      {
+        text: 'Sponsorship Status',
+        value: 'sponsorshipStatus'
+      },
       { text: 'Account No', value: 'accountNumber' }
     ],
     selectedNewVillageOrphans: [],
@@ -2280,6 +2288,11 @@ export default {
         new Date().getUTCFullYear() -
         new Date(Date.parse(item.dateOfBirth.toString())).getUTCFullYear()
       );
+    },
+
+    orphanCalcSponsorshipStatus(item) {
+      return item.sponsorshipStatuses[item.sponsorshipStatuses.length - 1]
+        .status;
     },
 
     individualGuardianFullName(item) {
