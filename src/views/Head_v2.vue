@@ -21,7 +21,7 @@
         <!-- Registeration tab -->
         <v-list-group
           active-class="indigo lighten-4"
-          :value="false"
+          :value="true"
           no-action
           prepend-icon="mdi-book-plus-multiple"
         >
@@ -915,7 +915,7 @@
         <!-- Users -->
         <v-list-group
           active-class="indigo lighten-4"
-          :value="true"
+          :value="false"
           no-action
           prepend-icon="mdi-book-plus-multiple"
         >
