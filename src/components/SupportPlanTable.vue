@@ -19,12 +19,22 @@
         </v-col>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon class="mr-2" @click="openSetInitDateDialog(item)"> -->
-        <v-icon large class="mr-2" @click="openPaymentDialog(item)">
-          <!-- mdi-clipboard-text-multiple-outline -->
-          <!-- mdi-hand-coin-outline -->
-          mdi-cash-multiple
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              large
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="openPaymentDialog(item)"
+            >
+              <!-- mdi-hand-coin-outline -->
+              mdi-cash-multiple
+            </v-icon>
+          </template>
+          <span>Group Payments</span>
+        </v-tooltip>
+
         <v-dialog v-model="showEditDialog" width="560px">
           <v-card>
             <v-card-title class="justify-center">
@@ -459,22 +469,37 @@
               {{ `${item.paymentPeriodInMonths} months` }}
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-icon
-                class="ml-n3"
-                large
-                @click="openIndividualPaymentEditDialog(item)"
-              >
-                <!-- mdi-clipboard-text-outline -->
-                mdi-cash-plus
-              </v-icon>
-              <v-icon
-                class="ml-2"
-                large
-                @click="openIndividualPaymentDialog(item)"
-              >
-                mdi-cash-check
-                <!-- mdi-clipboard-text-outline -->
-              </v-icon>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    class="ml-n3"
+                    large
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="openIndividualPaymentEditDialog(item)"
+                  >
+                    <!-- mdi-clipboard-text-outline -->
+                    mdi-cash-plus
+                  </v-icon>
+                </template>
+                <span>Edit Individual Payments</span>
+              </v-tooltip>
+
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    class="ml-2"
+                    large
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="openIndividualPaymentDialog(item)"
+                  >
+                    mdi-cash-check
+                    <!-- mdi-clipboard-text-outline -->
+                  </v-icon>
+                </template>
+                <span>View Individual Payments</span>
+              </v-tooltip>
             </template>
           </v-data-table>
         </v-card-text>
@@ -567,36 +592,44 @@
                 </v-card>
               </v-dialog>
             </template>
+
             <template v-slot:item.depositInPrimaryForeignCurrency="props">
-              <!-- this can be done better by getting the divs parent and changeing its style -->
-              <div
-                :style="{
-                  'background-color': totalAndSummationConflictColor,
-                  color: totalAndSummationConflictTextColor
-                }"
-              >
-                <v-edit-dialog
-                  :return-value.sync="
-                    props.item.depositInPrimaryForeignCurrency
-                  "
-                  large
-                  persistent
-                  @save="savePrimaryForeignCurrencyChange(props.item)"
-                  @cancel="cancelPrimaryForeignCurrencyChange"
-                  class="text--red"
-                >
-                  {{ props.item.depositInPrimaryForeignCurrency }}
-                  <template v-slot:input>
-                    Update Deposit in PrimaryFC
-                    <v-text-field
-                      v-model="props.item.depositInPrimaryForeignCurrency"
-                      label="Edit"
-                      single-line
-                      counter
-                    ></v-text-field>
-                  </template>
-                </v-edit-dialog>
-              </div>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <!-- this can be done better by getting the divs parent and changeing its style -->
+                  <div
+                    v-bind="attrs"
+                    v-on="on"
+                    :style="{
+                      'background-color': totalAndSummationConflictColor,
+                      color: totalAndSummationConflictTextColor
+                    }"
+                  >
+                    <v-edit-dialog
+                      :return-value.sync="
+                        props.item.depositInPrimaryForeignCurrency
+                      "
+                      large
+                      persistent
+                      @save="savePrimaryForeignCurrencyChange(props.item)"
+                      @cancel="cancelPrimaryForeignCurrencyChange"
+                      class="text--red"
+                    >
+                      {{ props.item.depositInPrimaryForeignCurrency }}
+                      <template v-slot:input>
+                        Update Deposit in PrimaryFC
+                        <v-text-field
+                          v-model="props.item.depositInPrimaryForeignCurrency"
+                          label="Edit"
+                          single-line
+                          counter
+                        ></v-text-field>
+                      </template>
+                    </v-edit-dialog>
+                  </div>
+                </template>
+                <span>Edit</span>
+              </v-tooltip>
             </template>
             <template v-slot:item.id="{ item }">
               {{ individualOrphanId(item) }}

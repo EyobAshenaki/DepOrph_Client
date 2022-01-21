@@ -339,7 +339,7 @@
     <template v-else>
       <v-row v-if="!showOrphans" justify="center" no-gutters>
         <!-- Project Main card -->
-        <v-col cols="12">
+        <v-col cols="12" class="mt-15">
           <v-card
             class="mx-auto mt-8"
             min-width="500"
@@ -369,14 +369,28 @@
                     src="../assets/brandi-redd-aJTiW00qqtI-unsplash.jpg"
                   >
                     <v-col cols="12" class="ma-0 mt-3 d-flex justify-end">
-                      <v-btn class="mr-1">
-                        <v-icon>mdi-text-box-multiple-outline</v-icon>
-                      </v-btn>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn class="mr-1" v-bind="attrs" v-on="on">
+                            <v-icon>mdi-text-box-multiple-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Project documents</span>
+                      </v-tooltip>
 
-                      <v-btn @click="openSupportPlanDialog(item)">
-                        <v-icon>mdi-calendar-month</v-icon>
-                        <!-- <v-icon>mdi-handshake-outline</v-icon> -->
-                      </v-btn>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            @click="openSupportPlanDialog(item)"
+                          >
+                            <v-icon>mdi-calendar-month</v-icon>
+                            <!-- <v-icon>mdi-handshake-outline</v-icon> -->
+                          </v-btn>
+                        </template>
+                        <span>Support plans</span>
+                      </v-tooltip>
                     </v-col>
                     <v-col cols="12" class="d-flex mt-12">
                       <v-card-title
