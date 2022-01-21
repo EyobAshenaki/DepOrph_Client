@@ -1109,6 +1109,27 @@ export default {
                         nameInitials
                         companyName
                       }
+                      orphans {
+                        id
+                        firstName
+                        father {
+                          firstName
+                          lastName
+                        }
+                        dateOfBirth
+                        gender
+                        accountNumber
+                        village {
+                          id
+                          name
+                          socialWorker {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                          }
+                        }
+                      }
                       project {
                         id
                         number
