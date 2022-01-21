@@ -338,209 +338,6 @@
 
     <template v-else>
       <v-row v-if="!showOrphans" justify="center" no-gutters>
-        <!-- Project Creation dialog -->
-        <v-row justify="center">
-          <v-dialog v-model="createProjectDialog" persistent max-width="600px">
-            <template v-slot:activator="{ on, attrs }">
-              <v-col
-                cols="12"
-                class="text-center"
-                dark
-                style="margin-top: 6rem"
-              >
-                <v-btn fab dark color="indigo">
-                  <v-icon dark v-bind="attrs" v-on="on">
-                    mdi-plus
-                  </v-icon>
-                </v-btn>
-              </v-col>
-            </template>
-
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">Create Project</span>
-              </v-card-title>
-              <v-card-text>
-                <v-form
-                  ref="createProjectForm"
-                  v-model="validCreateProject"
-                  lazy-validation
-                >
-                  <v-row>
-                    <!-- Project start date -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-menu
-                        ref="projectStartDateMenu"
-                        v-model="projectStartDateMenu"
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="projectStartDate"
-                            label="Start date"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            :rules="[rules.required]"
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="projectStartDate"
-                          :active-picker.sync="projectStartDateActivePicker"
-                          :min="
-                            new Date(
-                              Date.now() -
-                                new Date().getTimezoneOffset() * 60000
-                            )
-                              .toISOString()
-                              .substr(0, 10)
-                          "
-                          max="2070-01-01"
-                          @change="projectStartDateSave"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                    <!-- Project Number -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-text-field
-                        v-model="projectNumber"
-                        label="Number*"
-                        type="number"
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- Project duration in years -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-text-field
-                        v-model="projectDurationInYears"
-                        label="Duration*"
-                        type="number"
-                        :rules="[rules.required]"
-                        hint="duration of the project in years"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- Project maximum number of orphans -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-text-field
-                        v-model="projectMaxBeneficiaries"
-                        label="Maximum beneficiaries*"
-                        type="number"
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- Project total budget -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-text-field
-                        v-model="projectTotalBudget"
-                        label="Total budget*"
-                        type="number"
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- Project admin cost -->
-                    <v-col cols="12" md="6" sm="4">
-                      <v-text-field
-                        v-model="projectAdministrativeCost"
-                        label="Administrative cost*"
-                        type="number"
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- Project location/village -->
-                    <v-col cols="12" md="6" sm="6">
-                      <v-select
-                        v-model="projectLocation"
-                        :items="allVillages"
-                        :item-text="villageText_Value"
-                        :item-value="villageText_Value"
-                        :menu-props="{
-                          top: true,
-                          offsetY: true
-                        }"
-                        :rules="[rules.required]"
-                        label="Locations*"
-                      ></v-select>
-                    </v-col>
-                    <!-- Project proposal insertion -->
-                    <v-col cols="12" md="6" sm="6">
-                      <v-file-input
-                        v-model="projectProposalFile"
-                        accept=".pdf,.doc"
-                        label="Project proposal"
-                        :rules="[rules.required]"
-                        @change="toggleProjectProposalInput($event)"
-                      >
-                        <template v-slot:append>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-auto"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="toggleProjectProposalDialog"
-                              >
-                                mdi-file-eye-outline
-                              </v-icon>
-                            </template>
-                            <span>Preview</span>
-                          </v-tooltip>
-
-                          <!-- preview image popup -->
-                          <v-dialog v-model="projectProposalDialog">
-                            <v-container>
-                              <v-row>
-                                <!-- <v-col>what</v-col> -->
-                                <v-spacer></v-spacer>
-                                <v-col class="mr-n12" sm="1">
-                                  <v-icon
-                                    dark
-                                    @click="toggleProjectProposalDialog"
-                                  >
-                                    mdi-close
-                                  </v-icon>
-                                </v-col>
-                              </v-row>
-
-                              <v-img
-                                height="82vh"
-                                :src="projectProposalPreview"
-                                contain
-                                alt="Project Proposal Document"
-                              ></v-img>
-                            </v-container>
-                          </v-dialog>
-                        </template>
-                      </v-file-input>
-                    </v-col>
-                  </v-row>
-                </v-form>
-                <small>*indicates required field</small>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="red darken-1"
-                  text
-                  @click="createProjectDialog = false"
-                >
-                  Close
-                </v-btn>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  :disabled="!validCreateProject"
-                  @click="createProjectSave"
-                >
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-row>
         <!-- Project Main card -->
         <v-col cols="12">
           <v-card
@@ -794,20 +591,6 @@ export default {
     rules: {
       required: (value) => !!value || 'Required.'
     },
-    createProjectDialog: false,
-    validCreateProject: false,
-    projectStartDateActivePicker: null,
-    projectStartDate: null,
-    projectStartDateMenu: false,
-    projectNumber: null,
-    projectDurationInYears: null,
-    projectMaxBeneficiaries: null,
-    projectTotalBudget: null,
-    projectAdministrativeCost: null,
-    projectProposalDialog: false,
-    projectLocation: null,
-    projectProposalFile: null,
-    projectProposalPreview: null,
     selectedProjectId: null,
     newOrphanDialog: false,
     showVillagesSelectionDialog: false,
@@ -832,14 +615,12 @@ export default {
     // table rows/items
     orphans: [],
     villages: [],
-    allVillages: [],
     showOrphans: false,
     selectedOrphanIds: { ids: [] }
   }),
   created() {
     this.initialize();
     this.initializeProjects();
-    this.initializeAllVillages();
   },
   computed: {
     // temporary filter for the notification panel
@@ -894,9 +675,6 @@ export default {
     singleOrphanSelect() {
       this.selectSwitch =
         this.singleOrphanSelect === true ? 'Single Orphan' : 'Multiple Orphans';
-    },
-    projectStartDateMenu(val) {
-      val && setTimeout(() => (this.projectStartDateActivePicker = 'YEAR'));
     }
   },
   methods: {
@@ -1018,20 +796,6 @@ export default {
         .then((projects) => (this.projects = [...projects]))
         .catch((err) => console.warn(err));
     },
-    initializeAllVillages() {
-      return axios
-        .post('/graphql/', {
-          query: `query {
-                  allVillages {
-                    id
-                    name
-                  }
-                }`
-        })
-        .then((res) => res.data.data.allVillages)
-        .then((allVillages) => (this.allVillages = [...allVillages]))
-        .catch((err) => console.warn(err));
-    },
     toggleNewOrphanDialog(val) {
       this.showVillagesSelectionDialog = val;
     },
@@ -1041,17 +805,6 @@ export default {
     },
     toggleChangeStatus(val) {
       this.showStatusChangeSelectionDialog = val;
-    },
-    toggleProjectProposalInput() {
-      if (this.projectProposalFile) {
-        this.projectProposalPreview = URL.createObjectURL(
-          this.projectProposalFile
-        );
-        console.log('Preview', this.projectProposalPreview);
-      }
-    },
-    toggleProjectProposalDialog() {
-      this.projectProposalDialog = !this.projectProposalDialog;
     },
     // #
     // goToOrphansTable() {
@@ -1247,60 +1000,6 @@ export default {
         .catch((err) => console.warn(err));
     },
 
-    createProject(
-      number,
-      startDate,
-      endDate,
-      maximumNumberOfBeneficiaries,
-      durationInYears,
-      location,
-      grandTotalBudget,
-      administrativeCost,
-      coordinators
-    ) {
-      return axios
-        .post('/graphql/', {
-          query: `mutation createProject (
-                  $number: String!
-                  $startDate: DateTime
-                  $endDate: DateTime
-                  $maximumNumberOfBeneficiaries: Int!
-                  $durationInYears: Int!
-                  $location: [ID]!
-                  $grandTotalBudget: Float!
-                  $administrativeCost: Float!
-                  $coordinators: [ID]
-                ) {
-                  createProject (
-                    number: $number
-                    startDate: $startDate
-                    endDate: $endDate
-                    maximumNumberOfBeneficiaries: $maximumNumberOfBeneficiaries
-                    durationInYears: $durationInYears
-                    location: $location
-                    grandTotalBudget: $grandTotalBudget
-                    administrativeCost: $administrativeCost
-                    coordinators: $coordinators
-                  ) {
-                    id
-                  }
-                }`,
-          variables: {
-            number: number,
-            startDate: startDate,
-            endDate: endDate,
-            maximumNumberOfBeneficiaries: maximumNumberOfBeneficiaries,
-            durationInYears: durationInYears,
-            location: location,
-            grandTotalBudget: grandTotalBudget,
-            administrativeCost: administrativeCost,
-            coordinators: coordinators
-          }
-        })
-        .then((res) => res.data.data.createProject)
-        .catch((err) => console.warn(err));
-    },
-
     openSupportPlanDialog(project) {
       this.selectedProjectId = project.id;
 
@@ -1332,78 +1031,9 @@ export default {
         .then((res) => res.data.data.createProjectDocuments)
         .catch((err) => console.warn(err));
     },
-    async createProjectSave() {
-      if (this.$refs.createProjectForm.validate()) {
-        const startDate = new Date(this.projectStartDate).toISOString();
-
-        let tempDate = new Date(startDate);
-        const endDate = new Date(
-          tempDate.setFullYear(
-            tempDate.getFullYear() + parseInt(this.projectDurationInYears)
-          )
-        ).toISOString();
-
-        // check if the entered number is dublicate by using allProjects
-        // even better make it auto increment automatically
-        // projectNumber
-
-        const locations = this.allVillages
-          .filter((village) => {
-            return village.name === this.projectLocation;
-          })
-          .map((village) => village.id);
-
-        const coordinators = [this.coordinator.id];
-        const projectProposalUrl = 'qwertyuiop';
-
-        // const projectProposalFormData = new FormData();
-        // projectProposalFormData.append(
-        //   "ProjectProposal",
-        //   this.projectProposalFile,
-        //   this.projectProposalFile.name
-        // );
-
-        // const projectProposalUrl = await axios
-        //   .post(
-        //     `/public/images/orphanProjectProposal/`,
-        //     projectProposalFormData
-        //   )
-        //   .then((res) => res.data)
-        //   .catch((err) => console.warn(err));
-
-        const project = await this.createProject(
-          this.projectNumber,
-          startDate,
-          endDate,
-          parseInt(this.projectMaxBeneficiaries),
-          parseInt(this.projectDurationInYears),
-          locations,
-          parseFloat(this.projectTotalBudget),
-          parseFloat(this.projectAdministrativeCost),
-          coordinators
-        );
-
-        const projectDocument = await this.createProjectDocuments(
-          projectProposalUrl,
-          'proposal',
-          project.id
-        );
-
-        this.projects.push(project);
-
-        console.log(projectDocument);
-
-        this.$refs.createProjectForm.reset();
-        this.createProjectDialog = false;
-      }
-    },
 
     cancelSupportPlan() {
       this.$refs.supportPlanForm.reset();
-    },
-
-    projectStartDateSave(date) {
-      this.$refs.projectStartDateMenu.save(date);
     },
 
     donorText_Value(item) {

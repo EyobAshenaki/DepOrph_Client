@@ -30,6 +30,236 @@
               <v-list-item-title>Registration</v-list-item-title>
             </v-list-item-content>
           </template>
+          <!-- Project Registration -->
+          <v-list-item class="pl-4">
+            <v-menu
+              transition="scale-transition"
+              origin="top left"
+              style="margin-top: 3%; margin-left: 25%; height: 200px"
+              nudge-right="360%"
+              nudge-bottom="24%"
+              :close-on-content-click="sideMenu"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-list-item
+                  @click="showProjectRegistration"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-list-item-icon>
+                    <v-icon>mdi-book-plus</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title>Project</v-list-item-title>
+                </v-list-item>
+              </template>
+
+              <!-- Project Registration Card-->
+              <v-card v-if="showProject" max-width="700">
+                <v-form
+                  ref="createProjectForm"
+                  v-model="validCreateProject"
+                  lazy-validation
+                >
+                  <v-row class="pt-5">
+                    <!-- Project start date -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4">
+                        <v-menu
+                          ref="projectStartDateMenu"
+                          v-model="projectStartDateMenu"
+                          :close-on-content-click="false"
+                          transition="scale-transition"
+                          offset-y
+                          min-width="auto"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                              v-model="projectStartDate"
+                              label="Start date"
+                              prepend-icon="mdi-calendar"
+                              readonly
+                              :rules="requiredRule"
+                              v-bind="attrs"
+                              v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            v-model="projectStartDate"
+                            :active-picker.sync="projectStartDateActivePicker"
+                            :min="
+                              new Date(
+                                Date.now() -
+                                  new Date().getTimezoneOffset() * 60000
+                              )
+                                .toISOString()
+                                .substr(0, 10)
+                            "
+                            max="2070-01-01"
+                            @change="projectStartDateSave"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project Number -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4 ml-n5">
+                        <v-text-field
+                          v-model="projectNumber"
+                          label="Number*"
+                          type="number"
+                          :rules="requiredRule"
+                        ></v-text-field>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project duration in years -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4">
+                        <v-text-field
+                          v-model="projectDurationInYears"
+                          label="Duration*"
+                          type="number"
+                          :rules="requiredRule"
+                          hint="duration of the project in years"
+                        ></v-text-field>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project maximum number of orphans -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4 ml-n5">
+                        <v-text-field
+                          v-model="projectMaxBeneficiaries"
+                          label="Maximum beneficiaries*"
+                          type="number"
+                          :rules="requiredRule"
+                        ></v-text-field>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project total budget -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4">
+                        <v-text-field
+                          v-model="projectTotalBudget"
+                          label="Total budget*"
+                          type="number"
+                          :rules="requiredRule"
+                        ></v-text-field>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project admin cost -->
+                    <v-col cols="12" md="6" sm="4">
+                      <v-responsive max-width="" class="mx-10 mb-n4 ml-n5">
+                        <v-text-field
+                          v-model="projectAdministrativeCost"
+                          label="Administrative cost*"
+                          type="number"
+                          :rules="requiredRule"
+                        ></v-text-field>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project location/village -->
+                    <v-col cols="12" md="6" sm="6">
+                      <v-responsive max-width="" class="mx-10 mb-n4">
+                        <v-select
+                          v-model="projectLocation"
+                          :items="allDistricts"
+                          :item-text="villageText_Value"
+                          :item-value="villageText_Value"
+                          :menu-props="{
+                            top: true,
+                            offsetY: true
+                          }"
+                          :rules="requiredRule"
+                          label="Locations*"
+                        ></v-select>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project coordinator -->
+                    <v-col cols="12" md="6" sm="6">
+                      <v-responsive max-width="" class="mx-10 mb-n4 ml-n5">
+                        <v-select
+                          v-model="projectCoordinator"
+                          :items="coordinatorsOptions"
+                          :item-text="coordinatorText_Value"
+                          :item-value="coordinatorText_Value"
+                          :menu-props="{
+                            top: true,
+                            offsetY: true
+                          }"
+                          :rules="requiredRule"
+                          label="Coordinator*"
+                        ></v-select>
+                      </v-responsive>
+                    </v-col>
+                    <!-- Project proposal insertion -->
+                    <v-col cols="12" md="12" sm="12">
+                      <v-responsive max-width="" class="mx-10 mb-n4">
+                        <v-file-input
+                          v-model="projectProposalFile"
+                          accept=".pdf,.doc"
+                          label="Project proposal"
+                          :rules="requiredRule"
+                          @change="toggleProjectProposalInput($event)"
+                        >
+                          <template v-slot:append>
+                            <v-tooltip top>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                  class="ml-auto"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  @click="toggleProjectProposalDialog"
+                                >
+                                  mdi-file-eye-outline
+                                </v-icon>
+                              </template>
+                              <span>Preview</span>
+                            </v-tooltip>
+
+                            <!-- preview image popup -->
+                            <v-dialog v-model="projectProposalDialog">
+                              <v-container>
+                                <v-row>
+                                  <!-- <v-col>what</v-col> -->
+                                  <v-spacer></v-spacer>
+                                  <v-col class="mr-n12" sm="1">
+                                    <v-icon
+                                      dark
+                                      @click="toggleProjectProposalDialog"
+                                    >
+                                      mdi-close
+                                    </v-icon>
+                                  </v-col>
+                                </v-row>
+
+                                <v-img
+                                  height="82vh"
+                                  :src="projectProposalPreview"
+                                  contain
+                                  alt="Project Proposal Document"
+                                ></v-img>
+                              </v-container>
+                            </v-dialog>
+                          </template>
+                        </v-file-input>
+                      </v-responsive>
+                    </v-col>
+                    <v-col align="right" class="mb-5">
+                      <v-btn class="mr-5" @click="createProjectCancel"
+                        >Cancel</v-btn
+                      >
+                      <v-btn
+                        class="mr-10"
+                        @click="createProjectSave"
+                        :disabled="!validCreateProject"
+                        >Save</v-btn
+                      >
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-card>
+            </v-menu>
+          </v-list-item>
+
           <!-- Coordinator Registration -->
           <v-list-item class="pl-4">
             <v-menu
@@ -1556,9 +1786,9 @@
                     <h3 class="headline mb-2">
                       {{
                         selectedSocialWorker.firstName +
-                          " " +
+                          ' ' +
                           selectedSocialWorker.middleName +
-                          " " +
+                          ' ' +
                           selectedSocialWorker.lastName
                       }}
                     </h3>
@@ -1846,7 +2076,7 @@
                     <v-list-item-icon
                       ><v-icon
                         >mdi-{{
-                          item.type == "register" ? "account" : "key"
+                          item.type == 'register' ? 'account' : 'key'
                         }}</v-icon
                       ></v-list-item-icon
                     >
@@ -1896,10 +2126,10 @@
 </style>
 
 <script>
-import axios from "axios";
-import AppNavBar from "@/components/AppNavBar";
-import { calculateAge } from "@/utils/utils";
-import { mapMutations } from "vuex";
+import axios from 'axios';
+import AppNavBar from '@/components/AppNavBar';
+import { calculateAge } from '@/utils/utils';
+import { mapMutations } from 'vuex';
 
 export default {
   components: {
@@ -1907,7 +2137,7 @@ export default {
   },
   data: () => ({
     infoDialog: false,
-    infoDialogType: "created",
+    infoDialogType: 'created',
     infoDialogOwner: null,
     infoDialogOwnerName: null,
     infoDialogOwnerEmail: null,
@@ -1922,6 +2152,7 @@ export default {
     sheet: false,
     group: null,
     benched: 10,
+    validCreateProject: false,
     validCoordinator: false,
     validDonor: false,
     validRegion: false,
@@ -1930,26 +2161,27 @@ export default {
     validVillage: false,
     validSocialWorker: false,
     personalNameRules: [
-      v => !!v || "Name is required",
-      v =>
+      (v) => !!v || 'Name is required',
+      (v) =>
         /^[A-z]([A-z/]+) ([A-z/]+) ([A-z/]+)$/gi.test(v) ||
-        "Name must include father and grandfather name"
+        'Name must include father and grandfather name'
     ],
     nameRules: [
-      v => !!v || "Name is required",
-      v => /^[A-z]([A-z/ ]+)*$/.test(v) || "Name must be valid"
+      (v) => !!v || 'Name is required',
+      (v) => /^[A-z]([A-z/ ]+)*$/.test(v) || 'Name must be valid'
     ],
-    requiredRule: [v => !!v || "Item is required"],
+    requiredRule: [(v) => !!v || 'Item is required'],
     emailRules: [
-      v => !!v || "Email is required",
-      v =>
+      (v) => !!v || 'Email is required',
+      (v) =>
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-        "Email must be valid"
+        'Email must be valid'
     ],
     phoneNumberRules: [
-      v => !!v || "Phone Number is required",
-      v => /^09[0-9]{8}$/.test(v) || "Phone Number must be in 0945234576"
+      (v) => !!v || 'Phone Number is required',
+      (v) => /^09[0-9]{8}$/.test(v) || 'Phone Number must be in 0945234576'
     ],
+    showProject: false,
     showCoordinator: false,
     showDonor: false,
     showRegion: false,
@@ -1957,47 +2189,61 @@ export default {
     showDistrict: false,
     showPeasantAssociation: false,
     showSocialWorker: false,
-    coordinatorName: "",
-    coordinatorEmail: "",
-    coordinatorPassword: "",
-    donorName: "",
-    donorEmail: "",
-    donorPassword: "",
-    donorCoordinator: "",
+    projectStartDateActivePicker: null,
+    projectStartDate: null,
+    projectStartDateMenu: false,
+    projectNumber: null,
+    projectDurationInYears: null,
+    projectMaxBeneficiaries: null,
+    projectTotalBudget: null,
+    projectAdministrativeCost: null,
+    projectProposalDialog: false,
+    projectLocation: null,
+    projectCoordinator: null,
+    projectProposalFile: null,
+    projectProposalPreview: null,
+    coordinatorName: '',
+    coordinatorEmail: '',
+    coordinatorPassword: '',
+    donorName: '',
+    donorEmail: '',
+    donorPassword: '',
+    donorCoordinator: '',
     coordinatorsOptions: [],
-    regionName: "",
-    zoneName: "",
-    zoneRegion: "",
+    regionName: '',
+    zoneName: '',
+    zoneRegion: '',
     regionOptions: [],
-    districtName: "",
-    districtRegion: "",
-    districtZone: "",
+    districtName: '',
+    districtRegion: '',
+    districtZone: '',
     zoneOptions: [],
-    districtCoordinator: "",
+    districtCoordinator: '',
     districtCoordinatorsOptions: [],
     districtDonors: [],
-    villageName: "",
-    villageDistrict: "",
+    villageName: '',
+    villageDistrict: '',
     districts: [],
     coordinators: [
-      "Adem Mohammed Ali",
-      "Frost Abdela Belachew",
-      "Biggy Abel Wendosen"
+      'Adem Mohammed Ali',
+      'Frost Abdela Belachew',
+      'Biggy Abel Wendosen'
     ],
-    socialWorkerFullName: "",
-    socialWorkerGender: "",
-    genderOptions: ["Male", "Female"],
-    socialWorkerEmail: "",
-    socialWorkerBirthDate: "",
+    socialWorkerFullName: '',
+    socialWorkerGender: '',
+    genderOptions: ['Male', 'Female'],
+    socialWorkerEmail: '',
+    socialWorkerBirthDate: '',
     socialWorkerBirthDateMenu: false,
-    socialWorkerPhoneNumber: "",
-    socialWorkerDistrict: "",
+    socialWorkerPhoneNumber: '',
+    socialWorkerDistrict: '',
     socialWorkerDistricts: [],
     socialWorkerVillages: [],
     socialWorkerVillageOptions: [],
     socialWorkerDistrictDisabled: false,
     socialWorkerVillageDisabled: false,
     villages: [],
+    allDistricts: [],
     showDonorTree: false,
     showCoordinatorTree: false,
     showSocialWorkerTree: false,
@@ -2012,130 +2258,130 @@ export default {
     zoneTableLoading: true,
     villageTableLoading: true,
     // used in filter selection items
-    searchDistrictTable: "",
-    searchRegionTable: "",
-    searchZoneTable: "",
-    searchVillageTable: "",
+    searchDistrictTable: '',
+    searchRegionTable: '',
+    searchZoneTable: '',
+    searchVillageTable: '',
     filterItems: [
-      "Id",
-      "District Name",
-      "Region",
-      "Gender",
-      "Zone",
-      "Peasant Associations"
+      'Id',
+      'District Name',
+      'Region',
+      'Gender',
+      'Zone',
+      'Peasant Associations'
     ],
     filterValue: [],
     regionTableFilterItems: [
-      "Id",
-      "Region Name",
-      "Number of Zones",
-      "Number of Districts"
+      'Id',
+      'Region Name',
+      'Number of Zones',
+      'Number of Districts'
     ],
     regionTableFilterValue: [],
-    zoneTableFilterItems: ["Id", "Zone Name", "Region", "Number of Districts"],
+    zoneTableFilterItems: ['Id', 'Zone Name', 'Region', 'Number of Districts'],
     zoneTableFilterValue: [],
     districtTableFilterItems: [
-      "Id",
-      "District Name",
-      "Region",
-      "Zone",
-      "Number of PAs",
-      "Number of Social Workers"
+      'Id',
+      'District Name',
+      'Region',
+      'Zone',
+      'Number of PAs',
+      'Number of Social Workers'
     ],
     districtTableFilterValue: [],
     villageTableFilterItems: [
-      "Id",
-      "Village Name",
-      "District",
-      "SocialWorker",
-      "Number of Orphans"
+      'Id',
+      'Village Name',
+      'District',
+      'SocialWorker',
+      'Number of Orphans'
     ],
     villageTableFilterValue: [],
     // used for filter selection
     // table headers if that wasn't clear enough LOL
     districtHeaders: [
-      { text: "Id", value: "id" },
+      { text: 'Id', value: 'id' },
       {
-        text: "District Name",
-        align: "start",
-        value: "districtName"
+        text: 'District Name',
+        align: 'start',
+        value: 'districtName'
       },
       {
-        text: "Region",
-        value: "region"
+        text: 'Region',
+        value: 'region'
       },
       {
-        text: "Zone",
-        value: "zone"
+        text: 'Zone',
+        value: 'zone'
       },
       {
-        text: "Number of PAs",
-        value: "numberOfPAs"
+        text: 'Number of PAs',
+        value: 'numberOfPAs'
       },
       {
-        text: "Number of Social Workers",
-        value: "numberOfSocialWorkers"
+        text: 'Number of Social Workers',
+        value: 'numberOfSocialWorkers'
       }
     ],
     regionHeaders: [
-      { text: "Id", value: "id" },
+      { text: 'Id', value: 'id' },
       {
-        text: "Region Name",
-        align: "start",
-        value: "regionName"
+        text: 'Region Name',
+        align: 'start',
+        value: 'regionName'
       },
       {
-        text: "Number of Zones",
-        value: "numberOfZones"
+        text: 'Number of Zones',
+        value: 'numberOfZones'
       },
       {
-        text: "Number of Districts",
-        value: "numberOfDistricts"
+        text: 'Number of Districts',
+        value: 'numberOfDistricts'
       }
     ],
     zoneHeaders: [
-      { text: "Id", value: "id" },
+      { text: 'Id', value: 'id' },
       {
-        text: "Zone Name",
-        align: "Start",
-        value: "zoneName"
+        text: 'Zone Name',
+        align: 'Start',
+        value: 'zoneName'
       },
       {
-        text: "Region",
-        value: "region"
+        text: 'Region',
+        value: 'region'
       },
       {
-        text: "Number of Districts",
-        value: "numberOfDistricts"
+        text: 'Number of Districts',
+        value: 'numberOfDistricts'
       }
     ],
     villageHeaders: [
-      { text: "Id", value: "id" },
+      { text: 'Id', value: 'id' },
       {
-        text: "Village Name",
-        align: "Start",
-        value: "villageName"
+        text: 'Village Name',
+        align: 'Start',
+        value: 'villageName'
       },
       {
-        text: "District",
-        value: "district"
+        text: 'District',
+        value: 'district'
       },
       {
-        text: "SocialWorker",
-        value: "socialWorker"
+        text: 'SocialWorker',
+        value: 'socialWorker'
       },
       {
-        text: "Number of Orphans",
-        value: "numberOfOrphans"
+        text: 'Number of Orphans',
+        value: 'numberOfOrphans'
       }
     ],
     head: {},
     headUser: {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      email: "",
-      role: ""
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      role: ''
     },
     // table rows/items
     regionTable: [],
@@ -2163,6 +2409,7 @@ export default {
     this.initializeZoneSelect();
     this.initializeDistrictSelect();
     this.initializeVillageSelect();
+    this.initializeAllDistricts();
   },
   computed: {
     // temporary filter for the notification panel
@@ -2177,7 +2424,7 @@ export default {
       return [
         {
           id: 1,
-          name: "Donors",
+          name: 'Donors',
           children: this.donorsTree
         }
       ];
@@ -2187,13 +2434,13 @@ export default {
 
       const id = this.activeDonorTree[0];
 
-      return this.donorsTree.find(donor => donor.id === id);
+      return this.donorsTree.find((donor) => donor.id === id);
     },
     coordinatorItems() {
       return [
         {
           id: 2,
-          name: "Coordinators",
+          name: 'Coordinators',
           children: this.coordinatorsTree
         }
       ];
@@ -2203,13 +2450,13 @@ export default {
 
       const id = this.activeCoordinatorTree[0];
 
-      return this.coordinatorsTree.find(coordinator => coordinator.id === id);
+      return this.coordinatorsTree.find((coordinator) => coordinator.id === id);
     },
     socialWorkerItems() {
       return [
         {
           id: 3,
-          name: "SocialWorkers",
+          name: 'SocialWorkers',
           children: this.socialWorkersTree
         }
       ];
@@ -2220,7 +2467,7 @@ export default {
       const id = this.activeSocialWorkerTree[0];
 
       return this.socialWorkersTree.find(
-        socialWorker => socialWorker.id === id
+        (socialWorker) => socialWorker.id === id
       );
     },
     calcAge(dateOfBirth) {
@@ -2237,16 +2484,18 @@ export default {
       //   val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"))
       // );
       // Changes the active picker from the default "DATE" to "YEAR"
-      val && setTimeout(() => (this.$refs.picker.activePicker = "YEAR"));
+      val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'));
     },
     // #TODO - fix the bug in region selection changes which comes from changing the regoion frequently
     districtRegion(val) {
       if (val) {
-        const region = this.regionOptions.filter(region => region.name === val);
+        const region = this.regionOptions.filter(
+          (region) => region.name === val
+        );
         const regionId = parseInt(region[0].id);
-        console.log("regionId", regionId);
-        console.log("zoneOptions", this.zoneOptions);
-        this.zoneOptions = this.zoneOptions.filter(zone => {
+        console.log('regionId', regionId);
+        console.log('zoneOptions', this.zoneOptions);
+        this.zoneOptions = this.zoneOptions.filter((zone) => {
           if (zone.region !== null) {
             return parseInt(zone.region.id) === regionId;
           }
@@ -2261,13 +2510,13 @@ export default {
         this.socialWorkerDistrictDisabled = false;
 
         const district = this.districts.filter(
-          district => district.name === val
+          (district) => district.name === val
         );
 
         if (district !== undefined) {
           // make this thing happen when the menu is triggered
           this.socialWorkerVillageOptions = this.villageTable.filter(
-            village => {
+            (village) => {
               // remove one negative to make it village without districts
               return !!village.district;
               // return !!village;
@@ -2280,7 +2529,7 @@ export default {
       }
     },
     socialWorkerVillages(val) {
-      console.log("villages", val);
+      console.log('villages', val);
       if (val.length !== 0) {
         this.socialWorkerDistrictDisabled = true;
         this.socialWorkerVillageDisabled = false;
@@ -2288,17 +2537,20 @@ export default {
         // this.socialWorkerVillageDisabled = true;
         this.socialWorkerDistrictDisabled = false;
       }
+    },
+    projectStartDateMenu(val) {
+      val && setTimeout(() => (this.projectStartDateActivePicker = 'YEAR'));
     }
   },
   methods: {
     ...mapMutations([
-      "SET_SNACKBAR",
-      "SET_SNACKBAR_COLOR",
-      "SET_SNACKBAR_TEXT"
+      'SET_SNACKBAR',
+      'SET_SNACKBAR_COLOR',
+      'SET_SNACKBAR_TEXT'
     ]),
     initializeHead() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query head($id: ID!) {
                   head(id: $id) {
                     id
@@ -2316,13 +2568,13 @@ export default {
             id: this.$route.params.id
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
 
           return res.data.data.head;
         })
-        .then(head => {
+        .then((head) => {
           this.head = Object.assign({}, head);
           this.headUser = Object.assign(this.headUser, head.user);
           for (const property in this.headUser) {
@@ -2331,11 +2583,11 @@ export default {
             }
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           return console.error(err);
         });
@@ -2344,9 +2596,9 @@ export default {
     resetPassword(item) {
       (async () => {
         const newPassword =
-          item.user.role === "Donor"
-            ? `${item.companyName}${item.user.email.split("@")[0]}`
-            : `${item.lastName}${item.user.email.split("@")[0]}`;
+          item.user.role === 'Donor'
+            ? `${item.companyName}${item.user.email.split('@')[0]}`
+            : `${item.lastName}${item.user.email.split('@')[0]}`;
         const query = `
           mutation ($id: ID! $password: String){
             updateUser(id: $id password: $password){
@@ -2363,31 +2615,31 @@ export default {
           }
         };
         try {
-          const resetPassword = await axios.post("/graphql", queryOptions);
+          const resetPassword = await axios.post('/graphql', queryOptions);
           if (resetPassword.data.errors?.length)
             throw new Error(resetPassword.data.errors[0].message.message);
         } catch (error) {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(error);
         }
         this.donorPasswordResetConfirmationDialog = false;
         this.coordinatorPasswordResetConfirmationDialog = false;
         this.socialWorkerPasswordResetConfirmationDialog = false;
-        this.infoDialogType = "password reset";
+        this.infoDialogType = 'password reset';
         this.infoDialogOwner = item.user.role;
         this.infoDialogOwnerName =
-          item.user.role == "Donor"
+          item.user.role == 'Donor'
             ? item.nameInitials
             : `${item.firstName} ${item.lastName}`;
         this.infoDialogOwnerEmail = item.user.email;
         this.infoDialogOwnerPassword = newPassword;
 
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully reset the password for ${this.infoDialogOwnerName}`
         );
@@ -2397,13 +2649,13 @@ export default {
     },
     filteredAccountMaintainences(type, status) {
       return this.allAccountMaintainences.filter(
-        item => item.type.includes(type) && item.status.includes(status)
+        (item) => item.type.includes(type) && item.status.includes(status)
       );
     },
     initializeAccountMaintainenceLists() {
       (async () => {
         try {
-          const allAccountMaintainences = await axios.post("/graphql", {
+          const allAccountMaintainences = await axios.post('/graphql', {
             query: `
           query allAccountMaintainences {
             allAccountMaintainences {
@@ -2429,9 +2681,9 @@ export default {
             allAccountMaintainences.data.data.allAccountMaintainences;
         } catch (error) {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(error);
         }
@@ -2452,19 +2704,19 @@ export default {
           }
         };
         try {
-          const approveRequestRes = await axios.post("/graphql", queryOptions);
+          const approveRequestRes = await axios.post('/graphql', queryOptions);
 
           if (approveRequestRes.data.errors?.length) {
             throw new Error(approveRequestRes.data.errors[0].message.message);
           }
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("success");
-          this.SET_SNACKBAR_TEXT("You have successfully approved the request.");
+          this.SET_SNACKBAR_COLOR('success');
+          this.SET_SNACKBAR_TEXT('You have successfully approved the request.');
         } catch (error) {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(error);
         }
@@ -2486,19 +2738,19 @@ export default {
           }
         };
         try {
-          const rejectRequestRes = await axios.post("/graphql", queryOptions);
+          const rejectRequestRes = await axios.post('/graphql', queryOptions);
 
           if (rejectRequestRes.data.errors?.length) {
             throw new Error(rejectRequestRes.data.errors[0].message.message);
           }
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("success");
-          this.SET_SNACKBAR_TEXT("You have successfully rejected the request.");
+          this.SET_SNACKBAR_COLOR('success');
+          this.SET_SNACKBAR_TEXT('You have successfully rejected the request.');
         } catch (error) {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(error);
         }
@@ -2509,7 +2761,29 @@ export default {
       // console.log(this.$refs.menu);
       this.$refs.menu.save(date);
     },
+    showProjectRegistration() {
+      this.showProject = true;
+      this.showCoordinator = false;
+      this.showDonor = false;
+      this.showRegion = false;
+      this.showZone = false;
+      this.showSocialWorker = false;
+      this.showDistrict = false;
+      this.showPeasantAssociation = false;
+      // table
+      this.showRegionTable = false;
+      this.showDistrictTable = false;
+      this.showZoneTable = false;
+      this.showVillageTable = false;
+      // tree Views
+      this.showDonorTree = false;
+      this.showCoordinatorTree = false;
+      this.showSocialWorkerTree = false;
+      // show menu
+      this.sideMenu = false;
+    },
     showCoordinatorRegistration() {
+      this.showProject = false;
       this.showCoordinator = true;
       this.showDonor = false;
       this.showRegion = false;
@@ -2530,6 +2804,7 @@ export default {
       this.sideMenu = false;
     },
     showDonorRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = true;
       this.showRegion = false;
@@ -2550,6 +2825,7 @@ export default {
       this.sideMenu = false;
     },
     showRegionRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = false;
       this.showRegion = true;
@@ -2570,6 +2846,7 @@ export default {
       this.sideMenu = false;
     },
     showZoneRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = false;
       this.showRegion = false;
@@ -2590,6 +2867,7 @@ export default {
       this.sideMenu = false;
     },
     showSocialWorkerRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = false;
       this.showRegion = false;
@@ -2610,6 +2888,7 @@ export default {
       this.sideMenu = false;
     },
     showDistrictRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = false;
       this.showRegion = false;
@@ -2630,6 +2909,7 @@ export default {
       this.sideMenu = false;
     },
     showPeasantAssociationRegistration() {
+      this.showProject = false;
       this.showCoordinator = false;
       this.showDonor = false;
       this.showRegion = false;
@@ -2651,7 +2931,7 @@ export default {
     },
     initializeCoordinatorSelect() {
       axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `query {
                   allCoordinators {
                     id
@@ -2661,25 +2941,25 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.allCoordinators;
         })
-        .then(res => this.coordinatorsOptions.push(...res))
-        .catch(err => {
+        .then((res) => this.coordinatorsOptions.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     initializeRegionSelect() {
       axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `query {
                   allRegions {
                     id
@@ -2687,25 +2967,25 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.allRegions;
         })
-        .then(res => this.regionOptions.push(...res))
-        .catch(err => {
+        .then((res) => this.regionOptions.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     initializeZoneSelect() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                     allZones {
                       id
@@ -2716,25 +2996,25 @@ export default {
                     }
                   }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.allZones;
         })
-        .then(res => this.zoneOptions.push(...res))
-        .catch(err => {
+        .then((res) => this.zoneOptions.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     initializeDistrictSelect() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allDistricts {
                     id
@@ -2746,25 +3026,25 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.allDistricts;
         })
-        .then(res => this.districts.push(...res))
-        .catch(err => {
+        .then((res) => this.districts.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     initializeVillageSelect() {
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allVillages {
                     id
@@ -2772,21 +3052,39 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.allVillages;
         })
-        .then(res => this.villages.push(...res))
-        .catch(err => {
+        .then((res) => this.villages.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
+    },
+    initializeAllDistricts() {
+      return axios
+        .post('/graphql/', {
+          query: `query {
+                    allDistricts {
+                      id
+                      name
+                      villages {
+                        id
+                        name
+                      }
+                    }
+                  }`
+        })
+        .then((res) => res.data.data.allDistricts)
+        .then((allDistricts) => (this.allDistricts = [...allDistricts]))
+        .catch((err) => console.warn(err));
     },
     // selet text and values
     coordinatorText_Value(item) {
@@ -2807,11 +3105,19 @@ export default {
     villageText_Value(item) {
       return `${item.name}`;
     },
+    toggleProjectProposalInput() {
+      if (this.projectProposalFile) {
+        this.projectProposalPreview = URL.createObjectURL(
+          this.projectProposalFile
+        );
+        console.log('Preview', this.projectProposalPreview);
+      }
+    },
     // menu save and cancel
 
     async registerUser(role, email, pwd) {
       return await axios
-        .post("/graphql", {
+        .post('/graphql', {
           query: `mutation register ($role: userRoles!, $email: String!, $password: String!) {
                       register (
                         role: $role
@@ -2831,29 +3137,29 @@ export default {
             password: String(pwd)
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length) {
             throw new Error(res.data.errors[0].message.message);
           }
           return res.data.data.register.user;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
-          if (String(err).startsWith("Error: Unique"))
+          this.SET_SNACKBAR_COLOR('error');
+          if (String(err).startsWith('Error: Unique'))
             this.SET_SNACKBAR_TEXT(
-              "There is another account with that email. Try using another email."
+              'There is another account with that email. Try using another email.'
             );
           else
             this.SET_SNACKBAR_TEXT(
-              "Server error. Reload the page and try again."
+              'Server error. Reload the page and try again.'
             );
           console.error(err);
         });
     },
     async createCoordinator(firstName, middleName, lastName, userId) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createCoordinator ($firstName: String!, $middleName: String!, $lastName: String!, $userId: ID!) {
                   createCoordinator (
                     firstName: $firstName
@@ -2879,24 +3185,24 @@ export default {
             userId: parseInt(userId)
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createCoordinator;
         })
-        .then(res => console.log(res))
-        .catch(err => {
+        .then((res) => console.log(res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async createDonor(companyName, nameInitials, userId, coordinatorId) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createDonor (
                   $companyName: String!, 
                   $nameInitials: String!, 
@@ -2926,23 +3232,23 @@ export default {
             coordinators: coordinatorId
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createDonor;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async createRegion(regionName) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createRegion($regionName: String!) {
                   createRegion(
                     name: $regionName
@@ -2955,23 +3261,23 @@ export default {
             regionName: regionName
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createRegion;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async createZone(zoneName, regionId) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createZone($zoneName: String!, $regionId: ID!) {
                   createZone(name: $zoneName, regionId: $regionId) {
                     id
@@ -2986,23 +3292,23 @@ export default {
             regionId: regionId
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createZone;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async createDistrict(districtName, zoneId) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createDistrict(
                     $districtName: String!
                     $zoneId: ID!
@@ -3025,16 +3331,16 @@ export default {
             zoneId: zoneId
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createDistrict;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
@@ -3053,7 +3359,7 @@ export default {
         };
       }
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createVillage(
                     $villageName: String
                     $districtId: ID
@@ -3068,16 +3374,16 @@ export default {
                   }`,
           variables: variables
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createVillage;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
@@ -3095,7 +3401,7 @@ export default {
       villageIds
     ) {
       return await axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `mutation createSocialWorker(
                     $firstName: String!
                     $middleName: String!
@@ -3146,31 +3452,201 @@ export default {
             villages: villageIds
           }
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.createSocialWorker;
         })
-        .catch(err => {
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
 
+    async createProjectSave() {
+      if (this.$refs.createProjectForm.validate()) {
+        const startDate = new Date(this.projectStartDate).toISOString();
+
+        let tempDate = new Date(startDate);
+        const endDate = new Date(
+          tempDate.setFullYear(
+            tempDate.getFullYear() + parseInt(this.projectDurationInYears)
+          )
+        ).toISOString();
+
+        // check if the entered number is dublicate by using allProjects
+        // even better make it auto increment automatically
+        // projectNumber
+
+        const selectedDistrict = this.allDistricts
+          .filter((district) => {
+            return district.name === this.projectLocation;
+          })
+          .map((district) => district.id);
+
+        let locations = this.allDistricts.map((district) => {
+          if ((district.id = selectedDistrict[0])) {
+            return district.villages;
+          }
+        });
+
+        locations = locations.map((villages) =>
+          villages.map((village) => village.id)
+        )[0];
+
+        const coordinators = this.coordinatorsOptions
+          .filter((coordinator) => {
+            return (
+              coordinator.firstName +
+                ' ' +
+                coordinator.middleName +
+                ' ' +
+                coordinator.lastName ===
+              this.projectCoordinator
+            );
+          })
+          .map((coordinator) => coordinator.id);
+
+        console.log(coordinators);
+
+        // const coordinatorId = parseInt(coordinator[0].id);
+        // const projectProposalUrl = 'qwertyuiop';
+
+        const projectProposalFormData = new FormData();
+        projectProposalFormData.append(
+          'projectDocument',
+          this.projectProposalFile,
+          this.projectProposalFile.name
+        );
+
+        const projectProposalUrl = await axios
+          .post(`/public/images/projectDocument/`, projectProposalFormData)
+          .then((res) => res.data)
+          .catch((err) => console.warn(err));
+
+        const project = await this.createProject(
+          this.projectNumber,
+          startDate,
+          endDate,
+          parseInt(this.projectMaxBeneficiaries),
+          parseInt(this.projectDurationInYears),
+          locations,
+          parseFloat(this.projectTotalBudget),
+          parseFloat(this.projectAdministrativeCost),
+          coordinators
+        );
+
+        await this.createProjectDocuments(
+          projectProposalUrl,
+          'proposal',
+          project.id
+        );
+
+        this.$refs.createProjectForm.reset();
+        this.createProjectDialog = false;
+      }
+    },
+
+    createProject(
+      number,
+      startDate,
+      endDate,
+      maximumNumberOfBeneficiaries,
+      durationInYears,
+      location,
+      grandTotalBudget,
+      administrativeCost,
+      coordinators
+    ) {
+      return axios
+        .post('/graphql/', {
+          query: `mutation createProject (
+                  $number: String!
+                  $startDate: DateTime
+                  $endDate: DateTime
+                  $maximumNumberOfBeneficiaries: Int!
+                  $durationInYears: Int!
+                  $location: [ID]!
+                  $grandTotalBudget: Float!
+                  $administrativeCost: Float!
+                  $coordinators: [ID]
+                ) {
+                  createProject (
+                    number: $number
+                    startDate: $startDate
+                    endDate: $endDate
+                    maximumNumberOfBeneficiaries: $maximumNumberOfBeneficiaries
+                    durationInYears: $durationInYears
+                    location: $location
+                    grandTotalBudget: $grandTotalBudget
+                    administrativeCost: $administrativeCost
+                    coordinators: $coordinators
+                  ) {
+                    id
+                  }
+                }`,
+          variables: {
+            number: number,
+            startDate: startDate,
+            endDate: endDate,
+            maximumNumberOfBeneficiaries: maximumNumberOfBeneficiaries,
+            durationInYears: durationInYears,
+            location: location,
+            grandTotalBudget: grandTotalBudget,
+            administrativeCost: administrativeCost,
+            coordinators: coordinators
+          }
+        })
+        .then((res) => res.data.data.createProject)
+        .catch((err) => console.warn(err));
+    },
+
+    async createProjectDocuments(documentUrl, documentType, projectId) {
+      return axios
+        .post('/graphql/', {
+          query: `mutation createProjectDocument (
+                  $documentUrl: String!
+                  $documentType: projectDocumentType!
+                  $projectId: ID!
+                ) {
+                  createProjectDocument (
+                    documentUrl: $documentUrl
+                    documentType: $documentType
+                    projectId: $projectId
+                  ) {
+                    id
+                    documentType
+                  }
+                }`,
+          variables: {
+            documentUrl: documentUrl,
+            documentType: documentType,
+            projectId: projectId
+          }
+        })
+        .then((res) => res.data.data.createProjectDocuments)
+        .catch((err) => console.warn(err));
+    },
+
+    createProjectCancel() {
+      this.$refs.createProjectForm.reset();
+      this.createProjectDialog = false;
+    },
+
     async coordinatorSave() {
       // console.log(this.$refs.coordinatorForm.$children[0]);
       if (this.$refs.coordinatorForm.validate()) {
-        const names = this.coordinatorName.split(" ");
+        const names = this.coordinatorName.split(' ');
         const firstName = names[0];
         const middleName = names[1];
         const lastName = names[2];
-        const password = `${lastName}${this.coordinatorEmail.split("@")[0]}`;
+        const password = `${lastName}${this.coordinatorEmail.split('@')[0]}`;
         const user = await this.registerUser(
-          "Coordinator",
+          'Coordinator',
           this.coordinatorEmail,
           password
         );
@@ -3178,14 +3654,14 @@ export default {
         // const coordinator =
         await this.createCoordinator(firstName, middleName, lastName, userId);
         // console.log("coordinator", coordinator);
-        this.infoDialogOwner = "Coordinator";
+        this.infoDialogOwner = 'Coordinator';
         this.infoDialogOwnerName = `${firstName} ${middleName} ${lastName}`;
         this.infoDialogOwnerEmail = this.coordinatorEmail;
         this.infoDialogOwnerPassword = password;
         this.$refs.coordinatorForm.reset();
         this.infoDialog = true;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created a ${this.infoDialogOwner} account.`
         );
@@ -3197,8 +3673,8 @@ export default {
     },
     async donorSave() {
       if (this.$refs.donorForm.validate()) {
-        let nameInitials = "";
-        let splitName = this.donorName.trim().split(" ");
+        let nameInitials = '';
+        let splitName = this.donorName.trim().split(' ');
         if (splitName.length === 1) {
           nameInitials =
             splitName[0].slice(0, 1).toUpperCase() +
@@ -3208,20 +3684,20 @@ export default {
             nameInitials += namePart.slice(0, 1).toUpperCase();
           }
         }
-        const coordinator = this.coordinatorsOptions.filter(coordinator => {
+        const coordinator = this.coordinatorsOptions.filter((coordinator) => {
           return (
             coordinator.firstName +
-              " " +
+              ' ' +
               coordinator.middleName +
-              " " +
+              ' ' +
               coordinator.lastName ===
             this.donorCoordinator
           );
         });
         const coordinatorId = parseInt(coordinator[0].id);
-        const password = `${this.donorName}${this.donorEmail.split("@")[0]}`;
+        const password = `${this.donorName}${this.donorEmail.split('@')[0]}`;
         const user = await this.registerUser(
-          "Donor",
+          'Donor',
           this.donorEmail,
           password
         );
@@ -3232,14 +3708,14 @@ export default {
           userId,
           coordinatorId
         );
-        this.infoDialogOwner = "Donor";
+        this.infoDialogOwner = 'Donor';
         this.infoDialogOwnerName = this.donorName;
         this.infoDialogOwnerEmail = this.donorEmail;
         this.infoDialogOwnerPassword = password;
         this.$refs.donorForm.reset();
         this.infoDialog = true;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created a ${this.infoDialogOwner} account.`
         );
@@ -3255,7 +3731,7 @@ export default {
         this.$refs.regionForm.reset();
         this.showRegion = false;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created ${region.name} region.`
         );
@@ -3268,14 +3744,14 @@ export default {
     async zoneSave() {
       if (this.$refs.zoneForm.validate()) {
         const region = this.regionOptions.filter(
-          region => region.name === this.zoneRegion
+          (region) => region.name === this.zoneRegion
         );
         const regionId = region[0].id;
         const zone = await this.createZone(this.zoneName, regionId);
         this.$refs.zoneForm.reset();
         this.showZone = false;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created ${zone.name} zone.`
         );
@@ -3288,7 +3764,7 @@ export default {
     async districtSave() {
       if (this.$refs.districtForm.validate()) {
         const zone = this.zoneOptions.filter(
-          zone => zone.name === this.districtZone
+          (zone) => zone.name === this.districtZone
         );
         const zoneId = zone[0].id;
 
@@ -3296,7 +3772,7 @@ export default {
         this.$refs.districtForm.reset();
         this.showDistrict = false;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created ${district.name} district.`
         );
@@ -3311,7 +3787,7 @@ export default {
         let districtId = undefined;
         if (this.villageDistrict) {
           const district = this.districts.filter(
-            district => district.name === this.villageDistrict
+            (district) => district.name === this.villageDistrict
           );
           districtId = district[0].id;
         }
@@ -3320,7 +3796,7 @@ export default {
         this.$refs.villageForm.reset();
         this.showPeasantAssociation = false;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created ${village.name} village.`
         );
@@ -3332,13 +3808,13 @@ export default {
     },
     async socialWorkerSave() {
       if (this.$refs.socialWorkerForm.validate()) {
-        const nameSplit = this.socialWorkerFullName.split(" ");
+        const nameSplit = this.socialWorkerFullName.split(' ');
         const firstName = nameSplit[0];
         const middleName = nameSplit[1];
         const lastName = nameSplit[2];
-        const password = `${lastName}${this.socialWorkerEmail.split("@")[0]}`;
+        const password = `${lastName}${this.socialWorkerEmail.split('@')[0]}`;
         const user = await this.registerUser(
-          "SocialWorker",
+          'SocialWorker',
           this.socialWorkerEmail,
           password
         );
@@ -3350,16 +3826,16 @@ export default {
         const socialWorkerStartDate = new Date().toISOString();
 
         const district = this.districts.filter(
-          district => district.name === this.socialWorkerDistrict
+          (district) => district.name === this.socialWorkerDistrict
         );
-        const districtIds = district.map(val => parseInt(val.id));
+        const districtIds = district.map((val) => parseInt(val.id));
 
-        const villages = this.socialWorkerVillageOptions.filter(village => {
+        const villages = this.socialWorkerVillageOptions.filter((village) => {
           for (const vlg of this.socialWorkerVillages) {
             return vlg === village.name;
           }
         });
-        const villageIds = villages.map(val => val.id);
+        const villageIds = villages.map((val) => val.id);
         console.log(this.socialWorkerVillages);
         console.log(villageIds);
 
@@ -3375,7 +3851,7 @@ export default {
           districtIds,
           villageIds
         );
-        this.infoDialogOwner = "Social Worker";
+        this.infoDialogOwner = 'Social Worker';
         this.infoDialogOwnerName = `${firstName} ${middleName} ${lastName}`;
         this.infoDialogOwnerEmail = this.socialWorkerEmail;
         this.infoDialogOwnerPassword = password;
@@ -3383,7 +3859,7 @@ export default {
         this.infoDialog = true;
         this.showSocialWorker = false;
         this.SET_SNACKBAR(true);
-        this.SET_SNACKBAR_COLOR("success");
+        this.SET_SNACKBAR_COLOR('success');
         this.SET_SNACKBAR_TEXT(
           `You have successfully created a ${this.infoDialogOwner} account.`
         );
@@ -3398,7 +3874,7 @@ export default {
     initializeDistrictTable() {
       if (this.districtTable.length > 0) this.districtTable.length = 0;
       axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                     allDistricts {
                       id
@@ -3418,17 +3894,17 @@ export default {
                     }
                   }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.allDistricts;
         })
-        .then(res => this.districtTable.push(...res))
-        .catch(err => {
+        .then((res) => this.districtTable.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
@@ -3438,7 +3914,7 @@ export default {
       return (
         axios
           .post(
-            "/graphql/",
+            '/graphql/',
             {
               query: `query {
                   allRegions {
@@ -3458,17 +3934,17 @@ export default {
             // }
           )
           // .then((res) => console.log(res))
-          .then(res => {
+          .then((res) => {
             if (res.data.errors?.length)
               throw new Error(res.data.errors[0].message.message);
             return res.data.data.allRegions;
           })
-          .then(res => this.regionTable.push(...res))
-          .catch(err => {
+          .then((res) => this.regionTable.push(...res))
+          .catch((err) => {
             this.SET_SNACKBAR(true);
-            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_COLOR('error');
             this.SET_SNACKBAR_TEXT(
-              "Server error. Reload the page and try again."
+              'Server error. Reload the page and try again.'
             );
             console.error(err);
           })
@@ -3477,7 +3953,7 @@ export default {
     initializeZoneTable() {
       if (this.zoneTable.length > 0) this.zoneTable.length = 0;
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allZones {
                     id
@@ -3491,17 +3967,17 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.allZones;
         })
-        .then(res => this.zoneTable.push(...res))
-        .catch(err => {
+        .then((res) => this.zoneTable.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
@@ -3510,7 +3986,7 @@ export default {
       if (this.villageTable.length > 0) this.villageTable.length = 0;
       return (
         axios
-          .post("/graphql", {
+          .post('/graphql', {
             query: `query {
                   allVillages {
                     id
@@ -3531,17 +4007,17 @@ export default {
                 }`
           })
           // .then(res => console.log("villages", res))
-          .then(res => {
+          .then((res) => {
             if (res.data.errors?.length)
               throw new Error(res.data.errors[0].message.message);
             return res.data.data.allVillages;
           })
-          .then(res => this.villageTable.push(...res))
-          .catch(err => {
+          .then((res) => this.villageTable.push(...res))
+          .catch((err) => {
             this.SET_SNACKBAR(true);
-            this.SET_SNACKBAR_COLOR("error");
+            this.SET_SNACKBAR_COLOR('error');
             this.SET_SNACKBAR_TEXT(
-              "Server error. Reload the page and try again."
+              'Server error. Reload the page and try again.'
             );
             console.error(err);
           })
@@ -3592,7 +4068,7 @@ export default {
       return item.name;
     },
     getZoneTableRegion(item) {
-      if (item.region === null) return "";
+      if (item.region === null) return '';
       return item.region.name;
     },
     getZoneTableNumberOfDistricts(item) {
@@ -3606,21 +4082,27 @@ export default {
       return item.name;
     },
     getVillageTableDistrict(item) {
-      if (item.district === null) return "";
+      if (item.district === null) return '';
       return item.district.name;
     },
     getVillageTableSocialWorker(item) {
-      if (item.socialWorker === null) return "N/A";
+      if (item.socialWorker === null) return 'N/A';
       return (
         item.socialWorker.firstName +
-        " " +
+        ' ' +
         item.socialWorker.middleName +
-        " " +
+        ' ' +
         item.socialWorker.lastName
       );
     },
     getVillageTableNumberOfOrphans(item) {
       return item.orphans.length;
+    },
+    projectStartDateSave(date) {
+      this.$refs.projectStartDateMenu.save(date);
+    },
+    toggleProjectProposalDialog() {
+      this.projectProposalDialog = !this.projectProposalDialog;
     },
     // custom search function based on selected columns
     // TODO: do MultipleFilter
@@ -3648,7 +4130,7 @@ export default {
         } else {
           return (
             item.name != null &&
-            typeof item.name === "string" &&
+            typeof item.name === 'string' &&
             item.name
               .toString()
               .toLowerCase()
@@ -3681,7 +4163,7 @@ export default {
         } else {
           return (
             item.name != null &&
-            typeof item.name === "string" &&
+            typeof item.name === 'string' &&
             item.name
               .toString()
               .toLowerCase()
@@ -3691,7 +4173,7 @@ export default {
       }
     },
     searchDistrictTableFilter(value, search, item) {
-      console.log("Value: " + value);
+      console.log('Value: ' + value);
       if (search.length > 0) {
         if (this.districtTableFilterValue.length > 0) {
           for (const filterVal of this.districtTableFilterValue) {
@@ -3728,7 +4210,7 @@ export default {
         } else {
           return (
             item.name != null &&
-            typeof item.name === "string" &&
+            typeof item.name === 'string' &&
             item.name
               .toString()
               .toLowerCase()
@@ -3770,7 +4252,7 @@ export default {
         } else {
           return (
             item.name != null &&
-            typeof item.name === "string" &&
+            typeof item.name === 'string' &&
             item.name
               .toString()
               .toLowerCase()
@@ -3876,7 +4358,7 @@ export default {
     },
     async fetchDonors(item) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                 getAllDonors {
                   id
@@ -3903,24 +4385,24 @@ export default {
                 }
               }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.getAllDonors;
         })
-        .then(res => item.children.push(...res))
-        .catch(err => {
+        .then((res) => item.children.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async fetchCoordinators(item) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allCoordinators {
                     id
@@ -3939,24 +4421,24 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.allCoordinators;
         })
-        .then(res => item.children.push(...res))
-        .catch(err => {
+        .then((res) => item.children.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
     },
     async fetchSocialWorkers(item) {
       return axios
-        .post("/graphql/", {
+        .post('/graphql/', {
           query: `query {
                   allSocialWorkers {
                     id
@@ -3982,17 +4464,17 @@ export default {
                   }
                 }`
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.errors?.length)
             throw new Error(res.data.errors[0].message.message);
           return res.data.data.allSocialWorkers;
         })
-        .then(res => item.children.push(...res))
-        .catch(err => {
+        .then((res) => item.children.push(...res))
+        .catch((err) => {
           this.SET_SNACKBAR(true);
-          this.SET_SNACKBAR_COLOR("error");
+          this.SET_SNACKBAR_COLOR('error');
           this.SET_SNACKBAR_TEXT(
-            "Server error. Reload the page and try again."
+            'Server error. Reload the page and try again.'
           );
           console.error(err);
         });
